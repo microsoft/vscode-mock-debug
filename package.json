@@ -1,0 +1,24 @@
+{
+  "name": "opendebug-mock",
+  "version": "1.0.0",
+  "description": "Visual Studio Code 'mock' debug adapter",
+  "author": {
+    "name": "Microsoft Corporation"
+  },
+  "main": "mock/openDebugMock.js",
+  "private": true,
+  "dependencies": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://monacotools.visualstudio.com/DefaultCollection/Monaco/_git/opendebug-node"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-util": "^3.0.5",
+    "gulp-tsb": "git://github.com/jrieken/gulp-tsb.git#bbf53f1d4b503b9080f8c300208b3ffa829a12c7",
+    "git-rev-sync": "*",
+    "del": "*",
+    "run-sequence": "*"
+  }
+}

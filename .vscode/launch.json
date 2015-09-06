@@ -1,0 +1,20 @@
+{
+	"version": "0.1.0",
+	"configurations": [
+		{
+			"name": "opendebug-mock",
+			"type": "node",
+			"program": "./out/mock/openDebugMock.js",
+			"stopOnEntry": false,
+			"args": [ "--server=4711" ],
+			"sourceMaps": false,
+			"outDir": "out"
+		},
+		{
+			"name": "mock test",
+			"type": "mock",
+			"program": "./mock/test.cs",
+			"stopOnEntry": true
+		}
+	]
+}
