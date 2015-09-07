@@ -5,13 +5,13 @@
   "author": {
     "name": "Microsoft Corporation"
   },
-  "main": "mock/openDebugMock.js",
+  "main": "plugins/vs.debug.mock/mock/openDebugMock.js",
   "private": true,
   "dependencies": {
   },
   "repository": {
     "type": "git",
-    "url": "https://monacotools.visualstudio.com/DefaultCollection/Monaco/_git/opendebug-node"
+    "url": "https://monacotools.visualstudio.com/DefaultCollection/Monaco/_git/opendebug-mock"
   },
   "devDependencies": {
     "gulp": "^3.9.0",
