@@ -12,7 +12,7 @@ To run it, just create a launch config of type "mock" and specify any text file 
         {
             "name": "Mock",
 			"type": "mock",
-            "program": "test.cs"
+            "program": "readme.md"
         },
 
 If you want to be able to set breakpoints in that file use one of the extensions ".cs", ".js", or ".ts"
