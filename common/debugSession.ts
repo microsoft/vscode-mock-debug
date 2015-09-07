@@ -3,7 +3,6 @@
  *--------------------------------------------------------*/
 
 import {V8Protocol, Response, Event} from './v8Protocol';
-import * as Utils from './utilities';
 
 export class Source implements OpenDebugProtocol.Source {
 	name: string;
@@ -146,13 +145,13 @@ export class DebugSession extends V8Protocol {
 	protected sendErrorResponse(response: OpenDebugProtocol.Response, format: string, ...params: any[]): void {
 		response.success = false;
 		const args = [ `${response.command}: ${format}` ].concat(params);
-		response.message = Utils.formatPII.apply(null, args);
+		response.message = formatPII.apply(null, args);
 		this.sendResponse(response);
 	}
 
 	protected sendFErrorResponse(response: OpenDebugProtocol.Response, code: number, format: string, args?: any): void {
 
-		const message = Utils.formatPII(format, true, args);
+		const message = formatPII(format, true, args);
 
 		response.success = false;
 		response.message = `${response.command}: ${message}`;
@@ -333,4 +332,17 @@ export class DebugSession extends V8Protocol {
 		// TODO@AW
 		return path;
 	}
+}
+
+const _formatPIIRegexp = /{([^}]+)}/g;
+
+function formatPII(format:string, excludePII: boolean, args: {[key: string]: string}): string {
+	return format.replace(_formatPIIRegexp, function(match, paramName) {
+		if (excludePII && paramName.length > 0 && paramName[0] !== '_') {
+			return match;
+		}
+		return args[paramName] && args.hasOwnProperty(paramName) ?
+			args[paramName] :
+			match;
+	})
 }
