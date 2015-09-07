@@ -4,10 +4,9 @@
 
 import {DebugSession, InitializedEvent, TerminatedEvent, StoppedEvent, Thread, StackFrame, Scope, Source} from '../common/debugSession';
 import {Handles} from '../common/Handles';
-import {createServer} from 'net';
 import {readFileSync} from 'fs';
 import {basename} from 'path';
-import * as Net from 'net';
+
 
 class MockDebugSession extends DebugSession {
 
@@ -194,31 +193,4 @@ class MockDebugSession extends DebugSession {
 	}
 }
 
-// parse arguments
-let port = 0;
-const args = process.argv.slice(2);
-args.forEach(function (val, index, array) {
-	const portMatch = /^--server=(\d{4,5})$/.exec(val);
-	if (portMatch) {
-		port = parseInt(portMatch[1], 10);
-	}
-});
-
-// start session
-if (port > 0) {
-	console.error(`waiting for v8 protocol on port ${port}`);
-	Net.createServer((socket) => {
-		console.error('>> accepted connection from client');
-		socket.on('end', () => {
-			console.error('>> client connection closed\n');
-		});
-		new MockDebugSession(false, true).startDispatch(socket, socket);
-	}).listen(port);
-} else {
-	console.error("waiting for v8 protocol on stdin/stdout");
-	let session = new MockDebugSession(false);
-	process.on('SIGTERM', () => {
-		session.shutdown();
-  	});
-	session.startDispatch(process.stdin, process.stdout);
-}
+MockDebugSession.run();

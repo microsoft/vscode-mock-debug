@@ -3,6 +3,8 @@
  *--------------------------------------------------------*/
 
 import {V8Protocol, Response, Event} from './v8Protocol';
+import * as Net from 'net';
+
 
 export class Source implements OpenDebugProtocol.Source {
 	name: string;
@@ -120,7 +122,6 @@ export class DebugSession extends V8Protocol {
 	private _clientPathFormat: string;
 	private _isServer: boolean;
 
-
 	public constructor(debuggerLinesStartAt1: boolean, isServer: boolean = false) {
 		super();
 		this._debuggerLinesStartAt1 = debuggerLinesStartAt1;
@@ -132,6 +133,45 @@ export class DebugSession extends V8Protocol {
 		this.on('error', (error) => {
 			this.shutdown();
 		});
+	}
+
+	/**
+	 * A virtual constructor...
+	 */
+	public static run() {
+
+		// parse arguments
+		let port = 0;
+		const args = process.argv.slice(2);
+		args.forEach(function (val, index, array) {
+			const portMatch = /^--server=(\d{4,5})$/.exec(val);
+			if (portMatch) {
+				port = parseInt(portMatch[1], 10);
+			}
+		});
+
+		if (port > 0) {
+			// start as a server
+			console.error(`waiting for v8 protocol on port ${port}`);
+			Net.createServer((socket) => {
+				console.error('>> accepted connection from client');
+				socket.on('end', () => {
+					console.error('>> client connection closed\n');
+				});
+				//new MockDebugSession(false, true).startDispatch(socket, socket);
+				this.prototype.constructor(false, true).startDispatch(socket, socket);
+			}).listen(port);
+		} else {
+
+			// start a session
+			console.error("waiting for v8 protocol on stdin/stdout");
+			let session = this.prototype.constructor(false);
+			//let session = new MockDebugSession(false);
+			process.on('SIGTERM', () => {
+				session.shutdown();
+			});
+			session.startDispatch(process.stdin, process.stdout);
+		}
 	}
 
 	public shutdown(): void {
