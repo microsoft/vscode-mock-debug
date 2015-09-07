@@ -1,0 +1,12 @@
+{
+	"pluginId": "vs.debug.mock",
+	"contributes": {
+		"debugAdapter": [{
+			"type": "mock",
+			"languageIdsForBreakpoints": ["markdown"],
+			"program": "./debugAdapter/out/openDebugMock.js",
+			"runtime": "node",
+			"runtimeArgs": ["--harmony"]
+		}]
+	}
+}
