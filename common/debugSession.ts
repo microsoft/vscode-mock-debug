@@ -138,7 +138,7 @@ export class DebugSession extends V8Protocol {
 	/**
 	 * A virtual constructor...
 	 */
-	public static run() {
+	public static run(debugSession: typeof DebugSession) {
 
 		// parse arguments
 		let port = 0;
@@ -159,13 +159,13 @@ export class DebugSession extends V8Protocol {
 					console.error('>> client connection closed\n');
 				});
 				//new MockDebugSession(false, true).startDispatch(socket, socket);
-				this.prototype.constructor(false, true).startDispatch(socket, socket);
+				new debugSession(false, true).startDispatch(socket, socket);
 			}).listen(port);
 		} else {
 
 			// start a session
 			console.error("waiting for v8 protocol on stdin/stdout");
-			let session = this.prototype.constructor(false);
+			let session = new debugSession(false);
 			//let session = new MockDebugSession(false);
 			process.on('SIGTERM', () => {
 				session.shutdown();

@@ -193,4 +193,4 @@ class MockDebugSession extends DebugSession {
 	}
 }
 
-MockDebugSession.run();
+DebugSession.run(MockDebugSession);
