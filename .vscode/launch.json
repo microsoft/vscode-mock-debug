@@ -1,14 +1,13 @@
 {
 	"version": "0.1.0",
-	"opendDebug": "server=4711",
 	"configurations": [
 		{
 			"name": "opendebug-mock",
 			"type": "node",
-			"program": "./mock/openDebugMock.ts",
+			"program": "./plugins/vs.debug.mock/debugAdapter/mock/openDebugMock.js",
 			"stopOnEntry": true,
 			"args": [ "--server=4711" ],
-			"sourceMaps": true,
+			"sourceMaps": false,
 			"outDir": "plugins/vs.debug.mock/debugAdapter"
 		},
 		{
