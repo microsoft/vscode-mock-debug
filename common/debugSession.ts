@@ -183,14 +183,7 @@ export class DebugSession extends V8Protocol {
 		}
 	}
 
-	protected sendErrorResponse(response: OpenDebugProtocol.Response, format: string, ...params: any[]): void {
-		response.success = false;
-		const args = [ `${response.command}: ${format}` ].concat(params);
-		response.message = formatPII.apply(null, args);
-		this.sendResponse(response);
-	}
-
-	protected sendFErrorResponse(response: OpenDebugProtocol.Response, code: number, format: string, args?: any): void {
+	protected sendErrorResponse(response: OpenDebugProtocol.Response, code: number, format: string, args?: any): void {
 
 		const message = formatPII(format, true, args);
 
@@ -267,10 +260,10 @@ export class DebugSession extends V8Protocol {
 				this.evaluateRequest(<OpenDebugProtocol.EvaluateResponse> response, <OpenDebugProtocol.EvaluateArguments> request.arguments);
 
 			} else {
-				this.sendErrorResponse(response, "unhandled request");
+				this.sendErrorResponse(response, 1014, "unrecognized request");
 			}
 		} catch (e) {
-			this.sendErrorResponse(response, "exception: {0}", e);
+			this.sendErrorResponse(response, 1104, "exception while processing request (exception: {_exception})", { _exception: e.message });
 		}
 	}
 
@@ -377,6 +370,9 @@ export class DebugSession extends V8Protocol {
 
 const _formatPIIRegexp = /{([^}]+)}/g;
 
+/*
+ * If argument starts with '_' it is OK to send its value to telemetry.
+ */
 function formatPII(format:string, excludePII: boolean, args: {[key: string]: string}): string {
 	return format.replace(_formatPIIRegexp, function(match, paramName) {
 		if (excludePII && paramName.length > 0 && paramName[0] !== '_') {
