@@ -4,11 +4,11 @@
 		{
 			"name": "opendebug-mock",
 			"type": "node",
-			"program": "./plugins/vs.debug.mock/debugAdapter/mock/openDebugMock.js",
+			"program": "./extensions/debug-mock/debugAdapter/mock/openDebugMock.js",
 			"stopOnEntry": true,
 			"args": [ "--server=4711" ],
-			"sourceMaps": false,
-			"outDir": "plugins/vs.debug.mock/debugAdapter"
+			"sourceMaps": true,
+			"outDir": "./extensions/debug-mock/debugAdapter"
 		},
 		{
 			"name": "mock test",

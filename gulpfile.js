@@ -17,7 +17,7 @@ var sources = [
 	'typings/**/*.ts'
 ];
 
-var dest = 'plugins/vs.debug.mock/debugAdapter';
+var dest = 'extensions/debug-mock/debugAdapter';
 
 gulp.task('default', function(callback) {
 	runSequence('clean', 'build', callback);
@@ -30,7 +30,7 @@ gulp.task('build', function() {
 });
 
 gulp.task('clean', function() {
-	return del('./plugins/vs.debug.mock/debugAdapter');
+	return del('./extensions/debug-mock/debugAdapter');
 })
 
 gulp.task('ts-watch', ['build'], function(cb) {

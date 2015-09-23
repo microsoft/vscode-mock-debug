@@ -3,7 +3,7 @@
  *--------------------------------------------------------*/
 
 import {DebugSession, InitializedEvent, TerminatedEvent, StoppedEvent, Thread, StackFrame, Scope, Source} from '../common/debugSession';
-import {Handles} from '../common/Handles';
+import {Handles} from '../common/handles';
 import {readFileSync} from 'fs';
 import {basename} from 'path';
 
@@ -175,7 +175,7 @@ class MockDebugSession extends DebugSession {
 	}
 
 	protected nextRequest(response: OpenDebugProtocol.NextResponse): void {
-		
+
 		for (var ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
 			if (this._sourceLines[ln].trim().length > 0) {   // find next non-empty line
 				this._currentLine = ln;

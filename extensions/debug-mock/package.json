@@ -1,12 +1,13 @@
 {
-	"pluginId": "vs.debug.mock",
+	"pluginId": "debug-mock",
+	"version": "0.1.0",
+	"engines": { "vscode": "*" },
 	"contributes": {
 		"debugAdapter": [{
 			"type": "mock",
 			"enableBreakpointsFor": { "languageIds": ["markdown"] },
 			"program": "./debugAdapter/mock/openDebugMock.js",
-			"runtime": "node",
-			"runtimeArgs": ["--harmony"]
+			"runtime": "node"
 		}]
 	}
 }
