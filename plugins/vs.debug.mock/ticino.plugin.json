@@ -3,7 +3,7 @@
 	"contributes": {
 		"debugAdapter": [{
 			"type": "mock",
-			"languageIdsForBreakpoints": ["markdown"],
+			"enableBreakpointsFor": { "languageIds": ["markdown"] },
 			"program": "./debugAdapter/mock/openDebugMock.js",
 			"runtime": "node",
 			"runtimeArgs": ["--harmony"]
