@@ -4,6 +4,8 @@
 		{
 			"name": "opendebug-mock",
 			"type": "node",
+			//"runtimeExecutable": "/usr/local/bin/iojs",
+			"runtimeArgs": ["--harmony"],
 			"program": "./extensions/debug-mock/debugAdapter/mock/openDebugMock.js",
 			"stopOnEntry": true,
 			"args": [ "--server=4711" ],
