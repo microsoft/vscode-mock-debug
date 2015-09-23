@@ -10,11 +10,14 @@ import {basename} from 'path';
 
 class MockDebugSession extends DebugSession {
 
+	private static THREAD_ID = 1;
+
 	private _sourceFile: string;
 	private _currentLine: number;
 	private _sourceLines: string[];
 	private _breakPoints: any;
 	private _variableHandles: Handles<string>;
+
 
 	public constructor(debuggerLinesStartAt1: boolean, isServer: boolean = false) {
 		super(debuggerLinesStartAt1, isServer);
@@ -26,8 +29,9 @@ class MockDebugSession extends DebugSession {
 	}
 
 	protected initializeRequest(response: OpenDebugProtocol.InitializeResponse, args: OpenDebugProtocol.InitializeRequestArguments): void {
-		// give UI a chance to set breakpoints
 		this.sendResponse(response);
+
+		// now we are ready to accept breakpoints -> fire the initialized event to give UI a chance to set breakpoints
 		this.sendEvent(new InitializedEvent());
 	}
 
@@ -38,7 +42,7 @@ class MockDebugSession extends DebugSession {
 		if (args.stopOnEntry) {
 			this._currentLine = 0;
 			this.sendResponse(response);
-			this.sendEvent(new StoppedEvent("entry", 4711));
+			this.sendEvent(new StoppedEvent("entry", MockDebugSession.THREAD_ID));
 		} else {
 			this.continueRequest(response);
 		}
@@ -78,9 +82,10 @@ class MockDebugSession extends DebugSession {
 	}
 
 	protected threadsRequest(response: OpenDebugProtocol.ThreadsResponse): void {
+
 		response.body = {
 			threads: [
-				new Thread(4711, "thread 1")
+				new Thread(MockDebugSession.THREAD_ID, "thread 1")
 			]
 		};
 		this.sendResponse(response);
@@ -101,16 +106,10 @@ class MockDebugSession extends DebugSession {
 	protected scopesRequest(response: OpenDebugProtocol.ScopesResponse, args: OpenDebugProtocol.ScopesArguments): void {
 
 		const frameReference = args.frameId;
-		//const frame = this._frameHandles.get(frameReference);
-		//const frameIx = frame.index;
-		//const frameThis = this.getValueFromCache(frame.receiver);
-		var i = frameReference;
-
 		var scopes = new Array<Scope>();
-
-		scopes.push(new Scope("Local", this._variableHandles.create("local_" + i), false));
-		scopes.push(new Scope("Closure", this._variableHandles.create("closure_" + i), false));
-		scopes.push(new Scope("Global", this._variableHandles.create("global_" + i), true));
+		scopes.push(new Scope("Local", this._variableHandles.create("local_" + frameReference), false));
+		scopes.push(new Scope("Closure", this._variableHandles.create("closure_" + frameReference), false));
+		scopes.push(new Scope("Global", this._variableHandles.create("global_" + frameReference), true));
 
 		response.body = {
 			scopes: scopes
@@ -119,6 +118,7 @@ class MockDebugSession extends DebugSession {
 	}
 
 	protected variablesRequest(response: OpenDebugProtocol.VariablesResponse, args: OpenDebugProtocol.VariablesArguments): void {
+
 		var variables = [];
 		var id = this._variableHandles.get(args.variablesReference);
 		if (id != null) {
@@ -151,20 +151,21 @@ class MockDebugSession extends DebugSession {
 	}
 
 	protected continueRequest(response: OpenDebugProtocol.ContinueResponse): void {
+
 		var lines = this._breakPoints[this._sourceFile];
 		for (var ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
 			// is breakpoint on this line?
 			if (lines && lines.indexOf(ln) >= 0) {
 				this._currentLine = ln;
 				this.sendResponse(response);
-				this.sendEvent(new StoppedEvent("step", 4711));
+				this.sendEvent(new StoppedEvent("step", MockDebugSession.THREAD_ID));
 				return;
 			}
 			// if word 'exception' found in source -> throw exception
 			if (this._sourceLines[ln].indexOf("exception") >= 0) {
 				this._currentLine = ln;
 				this.sendResponse(response);
-				this.sendEvent(new StoppedEvent("exception", 4711));
+				this.sendEvent(new StoppedEvent("exception", MockDebugSession.THREAD_ID));
 				return;
 			}
 		}
@@ -174,11 +175,12 @@ class MockDebugSession extends DebugSession {
 	}
 
 	protected nextRequest(response: OpenDebugProtocol.NextResponse): void {
+		
 		for (var ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
 			if (this._sourceLines[ln].trim().length > 0) {   // find next non-empty line
 				this._currentLine = ln;
 				this.sendResponse(response);
-				this.sendEvent(new StoppedEvent("step", 4711));
+				this.sendEvent(new StoppedEvent("step", MockDebugSession.THREAD_ID));
 				return;
 			}
 		}
