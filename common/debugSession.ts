@@ -158,7 +158,6 @@ export class DebugSession extends V8Protocol {
 				socket.on('end', () => {
 					console.error('>> client connection closed\n');
 				});
-				//new MockDebugSession(false, true).startDispatch(socket, socket);
 				new debugSession(false, true).startDispatch(socket, socket);
 			}).listen(port);
 		} else {
@@ -166,7 +165,6 @@ export class DebugSession extends V8Protocol {
 			// start a session
 			console.error("waiting for v8 protocol on stdin/stdout");
 			let session = new debugSession(false);
-			//let session = new MockDebugSession(false);
 			process.on('SIGTERM', () => {
 				session.shutdown();
 			});
@@ -178,7 +176,10 @@ export class DebugSession extends V8Protocol {
 		if (this._isServer) {
 			console.error('process.exit ignored in server mode');
 		} else {
-			process.exit(0);
+			// wait a bit before shutting down
+			setTimeout(() => {
+				process.exit(0);
+			}, 100);
 		}
 	}
 
@@ -224,7 +225,7 @@ export class DebugSession extends V8Protocol {
 				this.attachRequest(<OpenDebugProtocol.AttachResponse> response, <OpenDebugProtocol.AttachRequestArguments> request.arguments);
 
 			} else if (request.command === 'disconnect') {
-				this.disconnectRequest(<OpenDebugProtocol.DisconnectResponse> response);
+				this.disconnectRequest(<OpenDebugProtocol.DisconnectResponse> response, <OpenDebugProtocol.DisconnectArguments> request.arguments);
 
 			} else if (request.command === 'setBreakpoints') {
 				this.setBreakPointsRequest(<OpenDebugProtocol.SetBreakpointsResponse> response, <OpenDebugProtocol.SetBreakpointsArguments> request.arguments);
@@ -277,7 +278,7 @@ export class DebugSession extends V8Protocol {
 		this.sendResponse(response);
 	}
 
-	protected disconnectRequest(response: OpenDebugProtocol.DisconnectResponse): void {
+	protected disconnectRequest(response: OpenDebugProtocol.DisconnectResponse, args: OpenDebugProtocol.DisconnectArguments): void {
 		this.sendResponse(response);
 		this.shutdown();
 	}
