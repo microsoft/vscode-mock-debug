@@ -1,5 +1,5 @@
 {
-	"pluginId": "debug-mock",
+	"pluginId": "mock-debug",
 	"version": "0.1.0",
 	"engines": { "vscode": "*" },
 	"contributes": {

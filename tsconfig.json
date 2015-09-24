@@ -6,6 +6,6 @@
         "preserveConstEnums": true,
 		"target": "es5",
         "sourceMap": true,
-		"outDir": "extensions/debug-mock/debugAdapter"
+		"outDir": "extensions/mock-debug/debugAdapter"
 	}
 }
