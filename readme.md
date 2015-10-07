@@ -17,7 +17,7 @@ To run it, just create a `launch.config` of type "mock" and specify any text fil
             "name": "Mock",
 			"type": "mock",
             "program": "readme.md"
-        },
+        }
 ```
 
 ## Breakpoints
