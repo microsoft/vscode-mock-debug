@@ -4,13 +4,12 @@
 		{
 			"name": "opendebug-mock",
 			"type": "node",
-			//"runtimeExecutable": "/usr/local/bin/iojs",
 			"runtimeArgs": ["--harmony"],
-			"program": "./extensions/debug-mock/debugAdapter/mock/openDebugMock.js",
-			"stopOnEntry": true,
+			"program": "./mock/openDebugMock.ts",
+			"stopOnEntry": false,
 			"args": [ "--server=4711" ],
 			"sourceMaps": true,
-			"outDir": "./extensions/debug-mock/debugAdapter"
+			"outDir": "./extensions/mock-debug/debugAdapter"
 		},
 		{
 			"name": "mock test",
