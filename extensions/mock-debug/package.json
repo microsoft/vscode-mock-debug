@@ -1,7 +1,8 @@
 {
 	"name": "mock-debug",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"publisher": "vscode",
+	"description": "Starter extension for developing debug adapters for VSCode.",
 	"engines": { "vscode": "*" },
 	"contributes": {
 		"debugAdapter": [{
