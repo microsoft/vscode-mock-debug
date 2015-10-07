@@ -401,6 +401,10 @@ declare module OpenDebugProtocol {
 		format: string;
 		/** An object used as a dictionary for looking up the variables in the format string. */
 		variables?: { [key: string]: string };
+		/** if true send to telemetry (Experimental) */
+		sendTelemetry?: boolean;
+		/** if true show user (Experimental) */
+		showUser?: boolean;
 	}
 
 	/** A Thread */

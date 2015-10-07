@@ -113,6 +113,10 @@ export class TerminatedEvent extends Event implements OpenDebugProtocol.Terminat
 	}
 }
 
+export enum ErrorDestination {
+	User = 1,
+	Telemetry = 2
+};
 
 export class DebugSession extends V8Protocol {
 
@@ -158,7 +162,7 @@ export class DebugSession extends V8Protocol {
 				socket.on('end', () => {
 					console.error('>> client connection closed\n');
 				});
-				new debugSession(false, true).startDispatch(socket, socket);
+				new debugSession(false, true).start(socket, socket);
 			}).listen(port);
 		} else {
 
@@ -168,7 +172,7 @@ export class DebugSession extends V8Protocol {
 			process.on('SIGTERM', () => {
 				session.shutdown();
 			});
-			session.startDispatch(process.stdin, process.stdout);
+			session.start(process.stdin, process.stdout);
 		}
 	}
 
@@ -183,7 +187,7 @@ export class DebugSession extends V8Protocol {
 		}
 	}
 
-	protected sendErrorResponse(response: OpenDebugProtocol.Response, code: number, format: string, args?: any): void {
+	protected sendErrorResponse(response: OpenDebugProtocol.Response, code: number, format: string, args?: any, dest: ErrorDestination = ErrorDestination.User): void {
 
 		const message = formatPII(format, true, args);
 
@@ -192,11 +196,21 @@ export class DebugSession extends V8Protocol {
 		if (!response.body) {
 			response.body = {};
 		}
-		response.body.error = <OpenDebugProtocol.Message> {
+		const msg = <OpenDebugProtocol.Message> {
 			id: code,
-			format: format,
-			variables: args
+			format: format
 		};
+		if (args) {
+			msg.variables = args;
+		}
+		if (dest & ErrorDestination.User) {
+			msg.showUser = true;
+		}
+		if (dest & ErrorDestination.Telemetry) {
+			msg.sendTelemetry = true;
+		}
+		response.body.error = msg;
+
 		this.sendResponse(response);
 	}
 
@@ -260,10 +274,10 @@ export class DebugSession extends V8Protocol {
 				this.evaluateRequest(<OpenDebugProtocol.EvaluateResponse> response, <OpenDebugProtocol.EvaluateArguments> request.arguments);
 
 			} else {
-				this.sendErrorResponse(response, 1014, "unrecognized request");
+				this.sendErrorResponse(response, 1014, "unrecognized request", null, ErrorDestination.Telemetry);
 			}
 		} catch (e) {
-			this.sendErrorResponse(response, 1104, "exception while processing request (exception: {_exception})", { _exception: e.message });
+			this.sendErrorResponse(response, 1104, "exception while processing request (exception: {_exception})", { _exception: e.message }, ErrorDestination.Telemetry);
 		}
 	}
 
