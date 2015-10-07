@@ -10,6 +10,7 @@ import {basename} from 'path';
 
 class MockDebugSession extends DebugSession {
 
+	// we don't support multiple threads, so we can use a hardcoded ID for the default thread
 	private static THREAD_ID = 1;
 
 	private _sourceFile: string;
@@ -42,8 +43,11 @@ class MockDebugSession extends DebugSession {
 		if (args.stopOnEntry) {
 			this._currentLine = 0;
 			this.sendResponse(response);
+
+			// we stop on the first line
 			this.sendEvent(new StoppedEvent("entry", MockDebugSession.THREAD_ID));
 		} else {
+			// we just start to run until we hit a breakpoint or an exception
 			this.continueRequest(response);
 		}
 	}
@@ -64,17 +68,20 @@ class MockDebugSession extends DebugSession {
 			var l = this.convertClientLineToDebugger(clientLines[i]);
 			var verified = false;
 			if (l < lines.length) {
-				if (lines[l].indexOf("+") == 0)   // if lines start with '+' we move breakpoint down
+				// if a line starts with '+' we don't allow to set a breakpoint but move the breakpoint down
+				if (lines[l].indexOf("+") == 0)
 					l++;
-				if (lines[l].indexOf("-") == 0)   // if lines start with '-' we move breakpoint up
+				// if a line starts with '-' we don't allow to set a breakpoint but move the breakpoint up
+				if (lines[l].indexOf("-") == 0)
 					l--;
-				verified = true;    // all breakpoints with valid positions are verified
+				verified = true;    // this breakpoint has been validated
 			}
 			newPositions[i] = l;
 			breakpoints.push({ verified: verified, line: this.convertDebuggerLineToClient(l)});
 		}
 		this._breakPoints[path] = newPositions;
 
+		// send back the actual breakpoints
 		response.body = {
 			breakpoints: breakpoints
 		};
@@ -83,6 +90,7 @@ class MockDebugSession extends DebugSession {
 
 	protected threadsRequest(response: OpenDebugProtocol.ThreadsResponse): void {
 
+		// return the default thread
 		response.body = {
 			threads: [
 				new Thread(MockDebugSession.THREAD_ID, "thread 1")
@@ -93,9 +101,13 @@ class MockDebugSession extends DebugSession {
 
 	protected stackTraceRequest(response: OpenDebugProtocol.StackTraceResponse, args: OpenDebugProtocol.StackTraceArguments): void {
 
-		var frames = new Array<StackFrame>();
-		for (var i= 0; i < 3; i++) {
-			frames.push(new StackFrame(i, "frame " + i, new Source(basename(this._sourceFile), this.convertDebuggerPathToClient(this._sourceFile)), this.convertDebuggerLineToClient(this._currentLine), 0));
+		const frames = new Array<StackFrame>();
+		const words = this._sourceLines[this._currentLine].trim().split(/\s+/);
+		// create three fake stack frames.
+		for (let i= 0; i < 3; i++) {
+			// use a word of the line as the stackframe name
+			const name = words.length > i ? words[i] : "frame";
+			frames.push(new StackFrame(i, `${name}(${i})`, new Source(basename(this._sourceFile), this.convertDebuggerPathToClient(this._sourceFile)), this.convertDebuggerLineToClient(this._currentLine), 0));
 		}
 		response.body = {
 			stackFrames: frames
@@ -106,7 +118,7 @@ class MockDebugSession extends DebugSession {
 	protected scopesRequest(response: OpenDebugProtocol.ScopesResponse, args: OpenDebugProtocol.ScopesArguments): void {
 
 		const frameReference = args.frameId;
-		var scopes = new Array<Scope>();
+		const scopes = new Array<Scope>();
 		scopes.push(new Scope("Local", this._variableHandles.create("local_" + frameReference), false));
 		scopes.push(new Scope("Closure", this._variableHandles.create("closure_" + frameReference), false));
 		scopes.push(new Scope("Global", this._variableHandles.create("global_" + frameReference), true));
@@ -119,8 +131,8 @@ class MockDebugSession extends DebugSession {
 
 	protected variablesRequest(response: OpenDebugProtocol.VariablesResponse, args: OpenDebugProtocol.VariablesArguments): void {
 
-		var variables = [];
-		var id = this._variableHandles.get(args.variablesReference);
+		const variables = [];
+		const id = this._variableHandles.get(args.variablesReference);
 		if (id != null) {
 			variables.push({
 				name: id + "_i",
@@ -152,8 +164,8 @@ class MockDebugSession extends DebugSession {
 
 	protected continueRequest(response: OpenDebugProtocol.ContinueResponse): void {
 
-		var lines = this._breakPoints[this._sourceFile];
-		for (var ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
+		const lines = this._breakPoints[this._sourceFile];
+		for (let ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
 			// is breakpoint on this line?
 			if (lines && lines.indexOf(ln) >= 0) {
 				this._currentLine = ln;
@@ -176,7 +188,7 @@ class MockDebugSession extends DebugSession {
 
 	protected nextRequest(response: OpenDebugProtocol.NextResponse): void {
 
-		for (var ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
+		for (let ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
 			if (this._sourceLines[ln].trim().length > 0) {   // find next non-empty line
 				this._currentLine = ln;
 				this.sendResponse(response);
@@ -190,7 +202,10 @@ class MockDebugSession extends DebugSession {
 	}
 
 	protected evaluateRequest(response: OpenDebugProtocol.EvaluateResponse, args: OpenDebugProtocol.EvaluateArguments): void {
-		response.body = { result: "evaluate(" + args.expression + ")", variablesReference: 0 };
+		response.body = {
+			result: `evaluate(${args.expression})`,
+			variablesReference: 0
+		};
 		this.sendResponse(response);
 	}
 }
