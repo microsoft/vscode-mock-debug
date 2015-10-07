@@ -2,7 +2,7 @@
 	"version": "0.1.0",
 	"configurations": [
 		{
-			"name": "opendebug-mock",
+			"name": "mock-debug server",
 			"type": "node",
 			"runtimeArgs": ["--harmony"],
 			"program": "./mock/openDebugMock.ts",
