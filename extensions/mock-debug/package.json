@@ -2,13 +2,13 @@
 	"name": "mock-debug",
 	"version": "0.1.1",
 	"publisher": "vscode",
-	"description": "Starter extension for developing debug adapters for VSCode.",
+	"description": "Starter extension for developing debug adapters for VS Code.",
 	"engines": { "vscode": "*" },
 	"contributes": {
 		"debugAdapter": [{
 			"type": "mock",
 			"enableBreakpointsFor": { "languageIds": ["markdown"] },
-			"program": "./debugAdapter/mock/openDebugMock.js",
+			"program": "./debugAdapter/mock/mockDebug.js",
 			"runtime": "node"
 		}]
 	}

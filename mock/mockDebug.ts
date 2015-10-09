@@ -29,14 +29,14 @@ class MockDebugSession extends DebugSession {
 		this._variableHandles = new Handles<string>();
 	}
 
-	protected initializeRequest(response: OpenDebugProtocol.InitializeResponse, args: OpenDebugProtocol.InitializeRequestArguments): void {
+	protected initializeRequest(response: DebugProtocol.InitializeResponse, args: DebugProtocol.InitializeRequestArguments): void {
 		this.sendResponse(response);
 
 		// now we are ready to accept breakpoints -> fire the initialized event to give UI a chance to set breakpoints
 		this.sendEvent(new InitializedEvent());
 	}
 
-	protected launchRequest(response: OpenDebugProtocol.LaunchResponse, args: OpenDebugProtocol.LaunchRequestArguments): void {
+	protected launchRequest(response: DebugProtocol.LaunchResponse, args: DebugProtocol.LaunchRequestArguments): void {
 		this._sourceFile = args.program;
 		this._sourceLines = readFileSync(this._sourceFile).toString().split('\n');
 
@@ -52,7 +52,7 @@ class MockDebugSession extends DebugSession {
 		}
 	}
 
-	protected setBreakPointsRequest(response: OpenDebugProtocol.SetBreakpointsResponse, args: OpenDebugProtocol.SetBreakpointsArguments): void {
+	protected setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): void {
 
 		var path = args.source.path;
 		var clientLines = args.lines;
@@ -88,7 +88,7 @@ class MockDebugSession extends DebugSession {
 		this.sendResponse(response);
 	}
 
-	protected threadsRequest(response: OpenDebugProtocol.ThreadsResponse): void {
+	protected threadsRequest(response: DebugProtocol.ThreadsResponse): void {
 
 		// return the default thread
 		response.body = {
@@ -99,7 +99,7 @@ class MockDebugSession extends DebugSession {
 		this.sendResponse(response);
 	}
 
-	protected stackTraceRequest(response: OpenDebugProtocol.StackTraceResponse, args: OpenDebugProtocol.StackTraceArguments): void {
+	protected stackTraceRequest(response: DebugProtocol.StackTraceResponse, args: DebugProtocol.StackTraceArguments): void {
 
 		const frames = new Array<StackFrame>();
 		const words = this._sourceLines[this._currentLine].trim().split(/\s+/);
@@ -115,7 +115,7 @@ class MockDebugSession extends DebugSession {
 		this.sendResponse(response);
 	}
 
-	protected scopesRequest(response: OpenDebugProtocol.ScopesResponse, args: OpenDebugProtocol.ScopesArguments): void {
+	protected scopesRequest(response: DebugProtocol.ScopesResponse, args: DebugProtocol.ScopesArguments): void {
 
 		const frameReference = args.frameId;
 		const scopes = new Array<Scope>();
@@ -129,7 +129,7 @@ class MockDebugSession extends DebugSession {
 		this.sendResponse(response);
 	}
 
-	protected variablesRequest(response: OpenDebugProtocol.VariablesResponse, args: OpenDebugProtocol.VariablesArguments): void {
+	protected variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments): void {
 
 		const variables = [];
 		const id = this._variableHandles.get(args.variablesReference);
@@ -162,7 +162,7 @@ class MockDebugSession extends DebugSession {
 		this.sendResponse(response);
 	}
 
-	protected continueRequest(response: OpenDebugProtocol.ContinueResponse): void {
+	protected continueRequest(response: DebugProtocol.ContinueResponse): void {
 
 		const lines = this._breakPoints[this._sourceFile];
 		for (let ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
@@ -186,7 +186,7 @@ class MockDebugSession extends DebugSession {
 		this.sendEvent(new TerminatedEvent());
 	}
 
-	protected nextRequest(response: OpenDebugProtocol.NextResponse): void {
+	protected nextRequest(response: DebugProtocol.NextResponse): void {
 
 		for (let ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
 			if (this._sourceLines[ln].trim().length > 0) {   // find next non-empty line
@@ -201,7 +201,7 @@ class MockDebugSession extends DebugSession {
 		this.sendEvent(new TerminatedEvent());
 	}
 
-	protected evaluateRequest(response: OpenDebugProtocol.EvaluateResponse, args: OpenDebugProtocol.EvaluateArguments): void {
+	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
 		response.body = {
 			result: `evaluate(${args.expression})`,
 			variablesReference: 0

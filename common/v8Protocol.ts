@@ -4,7 +4,7 @@
 
 import * as ee from 'events';
 
-export class Message implements OpenDebugProtocol.V8Message {
+export class Message implements DebugProtocol.V8Message {
 	seq: number;
 	type: string;
 
@@ -14,12 +14,12 @@ export class Message implements OpenDebugProtocol.V8Message {
 	}
 }
 
-export class Response extends Message implements OpenDebugProtocol.Response {
+export class Response extends Message implements DebugProtocol.Response {
 	request_seq: number;
 	success: boolean;
 	command: string;
 
-	public constructor(request: OpenDebugProtocol.Request, message?: string) {
+	public constructor(request: DebugProtocol.Request, message?: string) {
 		super('response');
 		this.request_seq = request.seq;
 		this.command = request.command;
@@ -32,7 +32,7 @@ export class Response extends Message implements OpenDebugProtocol.Response {
 	}
 }
 
-export class Event extends Message implements OpenDebugProtocol.Event {
+export class Event extends Message implements DebugProtocol.Event {
 	event: string;
 
 	public constructor(event: string, body?: any) {
@@ -54,7 +54,7 @@ export class V8Protocol extends ee.EventEmitter {
 	private _res: any;
 	private _sequence: number;
 	private _writableStream: NodeJS.WritableStream;
-	private _pendingRequests = new Map<number, OpenDebugProtocol.Response>();
+	private _pendingRequests = new Map<number, DebugProtocol.Response>();
 
 	constructor() {
 		super();
@@ -88,9 +88,9 @@ export class V8Protocol extends ee.EventEmitter {
 		}
 	}
 
-	protected send(command: string, args: any, timeout: number = V8Protocol.TIMEOUT): Promise<OpenDebugProtocol.Response> {
+	protected send(command: string, args: any, timeout: number = V8Protocol.TIMEOUT): Promise<DebugProtocol.Response> {
 		return new Promise((completeDispatch, errorDispatch) => {
-			this._sendRequest(command, args, timeout, (result: OpenDebugProtocol.Response) => {
+			this._sendRequest(command, args, timeout, (result: DebugProtocol.Response) => {
 				if (result.success) {
 					completeDispatch(result);
 				} else {
@@ -100,11 +100,11 @@ export class V8Protocol extends ee.EventEmitter {
 		});
 	}
 
-	public sendEvent(event: OpenDebugProtocol.Event): void {
+	public sendEvent(event: DebugProtocol.Event): void {
 		this._send('event', event);
 	}
 
-	public sendResponse(response: OpenDebugProtocol.Response): void {
+	public sendResponse(response: DebugProtocol.Response): void {
 		if (response.seq > 0) {
 			console.error('attempt to send more than one response for command {0}', response.command);
 		} else {
@@ -114,12 +114,12 @@ export class V8Protocol extends ee.EventEmitter {
 
 	// ---- protected ----------------------------------------------------------
 
-	protected dispatchRequest(request: OpenDebugProtocol.Request): void {
+	protected dispatchRequest(request: DebugProtocol.Request): void {
 	}
 
 	// ---- private ------------------------------------------------------------
 
-	private _sendRequest(command: string, args: any, timeout: number, cb: (response: OpenDebugProtocol.Response) => void): void {
+	private _sendRequest(command: string, args: any, timeout: number, cb: (response: DebugProtocol.Response) => void): void {
 
 		const request: any = {
 			command: command
@@ -146,11 +146,11 @@ export class V8Protocol extends ee.EventEmitter {
 		}
 	}
 
-	private _emitEvent(event: OpenDebugProtocol.Event) {
+	private _emitEvent(event: DebugProtocol.Event) {
 		this.emit(event.event, event);
 	}
 
-	private _send(typ: string, message: OpenDebugProtocol.V8Message): void {
+	private _send(typ: string, message: DebugProtocol.V8Message): void {
 		message.type = typ;
 		message.seq = this._sequence++;
 		const json = JSON.stringify(message);
@@ -216,13 +216,13 @@ export class V8Protocol extends ee.EventEmitter {
 		}
 	}
 
-	private _dispatch(message: OpenDebugProtocol.V8Message): void {
+	private _dispatch(message: DebugProtocol.V8Message): void {
 		switch (message.type) {
 		case 'event':
-			this._emitEvent(<OpenDebugProtocol.Event> message);
+			this._emitEvent(<DebugProtocol.Event> message);
 			break;
 		case 'response':
-			const response = <OpenDebugProtocol.Response> message;
+			const response = <DebugProtocol.Response> message;
 			const clb = this._pendingRequests[response.request_seq];
 			if (clb) {
 				delete this._pendingRequests[response.request_seq];
@@ -230,7 +230,7 @@ export class V8Protocol extends ee.EventEmitter {
 			}
 			break;
 		case 'request':
-			this.dispatchRequest(<OpenDebugProtocol.Request> message);
+			this.dispatchRequest(<DebugProtocol.Request> message);
 			break;
 		default:
 			break;

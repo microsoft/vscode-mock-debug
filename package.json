@@ -1,17 +1,17 @@
 {
-  "name": "opendebug-mock",
+  "name": "mock-debug",
   "version": "1.0.0",
-  "description": "Visual Studio Code 'mock' debug adapter",
+  "description": "Starter extension for developing debug adapters for VS Code.",
   "author": {
     "name": "Microsoft Corporation"
   },
-  "main": "plugins/vs.debug.mock/mock/openDebugMock.js",
+  "main": "plugins/vs.debug.mock/mock/mockDebug.js",
   "private": true,
   "dependencies": {
   },
   "repository": {
     "type": "git",
-    "url": "https://monacotools.visualstudio.com/DefaultCollection/Monaco/_git/opendebug-mock"
+    "url": "https://monacotools.visualstudio.com/DefaultCollection/Monaco/_git/vscode-mock-debug.git"
   },
   "devDependencies": {
     "gulp": "^3.9.0",

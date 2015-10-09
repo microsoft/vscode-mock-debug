@@ -5,7 +5,7 @@
 			"name": "mock-debug server",
 			"type": "node",
 			"runtimeArgs": ["--harmony"],
-			"program": "./mock/openDebugMock.ts",
+			"program": "./mock/mockDebug.ts",
 			"stopOnEntry": false,
 			"args": [ "--server=4711" ],
 			"sourceMaps": true,
