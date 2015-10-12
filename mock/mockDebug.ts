@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {DebugSession, InitializedEvent, TerminatedEvent, StoppedEvent, Thread, StackFrame, Scope, Source} from '../common/debugSession';
+import {DebugSession, InitializedEvent, TerminatedEvent, StoppedEvent, OutputEvent, Thread, StackFrame, Scope, Source} from '../common/debugSession';
 import {Handles} from '../common/handles';
 import {readFileSync} from 'fs';
 import {basename} from 'path';
@@ -13,8 +13,16 @@ class MockDebugSession extends DebugSession {
 	// we don't support multiple threads, so we can use a hardcoded ID for the default thread
 	private static THREAD_ID = 1;
 
+	private __currentLine: number;
+	private get _currentLine() : number {
+        return this.__currentLine;
+    }
+	private set _currentLine(line: number) {
+        this.__currentLine = line;
+		this.sendEvent(new OutputEvent('line: ' + line));	// print current line on debug console
+    }
+
 	private _sourceFile: string;
-	private _currentLine: number;
 	private _sourceLines: string[];
 	private _breakPoints: any;
 	private _variableHandles: Handles<string>;
@@ -48,7 +56,7 @@ class MockDebugSession extends DebugSession {
 			this.sendEvent(new StoppedEvent("entry", MockDebugSession.THREAD_ID));
 		} else {
 			// we just start to run until we hit a breakpoint or an exception
-			this.continueRequest(response);
+			this.continueRequest(response, { threadId: MockDebugSession.THREAD_ID });
 		}
 	}
 
@@ -162,7 +170,7 @@ class MockDebugSession extends DebugSession {
 		this.sendResponse(response);
 	}
 
-	protected continueRequest(response: DebugProtocol.ContinueResponse): void {
+	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {
 
 		const lines = this._breakPoints[this._sourceFile];
 		for (let ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
@@ -186,7 +194,7 @@ class MockDebugSession extends DebugSession {
 		this.sendEvent(new TerminatedEvent());
 	}
 
-	protected nextRequest(response: DebugProtocol.NextResponse): void {
+	protected nextRequest(response: DebugProtocol.NextResponse, args: DebugProtocol.NextArguments): void {
 
 		for (let ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
 			if (this._sourceLines[ln].trim().length > 0) {   // find next non-empty line

@@ -48,13 +48,13 @@ declare module DebugProtocol {
 
 	//---- Events
 
-	/** Event message for "initialized" event types.
+	/** Event message for "initialized" event type.
 		The event indicates that the debugee is ready to accept SetBreakpoint calls.
 	*/
 	export interface InitializedEvent extends Event {
 	}
 
-	/** Event message for "stopped" event types.
+	/** Event message for "stopped" event type.
 		The event indicates that the execution of the debugee has stopped due to a break condition.
 		This can be caused by by a break point previously set, a stepping action has completed or by executing a debugger statement.
     */
@@ -69,7 +69,7 @@ declare module DebugProtocol {
 		};
 	}
 
-	/** Event message for "exited" event types.
+	/** Event message for "exited" event type.
 		The event indicates that the debugee has exited.
 	*/
 	export interface ExitedEvent extends Event {
@@ -86,7 +86,7 @@ declare module DebugProtocol {
 	export interface TerminatedEvent extends Event {
 	}
 
-	/** Event message for "thread" event types.
+	/** Event message for "thread" event type.
 		The event indicates that a thread has started or exited.
 	*/
 	export interface ThreadEvent extends Event {
@@ -95,6 +95,18 @@ declare module DebugProtocol {
 			reason: string;
 			/** The identifier of the thread. */
 			threadId: number;
+		};
+	}
+
+	/** Event message for "output" event type.
+		The event indicates that the target has produced output.
+	*/
+	export interface OutputEvent extends Event {
+		body: {
+			/** The category of output (such as: 'console', 'stdout', 'stderr'). If not specified, 'console' is assumed. */
+			category?: string;
+			/** The output */
+			output: string;
 		};
 	}
 
@@ -226,19 +238,31 @@ declare module DebugProtocol {
 	}
 
 	/** Continue request; value of command field is "continue".
-		he request starts the debuggee to run again.
+		The request starts the debuggee to run again.
 	*/
 	export interface ContinueRequest extends Request {
+		arguments: ContinueArguments;
+	}
+	/** Arguments for "continue" request. */
+	export interface ContinueArguments {
+		/** continue execution for this thread. */
+		threadId: number;
 	}
 	/** Response to "continue" request. This is just an acknowledgement, so no body field is required. */
 	export interface ContinueResponse extends Response {
 	}
 
 	/** Next request; value of command field is "next".
-		he request starts the debuggee to run again for one step.
+		The request starts the debuggee to run again for one step.
 		penDebug will respond with a StoppedEvent (event type 'step') after running the step.
 	*/
 	export interface NextRequest extends Request {
+		arguments: NextArguments;
+	}
+	/** Arguments for "next" request. */
+	export interface NextArguments {
+		/** Continue execution for this thread. */
+		threadId: number;
 	}
 	/** Response to "next" request. This is just an acknowledgement, so no body field is required. */
 	export interface NextResponse extends Response {
@@ -249,26 +273,44 @@ declare module DebugProtocol {
 		The debug adapter will respond with a StoppedEvent (event type 'step') after running the step.
 	*/
 	export interface StepInRequest extends Request {
+		arguments: StepInArguments;
+	}
+	/** Arguments for "stepIn" request. */
+	export interface StepInArguments {
+		/** Continue execution for this thread. */
+		threadId: number;
 	}
 	/** Response to "stepIn" request. This is just an acknowledgement, so no body field is required. */
 	export interface StepInResponse extends Response {
 	}
 
 	/** StepOutIn request; value of command field is "stepOut".
-		he request starts the debuggee to run again for one step.
+		The request starts the debuggee to run again for one step.
 		penDebug will respond with a StoppedEvent (event type 'step') after running the step.
 	*/
 	export interface StepOutRequest extends Request {
+		arguments: StepOutArguments;
+	}
+	/** Arguments for "stepOut" request. */
+	export interface StepOutArguments {
+		/** Continue execution for this thread. */
+		threadId: number;
 	}
 	/** Response to "stepOut" request. This is just an acknowledgement, so no body field is required. */
 	export interface StepOutResponse extends Response {
 	}
 
 	/** Pause request; value of command field is "pause".
-		he request suspenses the debuggee.
+		The request suspenses the debuggee.
 		penDebug will respond with a StoppedEvent (event type 'pause') after a successful 'pause' command.
 	*/
 	export interface PauseRequest extends Request {
+		arguments: PauseArguments;
+	}
+	/** Arguments for "pause" request. */
+	export interface PauseArguments {
+		/** Pause execution for this thread. */
+		threadId: number;
 	}
 	/** Response to "pause" request. This is just an acknowledgement, so no body field is required. */
 	export interface PauseResponse extends Response {
@@ -390,7 +432,7 @@ declare module DebugProtocol {
 		};
 	}
 
-	//---- types
+	//---- Types
 
 	/** A structured message object. Used to return errors from requests. */
 	export interface Message {
