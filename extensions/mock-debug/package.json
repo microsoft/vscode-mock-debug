@@ -5,10 +5,10 @@
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"engines": { "vscode": "*" },
 	"contributes": {
-		"debugAdapter": [{
+		"debuggers": [{
 			"type": "mock",
 			"enableBreakpointsFor": { "languageIds": ["markdown"] },
-			"program": "./debugAdapter/mock/mockDebug.js",
+			"program": "./debugAdapters/mock/mockDebug.js",
 			"runtime": "node"
 		}]
 	}
