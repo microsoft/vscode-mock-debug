@@ -150,20 +150,6 @@ declare module DebugProtocol {
 	}
 	/** Arguments for "launch" request. */
 	export interface LaunchRequestArguments {
-		/** An absolute path to the program to debug. */
-		program: string;
-		/** Automatically stop target after launch. If not specified, target does not stop. */
-		stopOnEntry?: boolean;
-		/** Optional arguments passed to the debuggee. */
-		arguments?: string[];
-		/** Launch the debuggee in this working directory (specified as an absolute path). If omitted the debuggee is lauched in its own directory. */
-		workingDirectory?: string;
-		/** Absolute path to the runtime executable to be used. Default is the runtime executable on the PATH. */
-		runtimeExecutable?: string;
-		/** Optional arguments passed to the runtime executable. */
-		runtimeArguments?: string[];
-		/** Optional environment variables to pass to the debuggee. The string valued properties of the 'environmentVariables' are used as key/value pairs. */
-		environmentVariables?: { [key: string]: string; };
 	}
 	/** Response to "launch" request. This is just an acknowledgement, so no body field is required. */
 	export interface LaunchResponse extends Response {
@@ -176,8 +162,6 @@ declare module DebugProtocol {
 	}
 	/** Arguments for "attach" request. */
 	export interface AttachRequestArguments {
-		address: string;
-		port: number;
 	}
 	/** Response to "attach" request. This is just an acknowledgement, so no body field is required. */
 	export interface AttachResponse extends Response {

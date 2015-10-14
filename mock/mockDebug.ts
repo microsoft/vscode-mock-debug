@@ -8,6 +8,16 @@ import {readFileSync} from 'fs';
 import {basename} from 'path';
 
 
+/**
+ * This interface should always match the schema found in the mock-debug extension manifest.
+ */
+export interface LaunchRequestArguments {
+	/** An absolute path to the program to debug. */
+	program: string;
+	/** Automatically stop target after launch. If not specified, target does not stop. */
+	stopOnEntry?: boolean;
+}
+
 class MockDebugSession extends DebugSession {
 
 	// we don't support multiple threads, so we can use a hardcoded ID for the default thread
@@ -44,7 +54,7 @@ class MockDebugSession extends DebugSession {
 		this.sendEvent(new InitializedEvent());
 	}
 
-	protected launchRequest(response: DebugProtocol.LaunchResponse, args: DebugProtocol.LaunchRequestArguments): void {
+	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
 		this._sourceFile = args.program;
 		this._sourceLines = readFileSync(this._sourceFile).toString().split('\n');
 
@@ -186,6 +196,7 @@ class MockDebugSession extends DebugSession {
 				this._currentLine = ln;
 				this.sendResponse(response);
 				this.sendEvent(new StoppedEvent("exception", MockDebugSession.THREAD_ID));
+				this.sendEvent(new OutputEvent('exception in line: ' + ln, 'stderr'));
 				return;
 			}
 		}
