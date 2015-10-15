@@ -134,10 +134,6 @@ declare module DebugProtocol {
 		linesStartAt1?: boolean;
 		/** Determines in what format paths are specified. Possible values are 'path' or 'uri'. The default is 'path', which is the native format. */
 		pathFormat?: string;
-		/** Configure source maps. By default source maps are disabled. */
-		sourceMaps?: boolean;
-		/** Where to look for the generated code. Only used if sourceMaps is true. */
-		generatedCodeDirectory?: string;
 	}
 	/** Response to Initialize request. */
 	export interface InitializeResponse extends Response {
@@ -150,6 +146,7 @@ declare module DebugProtocol {
 	}
 	/** Arguments for "launch" request. */
 	export interface LaunchRequestArguments {
+		/* The launch request has no standardized attributes. */
 	}
 	/** Response to "launch" request. This is just an acknowledgement, so no body field is required. */
 	export interface LaunchResponse extends Response {
@@ -162,6 +159,7 @@ declare module DebugProtocol {
 	}
 	/** Arguments for "attach" request. */
 	export interface AttachRequestArguments {
+		/* The attach request has no standardized attributes. */
 	}
 	/** Response to "attach" request. This is just an acknowledgement, so no body field is required. */
 	export interface AttachResponse extends Response {
