@@ -9,7 +9,19 @@
 			"type": "mock",
 			"enableBreakpointsFor": { "languageIds": ["markdown"] },
 			"program": "./debugAdapters/mock/mockDebug.js",
-			"runtime": "node"
+			"runtime": "node",
+			"configurationAttributes": {
+				"program": {
+					"type": "string",
+					"description": "Workspace relative path to the program.",
+					"default": "app.js"
+				},
+				"stopOnEntry": {
+					"type": "boolean",
+					"description": "Automatically stop program after launch.",
+					"default": true
+				}
+			}
 		}]
 	}
 }
