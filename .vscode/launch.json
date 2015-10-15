@@ -4,16 +4,19 @@
 		{
 			"name": "mock-debug server",
 			"type": "node",
+			"request": "launch",
 			"runtimeArgs": ["--harmony"],
 			"program": "./mock/mockDebug.ts",
 			"stopOnEntry": false,
 			"args": [ "--server=4711" ],
 			"sourceMaps": true,
-			"outDir": "./extensions/mock-debug/debugAdapters"
+			"outDir": "./extensions/mock-debug/debugAdapters",
+			"externalConsole": false
 		},
 		{
 			"name": "mock test",
 			"type": "mock",
+			"request": "launch",
 			"program": "readme.md",
 			"stopOnEntry": true
 		}
