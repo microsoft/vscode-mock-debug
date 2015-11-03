@@ -29,7 +29,7 @@ class MockDebugSession extends DebugSession {
     }
 	private set _currentLine(line: number) {
         this.__currentLine = line;
-		this.sendEvent(new OutputEvent('line: ' + line));	// print current line on debug console
+		this.sendEvent(new OutputEvent(`line: ${line}\n`));	// print current line on debug console
     }
 
 	private _sourceFile: string;
@@ -196,7 +196,7 @@ class MockDebugSession extends DebugSession {
 				this._currentLine = ln;
 				this.sendResponse(response);
 				this.sendEvent(new StoppedEvent("exception", MockDebugSession.THREAD_ID));
-				this.sendEvent(new OutputEvent('exception in line: ' + ln, 'stderr'));
+				this.sendEvent(new OutputEvent(`exception in line: ${ln}\n`, 'stderr'));
 				return;
 			}
 		}
