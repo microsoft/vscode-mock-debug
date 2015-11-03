@@ -8,17 +8,29 @@
 		"debuggers": [{
 			"type": "mock",
 			"enableBreakpointsFor": { "languageIds": ["markdown"] },
+
 			"program": "./debugAdapters/mock/mockDebug.js",
 			"runtime": "node",
+
+			"initialConfigurations": [
+				{
+					"name": "Mock-Debug",
+					"type": "mock",
+					"request": "launch",
+					"program": "readme.md",
+					"stopOnEntry": true
+				}
+			],
+
 			"configurationAttributes": {
 				"program": {
 					"type": "string",
-					"description": "Workspace relative path to the program.",
-					"default": "app.js"
+					"description": "Workspace relative path to a text file.",
+					"default": "readme.md"
 				},
 				"stopOnEntry": {
 					"type": "boolean",
-					"description": "Automatically stop program after launch.",
+					"description": "Automatically stop after launch.",
 					"default": true
 				}
 			}
