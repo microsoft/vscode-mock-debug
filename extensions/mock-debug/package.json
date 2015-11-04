@@ -23,17 +23,23 @@
 			],
 
 			"configurationAttributes": {
-				"program": {
-					"type": "string",
-					"description": "Workspace relative path to a text file.",
-					"default": "readme.md"
-				},
-				"stopOnEntry": {
-					"type": "boolean",
-					"description": "Automatically stop after launch.",
-					"default": true
+				"launch": {
+					"required": ["program"],
+					"properties": {
+						"program": {
+							"type": "string",
+							"description": "Workspace relative path to a text file.",
+							"default": "readme.md"
+						},
+						"stopOnEntry": {
+							"type": "boolean",
+							"description": "Automatically stop after launch.",
+							"default": true
+						}
+					}
 				}
 			}
+
 		}]
 	}
 }
