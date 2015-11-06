@@ -12,16 +12,6 @@
 			"program": "./debugAdapters/mock/mockDebug.js",
 			"runtime": "node",
 
-			"initialConfigurations": [
-				{
-					"name": "Mock-Debug",
-					"type": "mock",
-					"request": "launch",
-					"program": "readme.md",
-					"stopOnEntry": true
-				}
-			],
-
 			"configurationAttributes": {
 				"launch": {
 					"required": ["program"],
@@ -38,7 +28,17 @@
 						}
 					}
 				}
-			}
+			},
+
+			"initialConfigurations": [
+				{
+					"name": "Mock-Debug",
+					"type": "mock",
+					"request": "launch",
+					"program": "readme.md",
+					"stopOnEntry": true
+				}
+			]
 
 		}]
 	}
