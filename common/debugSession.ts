@@ -4,6 +4,8 @@
 
 import {V8Protocol, Response, Event} from './v8Protocol';
 import * as Net from 'net';
+import * as Path from 'path';
+import * as Url from 'url';
 
 
 export class Source implements DebugProtocol.Source {
@@ -136,14 +138,26 @@ export enum ErrorDestination {
 export class DebugSession extends V8Protocol {
 
 	private _debuggerLinesStartAt1: boolean;
+	private _debuggerColumnsStartAt1: boolean;
+	private _debuggerPathsAreURIs: boolean;
 
 	private _clientLinesStartAt1: boolean;
-	private _clientPathFormat: string;
+	private _clientColumnsStartAt1: boolean;
+	private _clientPathsAreURIs: boolean;
+
 	private _isServer: boolean;
 
-	public constructor(debuggerLinesStartAt1: boolean, isServer: boolean = false) {
+	public constructor(debuggerLinesAndColumnsStartAt1: boolean, isServer: boolean = false) {
 		super();
-		this._debuggerLinesStartAt1 = debuggerLinesStartAt1;
+
+		this._debuggerLinesStartAt1 = debuggerLinesAndColumnsStartAt1;
+		this._debuggerColumnsStartAt1 = debuggerLinesAndColumnsStartAt1;
+		this._debuggerPathsAreURIs = false;
+
+		this._clientLinesStartAt1 = true;
+		this._clientColumnsStartAt1 = true;
+		this._clientPathsAreURIs = false;
+
 		this._isServer = isServer;
 
 		this.on('close', () => {
@@ -204,7 +218,7 @@ export class DebugSession extends V8Protocol {
 
 	protected sendErrorResponse(response: DebugProtocol.Response, code: number, format: string, args?: any, dest: ErrorDestination = ErrorDestination.User): void {
 
-		const message = formatPII(format, true, args);
+		const message = DebugSession.formatPII(format, true, args);
 
 		response.success = false;
 		response.message = `${response.command}: ${message}`;
@@ -236,9 +250,19 @@ export class DebugSession extends V8Protocol {
 		try {
 			if (request.command === 'initialize') {
 				var args = <DebugProtocol.InitializeRequestArguments> request.arguments;
-				this._clientLinesStartAt1 = args.linesStartAt1;
-				this._clientPathFormat = args.pathFormat;
-				this.initializeRequest(<DebugProtocol.InitializeResponse> response, args);
+
+				if (typeof args.linesStartAt1 === 'boolean') {
+					this._clientLinesStartAt1 = args.linesStartAt1;
+				}
+				if (typeof args.columnsStartAt1 === 'boolean') {
+					this._clientColumnsStartAt1 = args.columnsStartAt1;
+				}
+
+				if (args.pathFormat !== 'path') {
+					this.sendErrorResponse(response, 2018, "debug adapter only supports native paths", null, ErrorDestination.Telemetry);
+				} else {
+					this.initializeRequest(<DebugProtocol.InitializeResponse> response, args);
+				}
 
 			} else if (request.command === 'launch') {
 				this.launchRequest(<DebugProtocol.LaunchResponse> response, request.arguments);
@@ -365,50 +389,85 @@ export class DebugSession extends V8Protocol {
 		this.sendResponse(response);
 	}
 
-	//-----------------------------------------------------------------------------------------------------
+	//---- protected -------------------------------------------------------------------------------------------------
 
-	protected convertClientLineToDebugger(line): number {
+	protected convertClientLineToDebugger(line: number): number {
 		if (this._debuggerLinesStartAt1) {
 			return this._clientLinesStartAt1 ? line : line + 1;
 		}
 		return this._clientLinesStartAt1 ? line - 1 : line;
 	}
 
-	protected convertDebuggerLineToClient(line): number {
+	protected convertDebuggerLineToClient(line: number): number {
 		if (this._debuggerLinesStartAt1) {
 			return this._clientLinesStartAt1 ? line : line - 1;
 		}
 		return this._clientLinesStartAt1 ? line + 1 : line;
 	}
 
-	protected convertDebuggerColumnToClient(column): number {
-		// TODO@AW
-		return column;
-	}
-
-	protected convertClientPathToDebugger(path: string): string {
-		// TODO@AW
-		return path;
-	}
-
-	protected convertDebuggerPathToClient(path: string): string {
-		// TODO@AW
-		return path;
-	}
-}
-
-const _formatPIIRegexp = /{([^}]+)}/g;
-
-/*
- * If argument starts with '_' it is OK to send its value to telemetry.
- */
-function formatPII(format:string, excludePII: boolean, args: {[key: string]: string}): string {
-	return format.replace(_formatPIIRegexp, function(match, paramName) {
-		if (excludePII && paramName.length > 0 && paramName[0] !== '_') {
-			return match;
+	protected convertClientColumnToDebugger(column: number): number {
+		if (this._debuggerColumnsStartAt1) {
+			return this._clientColumnsStartAt1 ? column : column + 1;
 		}
-		return args[paramName] && args.hasOwnProperty(paramName) ?
-			args[paramName] :
-			match;
-	})
+		return this._clientColumnsStartAt1 ? column - 1 : column;
+	}
+
+	protected convertDebuggerColumnToClient(column: number): number {
+		if (this._debuggerColumnsStartAt1) {
+			return this._clientColumnsStartAt1 ? column : column + 1;
+		}
+		return this._clientColumnsStartAt1 ? column - 1 : column;
+	}
+
+	protected convertClientPathToDebugger(clientPath: string): string {
+		if (this._clientPathsAreURIs != this._debuggerPathsAreURIs) {
+			if (this._clientPathsAreURIs) {
+				return DebugSession.uri2path(clientPath);
+			} else {
+				return DebugSession.path2uri(clientPath);
+			}
+		}
+		return clientPath;
+	}
+
+	protected convertDebuggerPathToClient(debuggerPath: string): string {
+		if (this._debuggerPathsAreURIs != this._clientPathsAreURIs) {
+			if (this._debuggerPathsAreURIs) {
+				return DebugSession.uri2path(debuggerPath);
+			} else {
+				return DebugSession.path2uri(debuggerPath);
+			}
+		}
+		return debuggerPath;
+	}
+
+	//---- private -------------------------------------------------------------------------------
+
+	private static path2uri(str: string): string {
+		var pathName = str.replace(/\\/g, '/');
+		if (pathName[0] !== '/') {
+			pathName = '/' + pathName;
+		}
+		return encodeURI('file://' + pathName);
+	}
+
+	private static uri2path(url: string): string {
+		return Url.parse(url).pathname;
+	}
+
+	private static _formatPIIRegexp = /{([^}]+)}/g;
+
+	/*
+	* If argument starts with '_' it is OK to send its value to telemetry.
+	*/
+	private static formatPII(format:string, excludePII: boolean, args: {[key: string]: string}): string {
+		return format.replace(DebugSession._formatPIIRegexp, function(match, paramName) {
+			if (excludePII && paramName.length > 0 && paramName[0] !== '_') {
+				return match;
+			}
+			return args[paramName] && args.hasOwnProperty(paramName) ?
+				args[paramName] :
+				match;
+		})
+	}
 }

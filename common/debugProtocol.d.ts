@@ -81,7 +81,6 @@ declare module DebugProtocol {
 
 	/** Event message for "terminated" event types.
 		The event indicates that debugging of the debuggee has terminated.
-		TODO@AW not sure whether we need this.
 	*/
 	export interface TerminatedEvent extends Event {
 	}
@@ -130,8 +129,10 @@ declare module DebugProtocol {
 	export interface InitializeRequestArguments {
 		/** The ID of the debugger adapter. Used to select or verify debugger adapter. */
 		adapterID: string;
-		/** If true all line numbers are 1-based */
+		/** If true all line numbers are 1-based (default). */
 		linesStartAt1?: boolean;
+		/** If true all column numbers are 1-based (default). */
+		columnsStartAt1?: boolean;
 		/** Determines in what format paths are specified. Possible values are 'path' or 'uri'. The default is 'path', which is the native format. */
 		pathFormat?: string;
 	}
@@ -166,7 +167,6 @@ declare module DebugProtocol {
 	}
 
 	/** Disconnect request; value of command field is "disconnect".
-		TODO@AW currently this kills the debuggee too. A better semantics is to stop debugging but let the debugee continue to run.
 	*/
 	export interface DisconnectRequest extends Request {
 		arguments?: DisconnectArguments;
@@ -441,7 +441,7 @@ declare module DebugProtocol {
 
 	/** A Source .*/
 	export interface Source {
-		/** The short name of the source. Every source returned from the debu adapter has a name. When specifying a source to the debug adapter this name is optional. */
+		/** The short name of the source. Every source returned from the debug adapter has a name. When specifying a source to the debug adapter this name is optional. */
 		name?: string;
 		/** The long (absolute) path of the source. It is not guaranteed that the source exists at this location. */
 		path?: string;
