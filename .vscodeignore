@@ -1,0 +1,10 @@
+.vscode/**
+typings/**
+**/*.ts
+**/*.map
+.gitignore
+tsconfig.json
+tsd.json
+gulpfile.js
+readme.md
+mock-debug.gif

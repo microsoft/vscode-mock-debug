@@ -1,23 +1,67 @@
 {
-  "name": "mock-debug",
-  "version": "1.0.0",
-  "description": "Starter extension for developing debug adapters for VS Code.",
-  "author": {
-    "name": "Microsoft Corporation"
-  },
-  "main": "plugins/vs.debug.mock/mock/mockDebug.js",
-  "private": true,
-  "dependencies": {
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://monacotools.visualstudio.com/DefaultCollection/Monaco/_git/vscode-mock-debug.git"
-  },
-  "devDependencies": {
-    "gulp": "^3.9.0",
-    "gulp-util": "^3.0.5",
-    "gulp-tsb": "git://github.com/jrieken/gulp-tsb.git#bbf53f1d4b503b9080f8c300208b3ffa829a12c7",
-    "del": "*",
-    "run-sequence": "*"
-  }
+	"name": "mock-debug",
+	"version": "0.10.0",
+	"publisher": "isidor",
+	"description": "Starter extension for developing debug adapters for VS Code.",
+	"author": {
+		"name": "Microsoft Corporation"
+	},
+	"engines": {
+		"vscode": "0.10.x"
+	},
+	"private": true,
+	"dependencies": {},
+	"repository": {
+		"type": "git",
+		"url": "https://monacotools.visualstudio.com/DefaultCollection/Monaco/_git/vscode-mock-debug.git"
+	},
+	"devDependencies": {
+		"gulp": "^3.9.0",
+		"gulp-util": "^3.0.5",
+		"gulp-tsb": "git://github.com/jrieken/gulp-tsb.git#bbf53f1d4b503b9080f8c300208b3ffa829a12c7",
+		"del": "*",
+		"run-sequence": "*"
+	},
+	"contributes": {
+		"debuggers": [
+			{
+				"type": "mock",
+				"enableBreakpointsFor": {
+					"languageIds": [
+						"markdown"
+					]
+				},
+				"program": "./mock/mockDebug.js",
+				"runtime": "node",
+				"configurationAttributes": {
+					"launch": {
+						"required": [
+							"program"
+						],
+						"properties": {
+							"program": {
+								"type": "string",
+								"description": "Workspace relative path to a text file.",
+								"default": "readme.md"
+							},
+							"stopOnEntry": {
+								"type": "boolean",
+								"description": "Automatically stop after launch.",
+								"default": true
+							}
+						}
+					}
+				},
+				"initialConfigurations": [
+					{
+						"name": "Mock-Debug",
+						"type": "mock",
+						"request": "launch",
+						"program": "readme.md",
+						"stopOnEntry": true
+					}
+				]
+			}
+		]
+	}
 }
