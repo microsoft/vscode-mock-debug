@@ -17,7 +17,7 @@ var sources = [
 	'typings/**/*.ts'
 ];
 
-var dest = 'extensions/mock-debug/debugAdapters';
+var dest = 'out';
 
 gulp.task('default', function(callback) {
 	runSequence('clean', 'build', callback);

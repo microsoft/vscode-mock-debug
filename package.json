@@ -31,7 +31,7 @@
 						"markdown"
 					]
 				},
-				"program": "./mock/mockDebug.js",
+				"program": "./out/mock/mockDebug.js",
 				"runtime": "node",
 				"configurationAttributes": {
 					"launch": {

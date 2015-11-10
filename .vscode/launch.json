@@ -10,7 +10,7 @@
 			"stopOnEntry": false,
 			"args": [ "--server=4711" ],
 			"sourceMaps": true,
-			"outDir": "./extensions/mock-debug/debugAdapters",
+			"outDir": "./out/",
 			"externalConsole": false
 		},
 		{
