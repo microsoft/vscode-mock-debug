@@ -29,6 +29,7 @@
 		"debuggers": [
 			{
 				"type": "mock",
+				"label": "Mock Debugger",
 				"enableBreakpointsFor": {
 					"languageIds": [
 						"markdown"
