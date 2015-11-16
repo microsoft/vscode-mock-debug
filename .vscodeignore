@@ -3,3 +3,5 @@
 **/.DS_Store
 !out/**
 !package.json
+!ThirdPartyNotices.txt
+!LICENSE.txt
