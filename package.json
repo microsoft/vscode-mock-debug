@@ -30,18 +30,15 @@
 			{
 				"type": "mock",
 				"label": "Mock Debugger",
-				"enableBreakpointsFor": {
-					"languageIds": [
-						"markdown"
-					]
-				},
+
+				"enableBreakpointsFor": { "languageIds": [ "markdown" ] },
+
 				"program": "./out/mock/mockDebug.js",
 				"runtime": "node",
+
 				"configurationAttributes": {
 					"launch": {
-						"required": [
-							"program"
-						],
+						"required": [ "program" ],
 						"properties": {
 							"program": {
 								"type": "string",
@@ -56,6 +53,7 @@
 						}
 					}
 				},
+
 				"initialConfigurations": [
 					{
 						"name": "Mock-Debug",
