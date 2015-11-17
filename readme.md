@@ -27,7 +27,7 @@ You can now 'step through' the `readme.md` file, set and hit breakpoints, and ru
 * Clone the project https://github.com/Microsoft/vscode-mock-debug.git
 * Open the project folder in VS Code.
 * Press `F5` to build and launch Mock Debug in another VS Code window. In that window:
-	* Create a new 'program' file `readme.md` and enter several lines of arbitrary text.
+	* Open a new workspace, create a new 'program' file `readme.md` and enter several lines of arbitrary text.
 	* Switch to the debug viewlet and press the gear dropdown.
 	* Select the debug environment "Mock Debug".
 	* Press `F5` to start debugging.
