@@ -1,6 +1,7 @@
 {
 	"name": "mock-debug",
-	"version": "0.10.10",
+	"displayName": "Mock Debug",
+	"version": "0.10.13",
 	"publisher": "ANDREWEINAND",
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"author": {
@@ -17,7 +18,7 @@
 	"dependencies": {},
 	"repository": {
 		"type": "git",
-		"url": "https://monacotools.visualstudio.com/DefaultCollection/Monaco/_git/vscode-mock-debug.git"
+		"url": "https://github.com/Microsoft/vscode-mock-debug.git"
 	},
 	"devDependencies": {
 		"gulp": "^3.9.0",
@@ -30,7 +31,7 @@
 		"debuggers": [
 			{
 				"type": "mock",
-				"label": "Mock Debugger",
+				"label": "Mock Debug",
 
 				"enableBreakpointsFor": { "languageIds": [ "markdown" ] },
 
