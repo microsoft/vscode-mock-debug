@@ -1,7 +1,10 @@
-*
-*/**
-**/.DS_Store
-!out/**
-!package.json
-!ThirdPartyNotices.txt
-!LICENSE.txt
+.vscode/**/*
+.gitignore
+src/**/*
+typings/**/*
+test/**/*
+node_modules/**/*
+tsconfig.json
+gulpfile.js
+tsd.json
+**/*.js.map

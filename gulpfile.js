@@ -12,8 +12,7 @@ var runSequence = require('run-sequence');
 var compilation = tsb.create(path.join(__dirname, 'tsconfig.json'), true);
 
 var sources = [
-	'mock/**/*.ts',
-	'common/**/*.ts',
+	'src/**/*.ts',
 	'typings/**/*.ts'
 ];
 

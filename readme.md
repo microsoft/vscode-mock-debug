@@ -20,5 +20,4 @@ VS Code will let you select a debug environment (select "Mock Debugger") and cre
 If you now start the launch configuration by pressing the green play button,
 you can 'step through' the target file, set and hit breakpoints, and run into exceptions (if the word exception appears in a line).
 
-![Mock Debug](mock-debug.gif)
-
+![Mock Debug](https://github.com/Microsoft/vscode-mock-debug/blob/master/images/mock-debug.gif)

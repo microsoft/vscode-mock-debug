@@ -1,7 +1,7 @@
 {
 	"name": "mock-debug",
-	"version": "0.10.0",
-	"publisher": "isidor",
+	"version": "0.10.10",
+	"publisher": "ANDREWEINAND",
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"author": {
 		"name": "Microsoft Corporation"
@@ -9,6 +9,7 @@
 	"engines": {
 		"vscode": "^0.10.1"
 	},
+	"icon": "images/mock-debug-icon.svg",
 	"categories": [
 		"Debuggers"
 	],
