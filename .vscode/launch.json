@@ -18,7 +18,7 @@
 			"type": "node",
 			"request": "launch",
 			"runtimeArgs": ["--harmony"],
-			"program": "./mock/mockDebug.ts",
+			"program": "./src/mock/mockDebug.ts",
 			"stopOnEntry": false,
 			"args": [ "--server=4711" ],
 			"sourceMaps": true,
