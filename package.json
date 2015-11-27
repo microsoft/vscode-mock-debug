@@ -20,6 +20,9 @@
 		"type": "git",
 		"url": "https://github.com/Microsoft/vscode-mock-debug.git"
 	},
+	"bugs": {
+		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
+	},
 	"devDependencies": {
 		"gulp": "^3.9.0",
 		"gulp-util": "^3.0.5",
