@@ -15,7 +15,6 @@
 		"Debuggers"
 	],
 	"private": true,
-	"dependencies": {},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Microsoft/vscode-mock-debug.git"
@@ -23,12 +22,14 @@
 	"bugs": {
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
+	"dependencies": {},
 	"devDependencies": {
-		"gulp": "^3.9.0",
-		"gulp-util": "^3.0.5",
-		"gulp-tsb": "git://github.com/jrieken/gulp-tsb.git#bbf53f1d4b503b9080f8c300208b3ffa829a12c7",
-		"del": "*",
-		"run-sequence": "*"
+		"typescript": "^1.6.2"
+	},
+	"scripts": {
+		"prepublish": "tsc -p ./src",
+		"compile": "tsc -p ./src",
+		"watch": "tsc -w -p ./src"
 	},
 	"contributes": {
 		"debuggers": [
@@ -38,7 +39,7 @@
 
 				"enableBreakpointsFor": { "languageIds": [ "markdown" ] },
 
-				"program": "./out/mock/mockDebug.js",
+				"program": "./out/mockDebug.js",
 				"runtime": "node",
 
 				"configurationAttributes": {

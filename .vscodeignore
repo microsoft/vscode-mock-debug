@@ -1,10 +1,6 @@
 .vscode/**/*
 .gitignore
 src/**/*
-typings/**/*
 test/**/*
 node_modules/**/*
-tsconfig.json
-gulpfile.js
-tsd.json
 **/*.js.map

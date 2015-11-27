@@ -18,7 +18,7 @@
 			"type": "node",
 			"request": "launch",
 			"runtimeArgs": ["--harmony"],
-			"program": "./src/mock/mockDebug.ts",
+			"program": "./src/mockDebug.ts",
 			"stopOnEntry": false,
 			"args": [ "--server=4711" ],
 			"sourceMaps": true,
@@ -29,7 +29,7 @@
 			"name": "mock test",
 			"type": "mock",
 			"request": "launch",
-			"program": "readme.md",
+			"program": "README.md",
 			"stopOnEntry": true
 		}
 	]
