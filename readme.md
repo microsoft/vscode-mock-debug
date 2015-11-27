@@ -1,4 +1,5 @@
 # VS Code Mock Debug
+
 This is a starter sample for developing VS Code debug adapters.
 
 **Mock Debug** simulates a debug adapter for Visual Studio Code.
@@ -12,6 +13,7 @@ More information about how to develop a new debug adapter can be found
 [here](https://github.com/Microsoft/vscode-extensionbuilders/blob/master/docs/extensions/example-debuggers.md).
 
 ## Using Mock Debug
+
 * Install the **Mock Debug** extension in VS Code.
 * Create a new 'program' file `readme.md` and enter several lines of arbitrary text.
 * Switch to the debug viewlet and press the gear dropdown.
@@ -24,10 +26,13 @@ You can now 'step through' the `readme.md` file, set and hit breakpoints, and ru
 
 
 ## Build and Run
-* Clone the project https://github.com/Microsoft/vscode-mock-debug.git
+
+[![build status](https://travis-ci.org/Microsoft/vscode-mock-debug.svg?branch=master)](https://travis-ci.org/Microsoft/vscode-mock-debug)
+
+* Clone the project [https://github.com/Microsoft/vscode-mock-debug.git](https://github.com/Microsoft/vscode-mock-debug.git)
 * Open the project folder in VS Code.
 * Press `F5` to build and launch Mock Debug in another VS Code window. In that window:
-	* Open a new workspace, create a new 'program' file `readme.md` and enter several lines of arbitrary text.
-	* Switch to the debug viewlet and press the gear dropdown.
-	* Select the debug environment "Mock Debug".
-	* Press `F5` to start debugging.
+  * Open a new workspace, create a new 'program' file `readme.md` and enter several lines of arbitrary text.
+  * Switch to the debug viewlet and press the gear dropdown.
+  * Select the debug environment "Mock Debug".
+  * Press `F5` to start debugging.
