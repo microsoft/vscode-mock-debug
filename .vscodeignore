@@ -1,6 +1,6 @@
 .vscode/**/*
 .gitignore
 src/**/*
-test/**/*
+out/tests/**/*
 node_modules/**/*
 **/*.js.map

@@ -24,12 +24,14 @@
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"typescript": "^1.6.2"
+		"typescript": "^1.6.2",
+		"mocha": "*"
 	},
 	"scripts": {
 		"prepublish": "tsc -p ./src",
 		"compile": "tsc -p ./src",
-		"watch": "tsc -w -p ./src"
+		"watch": "tsc -w -p ./src",
+		"test": "mocha out/tests"
 	},
 	"contributes": {
 		"debuggers": [

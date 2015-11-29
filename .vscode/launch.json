@@ -9,7 +9,6 @@
 			"args": [
 				"--extensionDevelopmentPath=${workspaceRoot}"
 			],
-			"stopOnEntry": false,
 			"sourceMaps": true,
 			"outDir": "./out"
 		},
@@ -22,8 +21,7 @@
 			"stopOnEntry": false,
 			"args": [ "--server=4711" ],
 			"sourceMaps": true,
-			"outDir": "./out",
-			"externalConsole": false
+			"outDir": "./out"
 		},
 		{
 			"name": "mock test",
@@ -31,6 +29,19 @@
 			"request": "launch",
 			"program": "README.md",
 			"stopOnEntry": true
+		},
+		{
+			"name": "Run Tests",
+			"type": "node",
+			"request": "launch",
+			"program": "node_modules/mocha/bin/_mocha",
+			"args": [
+				"./out/tests",
+				"--timeout", "999999",
+				"--colors"
+			],
+			"sourceMaps": true,
+			"outDir": "./out"
 		}
 	]
 }
