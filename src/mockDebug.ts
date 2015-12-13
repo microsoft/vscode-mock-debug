@@ -2,8 +2,8 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {DebugSession, InitializedEvent, TerminatedEvent, StoppedEvent, OutputEvent, Thread, StackFrame, Scope, Source} from './common/debugSession';
-import {Handles} from './common/handles';
+import {DebugSession, InitializedEvent, TerminatedEvent, StoppedEvent, OutputEvent, Thread, StackFrame, Scope, Source, Handles} from 'vscode-debugadapter';
+import {DebugProtocol} from 'vscode-debugprotocol';
 import {readFileSync} from 'fs';
 import {basename} from 'path';
 

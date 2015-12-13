@@ -22,7 +22,10 @@
 	"bugs": {
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"vscode-debugadapter": "^1.0.1",
+		"vscode-debugprotocol": "^1.0.1"
+	},
 	"devDependencies": {
 		"typescript": "^1.6.2",
 		"mocha": "*"

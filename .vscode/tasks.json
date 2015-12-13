@@ -3,7 +3,7 @@
     "command": "npm",
     "isShellCommand": true,
     "args": ["run", "watch"],
-    "showOutput": "silent",
+    //"showOutput": "silent",
     "isWatching": true,
     "problemMatcher": "$tsc-watch"
 }
