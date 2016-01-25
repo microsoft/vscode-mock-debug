@@ -1,5 +1,7 @@
 # VS Code Mock Debug
 
+[![build status](https://travis-ci.org/Microsoft/vscode-mock-debug.svg?branch=master)](https://travis-ci.org/Microsoft/vscode-mock-debug)
+
 This is a starter sample for developing VS Code debug adapters.
 
 **Mock Debug** simulates a debug adapter for Visual Studio Code.
