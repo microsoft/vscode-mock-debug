@@ -2,6 +2,8 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
+"use strict";
+
 import {DebugSession, InitializedEvent, TerminatedEvent, StoppedEvent, OutputEvent, Thread, StackFrame, Scope, Source, Handles} from 'vscode-debugadapter';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {readFileSync} from 'fs';
@@ -48,10 +50,11 @@ class MockDebugSession extends DebugSession {
 	}
 
 	protected initializeRequest(response: DebugProtocol.InitializeResponse, args: DebugProtocol.InitializeRequestArguments): void {
-		this.sendResponse(response);
 
-		// now we are ready to accept breakpoints -> fire the initialized event to give UI a chance to set breakpoints
+		// announce that we are ready to accept breakpoints -> fire the initialized event to give UI a chance to set breakpoints
 		this.sendEvent(new InitializedEvent());
+
+		super.initializeRequest(response, args);
 	}
 
 	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
@@ -188,7 +191,7 @@ class MockDebugSession extends DebugSession {
 			if (lines && lines.indexOf(ln) >= 0) {
 				this._currentLine = ln;
 				this.sendResponse(response);
-				this.sendEvent(new StoppedEvent("step", MockDebugSession.THREAD_ID));
+				this.sendEvent(new StoppedEvent("breakpoint", MockDebugSession.THREAD_ID));
 				return;
 			}
 			// if word 'exception' found in source -> throw exception

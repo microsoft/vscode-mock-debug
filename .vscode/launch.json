@@ -10,38 +10,41 @@
 				"--extensionDevelopmentPath=${workspaceRoot}"
 			],
 			"sourceMaps": true,
-			"outDir": "./out"
+			"outDir": "${workspaceRoot}/out"
 		},
 		{
 			"name": "mock-debug server",
 			"type": "node",
 			"request": "launch",
 			"runtimeArgs": ["--harmony"],
-			"program": "./src/mockDebug.ts",
+			"program": "${workspaceRoot}/src/mockDebug.ts",
 			"stopOnEntry": false,
 			"args": [ "--server=4711" ],
 			"sourceMaps": true,
-			"outDir": "./out"
+			"outDir": "${workspaceRoot}/out",
+			"cwd": "${workspaceRoot}"
 		},
 		{
 			"name": "mock test",
 			"type": "mock",
 			"request": "launch",
-			"program": "README.md",
+			"program": "${workspaceRoot}/README.md",
 			"stopOnEntry": true
 		},
 		{
 			"name": "Run Tests",
 			"type": "node",
 			"request": "launch",
-			"program": "node_modules/mocha/bin/_mocha",
+			"program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
 			"args": [
-				"./out/tests",
+				"-u", "tdd",
 				"--timeout", "999999",
-				"--colors"
+				"--colors",
+				"./out/tests/"
 			],
 			"sourceMaps": true,
-			"outDir": "./out"
+			"outDir": "${workspaceRoot}/out",
+			"cwd": "${workspaceRoot}"
 		}
 	]
 }
