@@ -10,7 +10,7 @@ The sample is meant as an educational piece showing how to implement a debug
 adapter for VS Code. It can be used as a starting point for developing a real adapter.
 
 More information about how to develop a new debug adapter can be found
-[here](https://github.com/Microsoft/vscode-extensionbuilders/blob/master/docs/extensions/example-debuggers.md).
+[here](https://code.visualstudio.com/docs/extensions/example-debuggers).
 
 ## Using Mock Debug
 
