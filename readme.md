@@ -24,7 +24,6 @@ You can now 'step through' the `readme.md` file, set and hit breakpoints, and ru
 
 ![Mock Debug](images/mock-debug.gif)
 
-
 ## Build and Run
 
 [![build status](https://travis-ci.org/Microsoft/vscode-mock-debug.svg?branch=master)](https://travis-ci.org/Microsoft/vscode-mock-debug)
@@ -36,3 +35,7 @@ You can now 'step through' the `readme.md` file, set and hit breakpoints, and ru
   * Switch to the debug viewlet and press the gear dropdown.
   * Select the debug environment "Mock Debug".
   * Press `F5` to start debugging.
+
+## Forum
+
+A Gitter forum for discussing debug adapters is [Microsoft/vscode](https://gitter.im/Microsoft/vscode).
