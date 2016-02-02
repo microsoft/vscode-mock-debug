@@ -11,6 +11,8 @@ adapter for VS Code. It can be used as a starting point for developing a real ad
 
 More information about how to develop a new debug adapter can be found
 [here](https://code.visualstudio.com/docs/extensions/example-debuggers).
+Or discuss debug adapters on Gitter:
+[![Gitter Chat](http://img.shields.io/badge/chat-online-brightgreen.svg)](https://gitter.im/Microsoft/vscode)
 
 ## Using Mock Debug
 
@@ -35,7 +37,3 @@ You can now 'step through' the `readme.md` file, set and hit breakpoints, and ru
   * Switch to the debug viewlet and press the gear dropdown.
   * Select the debug environment "Mock Debug".
   * Press `F5` to start debugging.
-
-## Forum
-
-A Gitter forum for discussing debug adapters is [Microsoft/vscode](https://gitter.im/Microsoft/vscode).
