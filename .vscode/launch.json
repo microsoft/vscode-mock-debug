@@ -16,7 +16,7 @@
 			"name": "mock-debug server",
 			"type": "node",
 			"request": "launch",
-			"runtimeArgs": ["--harmony"],
+			"runtimeArgs": [ "--nolazy" ],
 			"program": "${workspaceRoot}/src/mockDebug.ts",
 			"stopOnEntry": false,
 			"args": [ "--server=4711" ],

@@ -23,8 +23,8 @@
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
 	"dependencies": {
-		"vscode-debugadapter": "^1.4.1",
-		"vscode-debugprotocol": "^1.4.0"
+		"vscode-debugprotocol": "~1.6.0-pre4",
+		"vscode-debugadapter": "~1.6.0-pre8"
 	},
 	"devDependencies": {
 		"typescript": "^1.6.2",

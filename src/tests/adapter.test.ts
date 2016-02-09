@@ -7,7 +7,7 @@
 
 import assert = require('assert');
 import * as Path from 'path';
-import {DebugClient} from './DebugClient';
+import {DebugClient} from './debugClient';
 import {DebugProtocol} from 'vscode-debugprotocol';
 
 suite('Node Debug Adapter', () => {
@@ -15,7 +15,8 @@ suite('Node Debug Adapter', () => {
 	const DEBUG_ADAPTER = './out/mockDebug.js';
 
 	const PROJECT_ROOT = Path.join(__dirname, '../../');
-	const PROGRAM = Path.join(PROJECT_ROOT, 'src/tests/data/test.md');
+	const DATA_ROOT = Path.join(PROJECT_ROOT, 'src/tests/data/');
+
 
 	let dc: DebugClient;
 
@@ -68,6 +69,8 @@ suite('Node Debug Adapter', () => {
 
 		test('should run program to the end', () => {
 
+			const PROGRAM = Path.join(DATA_ROOT, 'test.md');
+
 			return Promise.all([
 				dc.configurationSequence(),
 				dc.launch({ program: PROGRAM }),
@@ -77,12 +80,13 @@ suite('Node Debug Adapter', () => {
 
 		test('should stop on entry', () => {
 
+			const PROGRAM = Path.join(DATA_ROOT, 'test.md');
 			const ENTRY_LINE = 1;
 
 			return Promise.all([
 				dc.configurationSequence(),
 				dc.launch({ program: PROGRAM, stopOnEntry: true }),
-				dc.assertStoppedLocation('entry', ENTRY_LINE)
+				dc.assertStoppedLocation('entry', { line: ENTRY_LINE } )
 			]);
 		});
 	});
@@ -91,9 +95,10 @@ suite('Node Debug Adapter', () => {
 
 		test('should stop on a breakpoint', () => {
 
+			const PROGRAM = Path.join(DATA_ROOT, 'test.md');
 			const BREAKPOINT_LINE = 2;
 
-			return dc.hitBreakpoint({ program: PROGRAM, }, PROGRAM, BREAKPOINT_LINE);
+			return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAKPOINT_LINE } );
 		});
 	});
 
@@ -101,7 +106,7 @@ suite('Node Debug Adapter', () => {
 
 		test('should stop on an exception', () => {
 
-			const PROGRAM_WITH_EXCEPTION = Path.join(PROJECT_ROOT, 'src/tests/data/testWithException.md');
+			const PROGRAM_WITH_EXCEPTION = Path.join(DATA_ROOT, 'testWithException.md');
 			const EXCEPTION_LINE = 4;
 
 			return Promise.all([
@@ -116,7 +121,7 @@ suite('Node Debug Adapter', () => {
 
 				dc.launch({ program: PROGRAM_WITH_EXCEPTION }),
 
-				dc.assertStoppedLocation('exception', EXCEPTION_LINE)
+				dc.assertStoppedLocation('exception', { line: EXCEPTION_LINE } )
 			]);
 		});
 	});

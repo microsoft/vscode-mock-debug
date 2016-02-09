@@ -4,7 +4,7 @@
 
 "use strict";
 
-import {DebugSession, InitializedEvent, TerminatedEvent, StoppedEvent, OutputEvent, Thread, StackFrame, Scope, Source, Handles} from 'vscode-debugadapter';
+import {DebugSession, InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent, Thread, StackFrame, Scope, Source, Handles, Breakpoint} from 'vscode-debugadapter';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {readFileSync} from 'fs';
 import {basename} from 'path';
@@ -25,36 +25,56 @@ class MockDebugSession extends DebugSession {
 	// we don't support multiple threads, so we can use a hardcoded ID for the default thread
 	private static THREAD_ID = 1;
 
-	private __currentLine: number;
+	// the next line that will be 'executed'
+	private __currentLine = 0;
 	private get _currentLine() : number {
-        return this.__currentLine;
+		return this.__currentLine;
     }
 	private set _currentLine(line: number) {
-        this.__currentLine = line;
+		this.__currentLine = line;
 		this.sendEvent(new OutputEvent(`line: ${line}\n`));	// print current line on debug console
-    }
-
-	private _sourceFile: string;
-	private _sourceLines: string[];
-	private _breakPoints: any;
-	private _variableHandles: Handles<string>;
-
-
-	public constructor(debuggerLinesStartAt1: boolean, isServer: boolean = false) {
-		super(debuggerLinesStartAt1, isServer);
-		this._sourceFile = null;
-		this._sourceLines = [];
-		this._currentLine = 0;
-		this._breakPoints = {};
-		this._variableHandles = new Handles<string>();
 	}
 
+	// the initial (and one and only) file we are debugging
+	private _sourceFile: string;
+
+	// the contents (= lines) of the one and only file
+	private _sourceLines = new Array<string>();
+
+	// maps from sourceFile to array of Breakpoints
+	private _breakPoints = new Map<string, DebugProtocol.Breakpoint[]>();
+
+	private _variableHandles = new Handles<string>();
+
+
+	/**
+	 * Creates a new debug adapter.
+	 * We configure the default implementation of a debug adapter here
+	 * by specifying that this 'debugger' uses zero-based lines and columns.
+	 */
+	public constructor() {
+		super();
+
+		// this debugger uses zero-based lines and columns
+		this.setDebuggerLinesStartAt1(false);
+		this.setDebuggerColumnsStartAt1(false);
+	}
+
+	/**
+	 * The 'initialize' request is the first request called by the frontend
+	 * to interrogate the features the debug adapter provides.
+	 */
 	protected initializeRequest(response: DebugProtocol.InitializeResponse, args: DebugProtocol.InitializeRequestArguments): void {
 
-		// announce that we are ready to accept breakpoints -> fire the initialized event to give UI a chance to set breakpoints
+		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
+		// we request them early by sending an 'initializeRequest' to the frontend.
+		// The frontend will end the configuration sequence by calling 'configurationDone' request.
 		this.sendEvent(new InitializedEvent());
 
-		super.initializeRequest(response, args);
+		// This debug adapter implements the configurationDoneRequest.
+		response.body.supportsConfigurationDoneRequest = true;
+
+		this.sendResponse(response);
 	}
 
 	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
@@ -81,28 +101,27 @@ class MockDebugSession extends DebugSession {
 		// read file contents into array for direct access
 		var lines = readFileSync(path).toString().split('\n');
 
-		var newPositions = [clientLines.length];
-		var breakpoints = [];
+		var breakpoints = new Array<Breakpoint>();
 
 		// verify breakpoint locations
 		for (var i = 0; i < clientLines.length; i++) {
 			var l = this.convertClientLineToDebugger(clientLines[i]);
 			var verified = false;
 			if (l < lines.length) {
-				// if a line starts with '+' we don't allow to set a breakpoint but move the breakpoint down
+				// if a line is empty or starts with '+' we don't allow to set a breakpoint but move the breakpoint down
 				if (lines[l].indexOf("+") == 0)
 					l++;
 				// if a line starts with '-' we don't allow to set a breakpoint but move the breakpoint up
 				if (lines[l].indexOf("-") == 0)
 					l--;
-				verified = true;    // this breakpoint has been validated
+				verified = false;    // this breakpoint has been validated
 			}
-			newPositions[i] = l;
-			breakpoints.push({ verified: verified, line: this.convertDebuggerLineToClient(l)});
+			const bp = new Breakpoint(verified, this.convertDebuggerLineToClient(l));
+			breakpoints.push(bp);
 		}
-		this._breakPoints[path] = newPositions;
+		this._breakPoints[path] = breakpoints;
 
-		// send back the actual breakpoints
+		// send back the actual breakpoint positions
 		response.body = {
 			breakpoints: breakpoints
 		};
@@ -185,15 +204,31 @@ class MockDebugSession extends DebugSession {
 
 	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {
 
-		const lines = this._breakPoints[this._sourceFile];
-		for (let ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
-			// is breakpoint on this line?
-			if (lines && lines.indexOf(ln) >= 0) {
-				this._currentLine = ln;
-				this.sendResponse(response);
-				this.sendEvent(new StoppedEvent("breakpoint", MockDebugSession.THREAD_ID));
-				return;
+		// find the breakpoints for the current source file
+		const breakpoints = this._breakPoints[this._sourceFile];
+
+		for (var ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
+
+			if (breakpoints) {
+				const bps = breakpoints.filter(bp => bp.line === this.convertDebuggerLineToClient(ln));
+				if (bps.length > 0) {
+					this._currentLine = ln;
+
+					// 'continue' request finished
+					this.sendResponse(response);
+
+					// send 'stopped' event
+					this.sendEvent(new StoppedEvent("breakpoint", MockDebugSession.THREAD_ID));
+
+					// if breakpoint is not yet verified, verify it and send a 'breakpoint' update event
+					if (!bps[0].verified) {
+						bps[0].verified = true;
+						this.sendEvent(new BreakpointEvent("update", bps[0]));
+					}
+					return;
+				}
 			}
+
 			// if word 'exception' found in source -> throw exception
 			if (this._sourceLines[ln].indexOf("exception") >= 0) {
 				this._currentLine = ln;
