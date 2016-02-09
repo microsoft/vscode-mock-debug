@@ -25,6 +25,8 @@ class MockDebugSession extends DebugSession {
 	// we don't support multiple threads, so we can use a hardcoded ID for the default thread
 	private static THREAD_ID = 1;
 
+	private _breakpointId = 1000;
+
 	// the next line that will be 'executed'
 	private __currentLine = 0;
 	private get _currentLine() : number {
@@ -108,15 +110,21 @@ class MockDebugSession extends DebugSession {
 			var l = this.convertClientLineToDebugger(clientLines[i]);
 			var verified = false;
 			if (l < lines.length) {
+				const line = lines[l].trim();
 				// if a line is empty or starts with '+' we don't allow to set a breakpoint but move the breakpoint down
-				if (lines[l].indexOf("+") == 0)
+				if (line.length == 0 || line.indexOf("+") == 0)
 					l++;
 				// if a line starts with '-' we don't allow to set a breakpoint but move the breakpoint up
-				if (lines[l].indexOf("-") == 0)
+				if (line.indexOf("-") == 0)
 					l--;
-				verified = false;    // this breakpoint has been validated
+				// don't set 'verified' to true if the line contains the word 'lazy'
+				// in this case the breakpoint will be verified 'lazy' after hitting it once.
+				if (line.indexOf("lazy") < 0) {
+					verified = true;    // this breakpoint has been validated
+				}
 			}
-			const bp = new Breakpoint(verified, this.convertDebuggerLineToClient(l));
+			const bp = <DebugProtocol.Breakpoint> new Breakpoint(verified, this.convertDebuggerLineToClient(l));
+			bp.id = this._breakpointId++;
 			breakpoints.push(bp);
 		}
 		this._breakPoints[path] = breakpoints;

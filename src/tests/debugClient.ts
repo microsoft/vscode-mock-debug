@@ -325,7 +325,7 @@ export class DebugClient extends ProtocolClient {
 				});
 			}).then(response => {
 				const bp = response.body.breakpoints[0];
-				assert.equal(bp.verified, true);
+				assert.equal(bp.verified, true, "breakpoint verification mismatch: verified");
 				if (bp.source && bp.source.path) {
 					assert.equal(bp.source.path, location.path, "breakpoint verification mismatch: path");
 				}
