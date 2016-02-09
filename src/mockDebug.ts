@@ -228,7 +228,8 @@ class MockDebugSession extends DebugSession {
 					// send 'stopped' event
 					this.sendEvent(new StoppedEvent("breakpoint", MockDebugSession.THREAD_ID));
 
-					// if breakpoint is not yet verified, verify it and send a 'breakpoint' update event
+					// the following shows the use of 'breakpoint' events to update properties of a breakpoint in the UI
+					// if breakpoint is not yet verified, verify it now and send a 'breakpoint' update event
 					if (!bps[0].verified) {
 						bps[0].verified = true;
 						this.sendEvent(new BreakpointEvent("update", bps[0]));

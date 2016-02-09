@@ -313,7 +313,7 @@ export class DebugClient extends ProtocolClient {
 	 * and the event's reason and line number was asserted.
 	 * The promise will be rejected if a timeout occurs, the assertions fail, or if the requests fails.
 	 */
-	public hitBreakpoint(launchArgs: any, location: { path: string, line: number, column?: number}, expected?: { path?: string, line?: number, column?: number, verified?: boolean }) : Promise<any> {
+	public hitBreakpoint(launchArgs: any, location: { path: string, line: number, column?: number, verified?: boolean }, expected?: { path?: string, line?: number, column?: number, verified?: boolean }) : Promise<any> {
 
 		return Promise.all([
 
@@ -324,8 +324,12 @@ export class DebugClient extends ProtocolClient {
 					source: { path: location.path }
 				});
 			}).then(response => {
+
 				const bp = response.body.breakpoints[0];
-				assert.equal(bp.verified, true, "breakpoint verification mismatch: verified");
+
+				const verified = (typeof location.verified === 'boolean') ? location.verified : true;
+				assert.equal(bp.verified, verified, "breakpoint verification mismatch: verified");
+
 				if (bp.source && bp.source.path) {
 					assert.equal(bp.source.path, location.path, "breakpoint verification mismatch: path");
 				}

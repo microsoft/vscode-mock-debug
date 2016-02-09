@@ -36,6 +36,7 @@
 			"type": "node",
 			"request": "launch",
 			"program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+			"runtimeArgs": [ "--nolazy" ],
 			"args": [
 				"-u", "tdd",
 				"--timeout", "999999",

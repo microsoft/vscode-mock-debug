@@ -100,6 +100,24 @@ suite('Node Debug Adapter', () => {
 
 			return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAKPOINT_LINE } );
 		});
+
+		test('hitting a lazy breakpoint should send a breakpoint event', () => {
+
+			const PROGRAM = Path.join(DATA_ROOT, 'testLazyBreakpoint.md');
+			const BREAKPOINT_LINE = 3;
+
+			return Promise.all([
+
+				dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAKPOINT_LINE, verified: false } ),
+
+				dc.waitForEvent('breakpoint').then((event : DebugProtocol.BreakpointEvent ) => {
+					assert.equal(event.body.breakpoint.verified, true, "event mismatch: verified");
+				})
+
+			]);
+
+		});
+
 	});
 
 	suite('setExceptionBreakpoints', () => {
