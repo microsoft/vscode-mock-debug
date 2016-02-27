@@ -25,9 +25,11 @@ class MockDebugSession extends DebugSession {
 	// we don't support multiple threads, so we can use a hardcoded ID for the default thread
 	private static THREAD_ID = 1;
 
+	// since we want to send breakpoint events, we will assign an id to every event
+	// so that the frontend can match events with breakpoints.
 	private _breakpointId = 1000;
 
-	// the next line that will be 'executed'
+	// This is the next line that will be 'executed'
 	private __currentLine = 0;
 	private get _currentLine() : number {
 		return this.__currentLine;
@@ -37,7 +39,7 @@ class MockDebugSession extends DebugSession {
 		this.sendEvent(new OutputEvent(`line: ${line}\n`));	// print current line on debug console
 	}
 
-	// the initial (and one and only) file we are debugging
+	// the initial (and one and only) file we are 'debugging'
 	private _sourceFile: string;
 
 	// the contents (= lines) of the one and only file
@@ -50,9 +52,8 @@ class MockDebugSession extends DebugSession {
 
 
 	/**
-	 * Creates a new debug adapter.
-	 * We configure the default implementation of a debug adapter here
-	 * by specifying that this 'debugger' uses zero-based lines and columns.
+	 * Creates a new debug adapter that is used for one debug session.
+	 * We configure the default implementation of a debug adapter here.
 	 */
 	public constructor() {
 		super();
