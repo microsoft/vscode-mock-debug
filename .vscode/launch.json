@@ -2,7 +2,7 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Launch Extension",
+			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
@@ -13,7 +13,7 @@
 			"outDir": "${workspaceRoot}/out"
 		},
 		{
-			"name": "mock-debug server",
+			"name": "Run Server",
 			"type": "node",
 			"request": "launch",
 			"runtimeArgs": [ "--nolazy" ],
@@ -23,13 +23,6 @@
 			"sourceMaps": true,
 			"outDir": "${workspaceRoot}/out",
 			"cwd": "${workspaceRoot}"
-		},
-		{
-			"name": "mock test",
-			"type": "mock",
-			"request": "launch",
-			"program": "${workspaceRoot}/README.md",
-			"stopOnEntry": true
 		},
 		{
 			"name": "Run Tests",
@@ -46,6 +39,13 @@
 			"sourceMaps": true,
 			"outDir": "${workspaceRoot}/out",
 			"cwd": "${workspaceRoot}"
+		},
+		{
+			"name": "Run Mock Sample",
+			"type": "mock",
+			"request": "launch",
+			"program": "${workspaceRoot}/README.md",
+			"stopOnEntry": true
 		}
 	]
 }
