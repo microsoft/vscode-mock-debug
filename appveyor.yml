@@ -1,0 +1,8 @@
+install:
+  - ps: Install-Product node 4.1.1 x64
+
+build_script:
+  - npm install
+
+test_script:
+  - npm test
