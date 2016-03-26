@@ -4,7 +4,11 @@
 
 "use strict";
 
-import {DebugSession, InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent, Thread, StackFrame, Scope, Source, Handles, Breakpoint} from 'vscode-debugadapter';
+import {
+	DebugSession,
+	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent,
+	Thread, StackFrame, Scope, Source, Handles, Breakpoint
+} from 'vscode-debugadapter';
 import {DebugProtocol} from 'vscode-debugprotocol';
 import {readFileSync} from 'fs';
 import {basename} from 'path';
@@ -13,7 +17,7 @@ import {basename} from 'path';
 /**
  * This interface should always match the schema found in the mock-debug extension manifest.
  */
-export interface LaunchRequestArguments {
+export interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	/** An absolute path to the program to debug. */
 	program: string;
 	/** Automatically stop target after launch. If not specified, target does not stop. */
