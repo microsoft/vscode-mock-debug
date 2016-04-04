@@ -132,7 +132,7 @@ class MockDebugSession extends DebugSession {
 			bp.id = this._breakpointId++;
 			breakpoints.push(bp);
 		}
-		this._breakPoints[path] = breakpoints;
+		this._breakPoints.set(path, breakpoints);
 
 		// send back the actual breakpoint positions
 		response.body = {
@@ -218,7 +218,7 @@ class MockDebugSession extends DebugSession {
 	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {
 
 		// find the breakpoints for the current source file
-		const breakpoints = this._breakPoints[this._sourceFile];
+		const breakpoints = this._breakPoints.get(this._sourceFile);
 
 		for (var ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
 
@@ -278,6 +278,20 @@ class MockDebugSession extends DebugSession {
 			variablesReference: 0
 		};
 		this.sendResponse(response);
+	}
+
+	protected customRequest(request: string, response: DebugProtocol.Response, args: any): void {
+		if (request === 'infoRequest') {
+
+			response.body = {
+				'currentFile': this.convertDebuggerPathToClient(this._sourceFile),
+				'currentLine': this.convertDebuggerLineToClient(this._currentLine)
+			};
+
+			this.sendResponse(response);
+		} else {
+			super.customRequest(request, response, args);
+		}
 	}
 }
 

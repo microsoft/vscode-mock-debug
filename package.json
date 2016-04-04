@@ -8,7 +8,7 @@
 		"name": "Microsoft Corporation"
 	},
 	"engines": {
-		"vscode": "^0.10.1"
+		"vscode": "^0.10.2"
 	},
 	"icon": "images/mock-debug-icon.svg",
 	"categories": [
@@ -23,13 +23,13 @@
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
 	"dependencies": {
-		"vscode-debugprotocol": "1.8.0-pre.1",
-		"vscode-debugadapter": "1.8.0-pre.0"
+		"vscode-debugprotocol": "1.8.0-pre.3",
+		"vscode-debugadapter": "1.8.0-pre.3"
 	},
 	"devDependencies": {
 		"typescript": "^1.8.2",
 		"mocha": "^2.4.5",
-		"vscode-debugadapter-testsupport": "1.8.0-pre.1"
+		"vscode-debugadapter-testsupport": "1.8.0-pre.3"
 	},
 	"scripts": {
 		"prepublish": "node ./node_modules/typescript/bin/tsc -p ./src",
