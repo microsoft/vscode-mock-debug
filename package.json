@@ -24,7 +24,7 @@
 	},
 	"dependencies": {
 		"vscode-debugprotocol": "1.8.0-pre.3",
-		"vscode-debugadapter": "1.8.0-pre.3"
+		"vscode-debugadapter": "1.8.0-pre.4"
 	},
 	"devDependencies": {
 		"typescript": "^1.8.2",

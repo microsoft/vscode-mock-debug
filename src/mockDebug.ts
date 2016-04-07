@@ -6,7 +6,7 @@
 
 import {
 	DebugSession,
-	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent,
+	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent, Event,
 	Thread, StackFrame, Scope, Source, Handles, Breakpoint
 } from 'vscode-debugadapter';
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -80,6 +80,9 @@ class MockDebugSession extends DebugSession {
 
 		// This debug adapter implements the configurationDoneRequest.
 		response.body.supportsConfigurationDoneRequest = true;
+
+		// make VS Code to use 'evaluate' when hovering over source
+		response.body.supportsEvaluateForHovers = true;
 
 		this.sendResponse(response);
 	}
@@ -273,8 +276,11 @@ class MockDebugSession extends DebugSession {
 	}
 
 	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
+
+		this.sendEvent(new CustomEvent(args.expression))
+
 		response.body = {
-			result: `evaluate(${args.expression})`,
+			result: `evaluate(context: '${args.context}', '${args.expression}')`,
 			variablesReference: 0
 		};
 		this.sendResponse(response);
@@ -294,5 +300,12 @@ class MockDebugSession extends DebugSession {
 		}
 	}
 }
+
+class CustomEvent extends Event {
+    constructor(hoverExpression: string) {
+		super('custom', { hoverExpression: hoverExpression } );
+	}
+}
+
 
 DebugSession.run(MockDebugSession);
