@@ -20,23 +20,12 @@ suite('Node Debug Adapter', () => {
 
 	let dc: DebugClient;
 
-
-	setup(done => {
+	setup( () => {
 		dc = new DebugClient('node', DEBUG_ADAPTER, 'mock');
-		dc.start().then(_ => {
-			done();
-		}).catch(err => {
-			done(err);
-		});
+		return dc.start();
 	});
 
-	teardown(done => {
-		dc.stop().then(_ => {
-			done();
-		}).catch(err => {
-			done(err);
-		});
-	});
+	teardown( () => dc.stop() );
 
 
 	suite('basic', () => {
