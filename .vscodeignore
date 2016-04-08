@@ -1,5 +1,7 @@
 .vscode/**/*
 .gitignore
+.travis.yml
+appveyor.yml
 src/**/*
 out/tests/**/*
 node_modules/**/*
