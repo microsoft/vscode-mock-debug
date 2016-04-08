@@ -22,7 +22,7 @@ suite('Node Debug Adapter', () => {
 
 
 	setup(done => {
-		dc = new DebugClient('node', DEBUG_ADAPTER, 'node');
+		dc = new DebugClient('node', DEBUG_ADAPTER, 'mock');
 		dc.start().then(_ => {
 			done();
 		}).catch(err => {
