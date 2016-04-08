@@ -54,6 +54,8 @@ class MockDebugSession extends DebugSession {
 
 	private _variableHandles = new Handles<string>();
 
+	private _timer;
+
 
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
@@ -88,6 +90,12 @@ class MockDebugSession extends DebugSession {
 	}
 
 	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
+
+		// send a custom 'heartbeat' event (for demonstration purposes)
+		this._timer = setInterval(() => {
+			this.sendEvent(new Event('heartbeatEvent'));
+		}, 1000);
+
 		this._sourceFile = args.program;
 		this._sourceLines = readFileSync(this._sourceFile).toString().split('\n');
 
@@ -101,6 +109,11 @@ class MockDebugSession extends DebugSession {
 			// we just start to run until we hit a breakpoint or an exception
 			this.continueRequest(response, { threadId: MockDebugSession.THREAD_ID });
 		}
+	}
+
+	protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments): void {
+		// stop sending custom events
+		clearInterval(this._timer);
 	}
 
 	protected setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): void {
@@ -277,8 +290,6 @@ class MockDebugSession extends DebugSession {
 
 	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
 
-		this.sendEvent(new CustomEvent(args.expression))
-
 		response.body = {
 			result: `evaluate(context: '${args.context}', '${args.expression}')`,
 			variablesReference: 0
@@ -300,12 +311,5 @@ class MockDebugSession extends DebugSession {
 		}
 	}
 }
-
-class CustomEvent extends Event {
-    constructor(hoverExpression: string) {
-		super('custom', { hoverExpression: hoverExpression } );
-	}
-}
-
 
 DebugSession.run(MockDebugSession);
