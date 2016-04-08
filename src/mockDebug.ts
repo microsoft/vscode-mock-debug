@@ -114,6 +114,7 @@ class MockDebugSession extends DebugSession {
 	protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments): void {
 		// stop sending custom events
 		clearInterval(this._timer);
+		super.disconnectRequest(response, args);
 	}
 
 	protected setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): void {
@@ -298,16 +299,17 @@ class MockDebugSession extends DebugSession {
 	}
 
 	protected customRequest(request: string, response: DebugProtocol.Response, args: any): void {
-		if (request === 'infoRequest') {
-
+		switch (request) {
+		case 'infoRequest':
 			response.body = {
 				'currentFile': this.convertDebuggerPathToClient(this._sourceFile),
 				'currentLine': this.convertDebuggerLineToClient(this._currentLine)
 			};
-
 			this.sendResponse(response);
-		} else {
+			break;
+		default:
 			super.customRequest(request, response, args);
+			break;
 		}
 	}
 }
