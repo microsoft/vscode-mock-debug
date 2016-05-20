@@ -61,6 +61,10 @@
 				"program": "./out/mockDebug.js",
 				"runtime": "node",
 
+				"variables": {
+					"PickProcess": "extension.pickProcess"
+				},
+
 				"configurationAttributes": {
 					"launch": {
 						"required": [ "program" ],
