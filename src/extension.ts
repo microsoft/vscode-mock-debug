@@ -22,8 +22,8 @@ export function activate(context: vscode.ExtensionContext) {
 				items.push(err.message);
 			} else {
 				resultList.forEach( process => {
-					if (process) {
-						items.push(`${process.pid}: ${process.command} ${process.arguments}`);
+					if (process && process.command) {
+						items.push(`${process.command}`);
 					}
 				});
 			}
