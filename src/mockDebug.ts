@@ -107,7 +107,7 @@ class MockDebugSession extends DebugSession {
 			this.sendEvent(new StoppedEvent("entry", MockDebugSession.THREAD_ID));
 		} else {
 			// we just start to run until we hit a breakpoint or an exception
-			this.continueRequest(response, { threadId: MockDebugSession.THREAD_ID });
+			this.continueRequest(<DebugProtocol.ContinueResponse>response, { threadId: MockDebugSession.THREAD_ID });
 		}
 	}
 
