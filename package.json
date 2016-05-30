@@ -25,15 +25,14 @@
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
 	"dependencies": {
-		"vscode-debugprotocol": "^1.8.0",
-		"vscode-debugadapter": "^1.8.0",
-        "ps-node": "^0.1.1"
+		"vscode-debugprotocol": "^1.9.0",
+		"vscode-debugadapter": "^1.9.0"
 	},
 	"devDependencies": {
 		"typescript": "^1.8.5",
 		"mocha": "^2.4.5",
 		"vscode": "^0.11.13",
-		"vscode-debugadapter-testsupport": "^1.8.0"
+		"vscode-debugadapter-testsupport": "^1.9.0"
 	},
 	"scripts": {
 		"prepublish": "node ./node_modules/typescript/bin/tsc -p ./src",
