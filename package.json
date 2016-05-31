@@ -1,7 +1,7 @@
 {
 	"name": "mock-debug",
 	"displayName": "Mock Debug",
-	"version": "0.10.25",
+	"version": "0.10.26",
 	"publisher": "andreweinand",
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"author": {
@@ -46,10 +46,6 @@
         "onCommand:extension.pickProcess"
     ],
 	"contributes": {
-		"commands": [{
-			"command": "extension.pickProcess",
-			"title": "Pick Process"
-		}],
 		"debuggers": [
 			{
 				"type": "mock",
