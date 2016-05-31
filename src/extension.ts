@@ -123,15 +123,11 @@ export function activate(context: vscode.ExtensionContext) {
 			let options : vscode.QuickPickOptions = {
 				placeHolder: "Pick the process to attach to",
 				matchOnDescription: true,
-				matchOnDetail: false
+				matchOnDetail: true
 			};
 
 			return vscode.window.showQuickPick(items, options).then(item => {
-				if (item) {
-					return item.pid;
-				} else {
-					return null;
-				}
+				return item ? item.pid : null;
 			});
 		});
 
