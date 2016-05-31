@@ -41,8 +41,8 @@ function listProcesses() : Promise<ProcessItem[]> {
 					const items : ProcessItem[]= [];
 
 					const lines = stdout.split('\r\n');
-					lines.forEach((out, index) => {
-						const matches = CMD_PID.exec(out.trim());
+					for (const line of lines) {
+						const matches = CMD_PID.exec(line.trim());
 						if (matches && matches.length === 3) {
 
 							const cmd = matches[1].trim();
@@ -65,13 +65,13 @@ function listProcesses() : Promise<ProcessItem[]> {
 							if (executable) {
 								items.push({
 									label: basename(executable),
-									description: pid.toString(),
+									description: pid,
 									detail: cmd,
 									pid: pid
 								});
 							}
 						}
-					});
+					};
 
 					resolve(items);
 				}
@@ -82,7 +82,7 @@ function listProcesses() : Promise<ProcessItem[]> {
 
 		} else {	// OS X & Linux
 
-			const args = '-ax -c -o pid,command';
+			const args = '-ax -c -o pid=,args=';
 
 			exec('ps ' + args, (err, stdout, stderr) => {
 
@@ -92,10 +92,7 @@ function listProcesses() : Promise<ProcessItem[]> {
 					const items : ProcessItem[]= [];
 
 					const lines = stdout.toString().split('\n');
-
-					for (let i = 0; i < lines.length; i++) {
-						const line : string = lines[i];
-
+					for (const line of lines) {
 						const pos = line.indexOf(' ');
 						if (pos > 0) {
 							const pid = line.substr(0, pos);
@@ -104,6 +101,7 @@ function listProcesses() : Promise<ProcessItem[]> {
 							items.push({
 								label: cmd,
 								description: pid,
+								// detail: cmd,
 								pid: pid
 							});
 						}
