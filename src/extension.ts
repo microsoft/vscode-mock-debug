@@ -82,7 +82,9 @@ function listProcesses() : Promise<ProcessItem[]> {
 
 		} else {	// OS X & Linux
 
-			const args = '-ax -c -o pid=,args=';
+			const PID_CMD = new RegExp('^\\s*([0-9]+)\\s+(.+)$');
+
+			const args = '-ax -o pid=,args=';
 
 			exec('ps ' + args, (err, stdout, stderr) => {
 
@@ -93,15 +95,23 @@ function listProcesses() : Promise<ProcessItem[]> {
 
 					const lines = stdout.toString().split('\n');
 					for (const line of lines) {
-						const pos = line.indexOf(' ');
-						if (pos > 0) {
-							const pid = line.substr(0, pos);
-							const cmd = line.substr(pos+1);
+
+						const matches = PID_CMD.exec(line);
+						if (matches && matches.length === 3) {
+
+							const pid = matches[1];
+							const cmd = matches[2];
+
+							let executable = cmd;
+							const parts = cmd.split(' ');
+							if (parts.length >= 1) {
+								executable = basename(parts[0]);
+							}
 
 							items.push({
-								label: cmd,
+								label: executable,
 								description: pid,
-								// detail: cmd,
+								detail: cmd,
 								pid: pid
 							});
 						}
