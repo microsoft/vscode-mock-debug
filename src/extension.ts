@@ -5,45 +5,114 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import { spawn, exec } from 'child_process';
+import { basename } from 'path';
 
-var cp = require('child_process');
-
-class ProcessItem implements vscode.QuickPickItem {
-	label: string;
-	description: string;
-	// detail: string;
-	pid: string;
+interface ProcessItem extends vscode.QuickPickItem {
+	pid: string;	// payload for the QuickPick UI
 }
 
-function listProcesses(args: string) : Promise<any[]> {
+function listProcesses() : Promise<ProcessItem[]> {
 
 	return new Promise((resolve, reject) => {
-		cp.exec('ps ' + args, function(err, stdout, stderr) {
 
-			if (err || stderr) {
-				reject( err || stderr.toString() );
-			} else {
+		if (process.platform === 'win32') {
 
-				const os = stdout.toString().split('\n');
+			const CMD_PID = new RegExp('^(.+) ([0-9]+)$');
+			const EXECUTABLE_ARGS = new RegExp('^(?:"([^"]+)"|([^ ]+))(?: (.+))?$');
 
-				let items : ProcessItem[]= [];
+			let stdout = '';
+			let stderr = '';
 
-				for (let i = 0; i < os.length; i++) {
-					const o : string = os[i];
+			const cmd = spawn('cmd');
 
-					const pos = o.indexOf(' ');
-					if (pos > 0) {
-						const pid = o.substr(0, pos);
-						const cmd = o.substr(pos+1);
+			cmd.stdout.on('data', data => {
+				stdout += data.toString();
+			});
+			cmd.stderr.on('data', data => {
+				stderr += data.toString();
+			});
 
-						items.push({ label: cmd, description: pid, pid: pid });
-					}
+			cmd.on('exit', () => {
+
+				if (stderr.length > 0) {
+					reject(stderr);
+				} else {
+					const items : ProcessItem[]= [];
+
+					const lines = stdout.split('\r\n');
+					lines.forEach((out, index) => {
+						const matches = CMD_PID.exec(out.trim());
+						if (matches && matches.length === 3) {
+
+							const cmd = matches[1].trim();
+							const pid = matches[2];
+
+							let executable;
+							let args;
+							const matches2 = EXECUTABLE_ARGS.exec(cmd);
+							if (matches2 && matches2.length >= 2) {
+								if (matches2.length >= 3) {
+									executable = matches2[1] || matches2[2];
+								} else {
+									executable = matches2[1];
+								}
+								if (matches2.length === 4) {
+									args = matches2[3];
+								}
+							}
+
+							if (executable) {
+								items.push({
+									label: basename(executable),
+									description: pid.toString(),
+									detail: cmd,
+									pid: pid
+								});
+							}
+						}
+					});
+
+					resolve(items);
 				}
+			});
 
-				resolve(items);
-			}
+			cmd.stdin.write('wmic process get ProcessId,CommandLine \n');
+			cmd.stdin.end();
 
-		});
+		} else {	// OS X & Linux
+
+			const args = '-ax -c -o pid,command';
+
+			exec('ps ' + args, (err, stdout, stderr) => {
+
+				if (err || stderr) {
+					reject(err || stderr.toString());
+				} else {
+					const items : ProcessItem[]= [];
+
+					const lines = stdout.toString().split('\n');
+
+					for (let i = 0; i < lines.length; i++) {
+						const line : string = lines[i];
+
+						const pos = line.indexOf(' ');
+						if (pos > 0) {
+							const pid = line.substr(0, pos);
+							const cmd = line.substr(pos+1);
+
+							items.push({
+								label: cmd,
+								description: pid,
+								pid: pid
+							});
+						}
+					}
+
+					resolve(items);
+				}
+			});
+		}
 	});
 }
 
@@ -51,7 +120,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	let disposable = vscode.commands.registerCommand('extension.pickProcess', () => {
 
-		return listProcesses('-ax -c -o pid,command').then(items => {
+		return listProcesses().then(items => {
 
 			let options : vscode.QuickPickOptions = {
 				placeHolder: "Pick the process to attach to",
