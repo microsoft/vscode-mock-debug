@@ -86,6 +86,9 @@ class MockDebugSession extends DebugSession {
 		// make VS Code to use 'evaluate' when hovering over source
 		response.body.supportsEvaluateForHovers = true;
 
+		// make VS Code to show a 'step back' button
+		response.body.supportsStepBack = true;
+
 		this.sendResponse(response);
 	}
 
@@ -287,6 +290,19 @@ class MockDebugSession extends DebugSession {
 		this.sendResponse(response);
 		// no more lines: run to end
 		this.sendEvent(new TerminatedEvent());
+	}
+
+	protected stepBackRequest(response: DebugProtocol.StepBackResponse, args: DebugProtocol.StepBackArguments): void {
+
+		for (let ln = this._currentLine-1; ln >= 0; ln--) {
+			if (this._sourceLines[ln].trim().length > 0) {   // find next non-empty line
+				this._currentLine = ln;
+				this.sendResponse(response);
+				this.sendEvent(new StoppedEvent("step", MockDebugSession.THREAD_ID));
+				return;
+			}
+		}
+		this.sendResponse(response);
 	}
 
 	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
