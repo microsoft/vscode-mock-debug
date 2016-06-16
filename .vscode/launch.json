@@ -39,7 +39,8 @@
 			],
 			"sourceMaps": true,
 			"outDir": "${workspaceRoot}/out",
-			"cwd": "${workspaceRoot}"
+			"cwd": "${workspaceRoot}",
+			"internalConsoleOptions": "openOnSessionStart"
 		},
 		{
 			"name": "Run Mock Sample",
