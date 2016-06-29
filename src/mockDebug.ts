@@ -172,18 +172,21 @@ class MockDebugSession extends DebugSession {
 		this.sendResponse(response);
 	}
 
+	/**
+	 * Returns a fake 'stacktrace' where every 'stackframe' is a word from the current line.
+	 */
 	protected stackTraceRequest(response: DebugProtocol.StackTraceResponse, args: DebugProtocol.StackTraceArguments): void {
 
 		const frames = new Array<StackFrame>();
 		const words = this._sourceLines[this._currentLine].trim().split(/\s+/);
 		// create three fake stack frames.
-		for (let i= 0; i < 3; i++) {
-			// use a word of the line as the stackframe name
-			const name = words.length > i ? words[i] : "frame";
+		for (let i= 0; i < words.length; i++) {
+			const name = words[i];	// use a word of the line as the stackframe name
 			frames.push(new StackFrame(i, `${name}(${i})`, new Source(basename(this._sourceFile), this.convertDebuggerPathToClient(this._sourceFile)), this.convertDebuggerLineToClient(this._currentLine), 0));
 		}
 		response.body = {
-			stackFrames: frames
+			stackFrames: frames,
+			totalFrames: frames.length
 		};
 		this.sendResponse(response);
 	}
