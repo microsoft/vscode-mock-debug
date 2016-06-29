@@ -83,7 +83,7 @@
 						"name": "Mock-Debug",
 						"type": "mock",
 						"request": "launch",
-						"program": "readme.md",
+						"program": "${workspaceRoot}/readme.md",
 						"stopOnEntry": true
 					}
 				]
