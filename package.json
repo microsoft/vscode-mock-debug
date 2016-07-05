@@ -67,7 +67,7 @@
 							"program": {
 								"type": "string",
 								"description": "Workspace relative path to a text file.",
-								"default": "readme.md"
+								"default": "${workspaceRoot}/readme.md"
 							},
 							"stopOnEntry": {
 								"type": "boolean",
