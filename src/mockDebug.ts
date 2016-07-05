@@ -172,16 +172,23 @@ class MockDebugSession extends DebugSession {
 	 */
 	protected stackTraceRequest(response: DebugProtocol.StackTraceResponse, args: DebugProtocol.StackTraceArguments): void {
 
-		const frames = new Array<StackFrame>();
 		const words = this._sourceLines[this._currentLine].trim().split(/\s+/);
-		// create three fake stack frames.
-		for (let i= 0; i < words.length; i++) {
+
+		const startFrame = typeof args.startFrame === 'number' ? args.startFrame : 0;
+		const maxLevels = typeof args.levels === 'number' ? args.levels : words.length-startFrame;
+		const endFrame = Math.min(startFrame + maxLevels, words.length);
+
+		const frames = new Array<StackFrame>();
+		// every word of the current line becomes a stack frame.
+		for (let i= startFrame; i < endFrame; i++) {
 			const name = words[i];	// use a word of the line as the stackframe name
-			frames.push(new StackFrame(i, `${name}(${i})`, new Source(basename(this._sourceFile), this.convertDebuggerPathToClient(this._sourceFile)), this.convertDebuggerLineToClient(this._currentLine), 0));
+			frames.push(new StackFrame(i, `${name}(${i})`, new Source(basename(this._sourceFile),
+				this.convertDebuggerPathToClient(this._sourceFile)),
+				this.convertDebuggerLineToClient(this._currentLine), 0));
 		}
 		response.body = {
 			stackFrames: frames,
-			totalFrames: frames.length
+			totalFrames: words.length
 		};
 		this.sendResponse(response);
 	}
