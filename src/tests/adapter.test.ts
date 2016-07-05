@@ -140,21 +140,4 @@ suite('Node Debug Adapter', () => {
 			]);
 		});
 	});
-
-	suite('customRequest', () => {
-
-		test('should return current file/line informatiom from custom request', () => {
-
-			const PROGRAM = Path.join(DATA_ROOT, 'test.md');
-			const BREAKPOINT_LINE = 2;
-
-			return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAKPOINT_LINE } ).then(_ => {
-				return dc.send('infoRequest').then(response => {
-					assert.equal(response.body.currentFile, PROGRAM, "response mismatch: 'currentFile'");
-					assert.equal(response.body.currentLine, BREAKPOINT_LINE, "response mismatch: 'currentLine'");
-				});
-			});
-		});
-	});
-
 });
