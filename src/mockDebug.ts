@@ -315,21 +315,6 @@ class MockDebugSession extends DebugSession {
 		};
 		this.sendResponse(response);
 	}
-
-	protected customRequest(request: string, response: DebugProtocol.Response, args: any): void {
-		switch (request) {
-		case 'infoRequest':
-			response.body = {
-				'currentFile': this.convertDebuggerPathToClient(this._sourceFile),
-				'currentLine': this.convertDebuggerLineToClient(this._currentLine)
-			};
-			this.sendResponse(response);
-			break;
-		default:
-			super.customRequest(request, response, args);
-			break;
-		}
-	}
 }
 
 DebugSession.run(MockDebugSession);
