@@ -41,10 +41,10 @@
 		"test": "node ./node_modules/mocha/bin/mocha -u tdd ./out/tests/",
 		"postinstall": "node ./node_modules/vscode/bin/install"
 	},
-    "main": "./out/extension",
-    "activationEvents": [
-        "onCommand:extension.pickProcess"
-    ],
+	"main": "./out/extension",
+	"activationEvents": [
+		"onCommand:extension.getProgramName"
+	],
 	"contributes": {
 		"debuggers": [
 			{
@@ -57,7 +57,7 @@
 				"runtime": "node",
 
 				"variables": {
-					"PickProcess": "extension.pickProcess"
+					"AskForProgramName": "extension.getProgramName"
 				},
 
 				"configurationAttributes": {
@@ -66,8 +66,8 @@
 						"properties": {
 							"program": {
 								"type": "string",
-								"description": "Workspace relative path to a text file.",
-								"default": "readme.md"
+								"description": "Absolute path to a text file.",
+								"default": "${workspaceRoot}/${command.AskForProgramName}"
 							},
 							"stopOnEntry": {
 								"type": "boolean",
@@ -83,7 +83,7 @@
 						"name": "Mock-Debug",
 						"type": "mock",
 						"request": "launch",
-						"program": "${workspaceRoot}/readme.md",
+						"program": "${workspaceRoot}/${command.AskForProgramName}",
 						"stopOnEntry": true
 					}
 				]
