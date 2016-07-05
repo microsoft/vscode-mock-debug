@@ -94,11 +94,6 @@ class MockDebugSession extends DebugSession {
 
 	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
 
-		// send a custom 'heartbeat' event (for demonstration purposes)
-		this._timer = setInterval(() => {
-			this.sendEvent(new Event('heartbeatEvent'));
-		}, 1000);
-
 		this._sourceFile = args.program;
 		this._sourceLines = readFileSync(this._sourceFile).toString().split('\n');
 
