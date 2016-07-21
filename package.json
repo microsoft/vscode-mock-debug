@@ -25,14 +25,14 @@
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
 	"dependencies": {
-		"vscode-debugprotocol": "1.10.0",
-		"vscode-debugadapter": "1.10.0"
+		"vscode-debugprotocol": "^1.11.0-pre.8",
+		"vscode-debugadapter": "^1.11.0-pre.6"
 	},
 	"devDependencies": {
 		"typescript": "^1.8.5",
 		"mocha": "^2.4.5",
 		"vscode": "^0.11.13",
-		"vscode-debugadapter-testsupport": "^1.10.0"
+		"vscode-debugadapter-testsupport": "^1.11.0-pre.0"
 	},
 	"scripts": {
 		"prepublish": "node ./node_modules/typescript/bin/tsc -p ./src",
@@ -46,12 +46,15 @@
 		"onCommand:extension.getProgramName"
 	],
 	"contributes": {
+		"breakpoints": [
+			{
+				"language": "markdown"
+			}
+		],
 		"debuggers": [
 			{
 				"type": "mock",
 				"label": "Mock Debug",
-
-				"enableBreakpointsFor": { "languageIds": [ "markdown" ] },
 
 				"program": "./out/mockDebug.js",
 				"runtime": "node",
