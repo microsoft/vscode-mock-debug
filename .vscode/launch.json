@@ -46,7 +46,7 @@
 			"name": "Run Mock Sample",
 			"type": "mock",
 			"request": "launch",
-			"program": "${workspaceRoot}/README.md",
+			"program": "${workspaceRoot}/${command.AskForProgramName}",
 			"stopOnEntry": true
 		}
 	]
