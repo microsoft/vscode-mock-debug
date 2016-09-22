@@ -6,6 +6,16 @@
 
 import * as vscode from 'vscode';
 
+const initialConfigurations = [
+	{
+		name: 'Mock-Debug',
+		type: 'mock',
+		request: 'launch',
+		program: '${workspaceRoot}/${command.AskForProgramName}',
+		stopOnEntry: true
+	}
+]
+
 export function activate(context: vscode.ExtensionContext) {
 
 	let disposable = vscode.commands.registerCommand('extension.getProgramName', () => {
@@ -14,8 +24,11 @@ export function activate(context: vscode.ExtensionContext) {
 			value: "readme.md"
 		});
 	});
-
 	context.subscriptions.push(disposable);
+
+	context.subscriptions.push(vscode.commands.registerCommand('extension.provideInitialConfigurations', () => {
+		return JSON.stringify(initialConfigurations);
+	}));
 }
 
 export function deactivate() {

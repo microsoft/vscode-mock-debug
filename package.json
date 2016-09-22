@@ -80,16 +80,7 @@
 						}
 					}
 				},
-
-				"initialConfigurations": [
-					{
-						"name": "Mock-Debug",
-						"type": "mock",
-						"request": "launch",
-						"program": "${workspaceRoot}/${command.AskForProgramName}",
-						"stopOnEntry": true
-					}
-				]
+				"initialConfigurations": "extension.provideInitialConfigurations"
 			}
 		]
 	}
