@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-'use strict';
+/// <reference path="../node_modules/@types/es6-collections/index.d.ts" />
 
 import {
 	DebugSession,
