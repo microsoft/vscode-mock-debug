@@ -2,7 +2,8 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-/// <reference path="../node_modules/@types/es6-collections/index.d.ts" />
+/// <reference types="es6-collections" />
+/// <reference types="node" />
 
 import {
 	DebugSession,
