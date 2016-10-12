@@ -6,7 +6,9 @@
 
 import * as vscode from 'vscode';
 
-const initialConfigurations = [
+const initialConfigurations = {
+	version: '0.2.0',
+	configurations: [
 	{
 		name: 'Mock-Debug',
 		type: 'mock',
@@ -14,7 +16,7 @@ const initialConfigurations = [
 		program: '${workspaceRoot}/${command.AskForProgramName}',
 		stopOnEntry: true
 	}
-]
+]}
 
 export function activate(context: vscode.ExtensionContext) {
 
