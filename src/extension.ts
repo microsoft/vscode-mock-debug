@@ -28,7 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(disposable);
 
-	context.subscriptions.push(vscode.commands.registerCommand('extension.provideInitialConfigurations', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('extension.mock-debug.provideInitialConfigurations', () => {
 		return JSON.stringify(initialConfigurations);
 	}));
 }

@@ -47,7 +47,8 @@
 	},
 	"main": "./out/extension",
 	"activationEvents": [
-		"onCommand:extension.getProgramName"
+		"onCommand:extension.getProgramName",
+		"onCommand:extension.mock-debug.provideInitialConfigurations"
 	],
 	"contributes": {
 		"breakpoints": [
@@ -84,7 +85,7 @@
 						}
 					}
 				},
-				"initialConfigurations": "extension.provideInitialConfigurations"
+				"initialConfigurations": "extension.mock-debug.provideInitialConfigurations"
 			}
 		]
 	}
