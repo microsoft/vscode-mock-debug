@@ -55,8 +55,6 @@ class MockDebugSession extends DebugSession {
 
 	private _variableHandles = new Handles<string>();
 
-	private _timer;
-
 
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
@@ -108,12 +106,6 @@ class MockDebugSession extends DebugSession {
 			// we just start to run until we hit a breakpoint or an exception
 			this.continueRequest(<DebugProtocol.ContinueResponse>response, { threadId: MockDebugSession.THREAD_ID });
 		}
-	}
-
-	protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments): void {
-		// stop sending custom events
-		clearInterval(this._timer);
-		super.disconnectRequest(response, args);
 	}
 
 	protected setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): void {
