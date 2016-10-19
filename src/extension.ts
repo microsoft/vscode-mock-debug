@@ -10,9 +10,9 @@ const initialConfigurations = {
 	version: '0.2.0',
 	configurations: [
 	{
-		name: 'Mock-Debug',
 		type: 'mock',
 		request: 'launch',
+		name: 'Mock-Debug',
 		program: '${workspaceRoot}/${command.AskForProgramName}',
 		stopOnEntry: true
 	}
@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 
 	context.subscriptions.push(vscode.commands.registerCommand('extension.mock-debug.provideInitialConfigurations', () => {
-		return JSON.stringify(initialConfigurations);
+		return JSON.stringify(initialConfigurations, null, '\t');
 	}));
 }
 

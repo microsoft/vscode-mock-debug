@@ -2,35 +2,33 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
+			"name": "Run Extension",
+			"preLaunchTask": "npm",
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceRoot}"
 			],
 			"sourceMaps": true,
-			"outDir": "${workspaceRoot}/out",
-			"preLaunchTask": "npm"
+			"outFiles": [ "${workspaceRoot}/out/*.js" ]
 		},
 		{
-			"name": "Run Server",
 			"type": "node",
 			"request": "launch",
-			"runtimeArgs": [ "--nolazy" ],
+			"name": "Run Server",
+			"cwd": "${workspaceRoot}",
 			"program": "${workspaceRoot}/src/mockDebug.ts",
-			"stopOnEntry": false,
 			"args": [ "--server=4711" ],
 			"sourceMaps": true,
-			"outDir": "${workspaceRoot}/out",
-			"cwd": "${workspaceRoot}"
+			"outFiles": [ "${workspaceRoot}/out/*.js" ]
 		},
 		{
-			"name": "Run Tests",
 			"type": "node",
 			"request": "launch",
+			"name": "Run Tests",
+			"cwd": "${workspaceRoot}",
 			"program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
-			"runtimeArgs": [ "--nolazy" ],
 			"args": [
 				"-u", "tdd",
 				"--timeout", "999999",
@@ -39,13 +37,12 @@
 			],
 			"sourceMaps": true,
 			"outDir": "${workspaceRoot}/out",
-			"cwd": "${workspaceRoot}",
 			"internalConsoleOptions": "openOnSessionStart"
 		},
 		{
-			"name": "Run Mock Sample",
 			"type": "mock",
 			"request": "launch",
+			"name": "Run Mock Sample",
 			"program": "${workspaceRoot}/${command.AskForProgramName}",
 			"stopOnEntry": true
 		}
