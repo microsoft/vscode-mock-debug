@@ -29,7 +29,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 
 	context.subscriptions.push(vscode.commands.registerCommand('extension.mock-debug.provideInitialConfigurations', () => {
-		return JSON.stringify(initialConfigurations, null, '\t');
+		return [
+			'// Use IntelliSense to learn about possible Mock debug attributes.',
+			'// Hover to view descriptions of existing attributes.',
+			JSON.stringify(initialConfigurations, null, '\t')
+		].join('\n');
 	}));
 }
 
