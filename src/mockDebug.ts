@@ -239,38 +239,8 @@ class MockDebugSession extends DebugSession {
 
 	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {
 
-		// find the breakpoints for the current source file
-		const breakpoints = this._breakPoints.get(this._sourceFile);
-
 		for (var ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
-
-			if (breakpoints) {
-				const bps = breakpoints.filter(bp => bp.line === this.convertDebuggerLineToClient(ln));
-				if (bps.length > 0) {
-					this._currentLine = ln;
-
-					// 'continue' request finished
-					this.sendResponse(response);
-
-					// send 'stopped' event
-					this.sendEvent(new StoppedEvent("breakpoint", MockDebugSession.THREAD_ID));
-
-					// the following shows the use of 'breakpoint' events to update properties of a breakpoint in the UI
-					// if breakpoint is not yet verified, verify it now and send a 'breakpoint' update event
-					if (!bps[0].verified) {
-						bps[0].verified = true;
-						this.sendEvent(new BreakpointEvent("update", bps[0]));
-					}
-					return;
-				}
-			}
-
-			// if word 'exception' found in source -> throw exception
-			if (this._sourceLines[ln].indexOf("exception") >= 0) {
-				this._currentLine = ln;
-				this.sendResponse(response);
-				this.sendEvent(new StoppedEvent("exception", MockDebugSession.THREAD_ID));
-				this.sendEvent(new OutputEvent(`exception in line: ${ln}\n`, 'stderr'));
+			if (this.fireEventsForLine(response, ln)) {
 				return;
 			}
 		}
@@ -279,13 +249,23 @@ class MockDebugSession extends DebugSession {
 		this.sendEvent(new TerminatedEvent());
 	}
 
+	protected reverseContinueRequest(response: DebugProtocol.ReverseContinueResponse, args: DebugProtocol.ReverseContinueArguments) : void {
+
+		for (var ln = this._currentLine-1; ln >= 0; ln--) {
+			if (this.fireEventsForLine(response, ln)) {
+				return;
+			}
+		}
+		this.sendResponse(response);
+		// no more lines: stop at first line
+		this._currentLine = 0;
+		this.sendEvent(new StoppedEvent("entry", MockDebugSession.THREAD_ID));
+ 	}
+
 	protected nextRequest(response: DebugProtocol.NextResponse, args: DebugProtocol.NextArguments): void {
 
 		for (let ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
-			if (this._sourceLines[ln].trim().length > 0) {   // find next non-empty line
-				this._currentLine = ln;
-				this.sendResponse(response);
-				this.sendEvent(new StoppedEvent("step", MockDebugSession.THREAD_ID));
+			if (this.fireStepEvent(response, ln)) {
 				return;
 			}
 		}
@@ -297,14 +277,14 @@ class MockDebugSession extends DebugSession {
 	protected stepBackRequest(response: DebugProtocol.StepBackResponse, args: DebugProtocol.StepBackArguments): void {
 
 		for (let ln = this._currentLine-1; ln >= 0; ln--) {
-			if (this._sourceLines[ln].trim().length > 0) {   // find next non-empty line
-				this._currentLine = ln;
-				this.sendResponse(response);
-				this.sendEvent(new StoppedEvent("step", MockDebugSession.THREAD_ID));
+			if (this.fireStepEvent(response, ln)) {
 				return;
 			}
 		}
 		this.sendResponse(response);
+		// no more lines: stop at first line
+		this._currentLine = 0;
+		this.sendEvent(new StoppedEvent("entry", MockDebugSession.THREAD_ID));
 	}
 
 	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
@@ -314,6 +294,62 @@ class MockDebugSession extends DebugSession {
 			variablesReference: 0
 		};
 		this.sendResponse(response);
+	}
+
+	//---- some helpers
+
+	/**
+	 * Fire StoppedEvent if line is not empty.
+	 */
+	private fireStepEvent(response: DebugProtocol.Response, ln: number): boolean {
+
+		if (this._sourceLines[ln].trim().length > 0) {	// non-empty line
+			this._currentLine = ln;
+			this.sendResponse(response);
+			this.sendEvent(new StoppedEvent("step", MockDebugSession.THREAD_ID));
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Fire StoppedEvent if line has a breakpoint or the word 'exception' is found.
+	 */
+	private fireEventsForLine(response: DebugProtocol.Response, ln: number): boolean {
+
+		// find the breakpoints for the current source file
+		const breakpoints = this._breakPoints.get(this._sourceFile);
+		if (breakpoints) {
+			const bps = breakpoints.filter(bp => bp.line === this.convertDebuggerLineToClient(ln));
+			if (bps.length > 0) {
+				this._currentLine = ln;
+
+				// 'continue' request finished
+				this.sendResponse(response);
+
+				// send 'stopped' event
+				this.sendEvent(new StoppedEvent("breakpoint", MockDebugSession.THREAD_ID));
+
+				// the following shows the use of 'breakpoint' events to update properties of a breakpoint in the UI
+				// if breakpoint is not yet verified, verify it now and send a 'breakpoint' update event
+				if (!bps[0].verified) {
+					bps[0].verified = true;
+					this.sendEvent(new BreakpointEvent("update", bps[0]));
+				}
+				return true;
+			}
+		}
+
+		// if word 'exception' found in source -> throw exception
+		if (this._sourceLines[ln].indexOf("exception") >= 0) {
+			this._currentLine = ln;
+			this.sendResponse(response);
+			this.sendEvent(new StoppedEvent("exception", MockDebugSession.THREAD_ID));
+			this.sendEvent(new OutputEvent(`exception in line: ${ln}\n`, 'stderr'));
+			return true;
+		}
+
+		return false;
 	}
 }
 
