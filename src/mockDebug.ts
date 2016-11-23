@@ -2,9 +2,6 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-/// <reference types="es6-collections" />
-/// <reference types="node" />
-
 import {
 	DebugSession,
 	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent, Event,
@@ -41,7 +38,7 @@ class MockDebugSession extends DebugSession {
     }
 	private set _currentLine(line: number) {
 		this.__currentLine = line;
-		this.sendEvent(new OutputEvent(`line: ${line}\n`));	// print current line on debug console
+		this.log('line', line);
 	}
 
 	// the initial (and one and only) file we are 'debugging'
@@ -54,7 +51,6 @@ class MockDebugSession extends DebugSession {
 	private _breakPoints = new Map<string, DebugProtocol.Breakpoint[]>();
 
 	private _variableHandles = new Handles<string>();
-
 
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
@@ -345,11 +341,17 @@ class MockDebugSession extends DebugSession {
 			this._currentLine = ln;
 			this.sendResponse(response);
 			this.sendEvent(new StoppedEvent("exception", MockDebugSession.THREAD_ID));
-			this.sendEvent(new OutputEvent(`exception in line: ${ln}\n`, 'stderr'));
+			this.log('exception in line', ln);
 			return true;
 		}
 
 		return false;
+	}
+
+	private log(msg: string, line: number) {
+		const e = new OutputEvent(`${msg}: ${line}\n`);
+		(<DebugProtocol.OutputEvent>e).body.variablesReference = this._variableHandles.create("args");
+		this.sendEvent(e);	// print current line on debug console
 	}
 }
 
