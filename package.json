@@ -67,7 +67,7 @@
 				"variables": {
 					"AskForProgramName": "extension.mock-debug.getProgramName"
 				},
-				
+
 				"configurationSnippets": [
 					{
 						"label": "Mock Debug: Launch",
@@ -75,8 +75,8 @@
 						"body": {
 							"type": "mock",
 							"request": "launch",
-							"name": "{{2:Launch Program}}",
-							"program": "${workspaceRoot}/{{1:Program}}"
+							"name": "${2:Launch Program}",
+							"program": "${workspaceRoot}/${1:Program}"
 						}
 					}
 				],
