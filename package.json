@@ -25,8 +25,8 @@
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
 	"dependencies": {
-		"vscode-debugprotocol": "^1.16.0",
-		"vscode-debugadapter": "^1.16.0"
+		"vscode-debugprotocol": "^1.17.0",
+		"vscode-debugadapter": "^1.17.0"
 	},
 	"devDependencies": {
 		"@types/es6-collections": "^0.5.29",
@@ -36,7 +36,7 @@
 		"typescript": "^2.0.10",
 		"mocha": "^3.1.2",
 		"vscode": "^1.0.3",
-		"vscode-debugadapter-testsupport": "^1.16.0"
+		"vscode-debugadapter-testsupport": "^1.17.0"
 	},
 	"scripts": {
 		"prepublish": "node ./node_modules/typescript/bin/tsc -p ./src",
@@ -88,7 +88,7 @@
 							"program": {
 								"type": "string",
 								"description": "Absolute path to a text file.",
-								"default": "${workspaceRoot}/${command.AskForProgramName}"
+								"default": "${workspaceRoot}/${command:AskForProgramName}"
 							},
 							"stopOnEntry": {
 								"type": "boolean",
