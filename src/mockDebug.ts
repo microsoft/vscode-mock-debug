@@ -3,6 +3,7 @@
  *--------------------------------------------------------*/
 
 import {
+	Logger,
 	DebugSession, LoggingDebugSession,
 	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent, Event,
 	Thread, StackFrame, Scope, Source, Handles, Breakpoint
@@ -20,6 +21,8 @@ export interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArgum
 	program: string;
 	/** Automatically stop target after launch. If not specified, target does not stop. */
 	stopOnEntry?: boolean;
+	/** enable logging the Debug Adapter Protocol */
+	trace?: boolean;
 }
 
 class MockDebugSession extends LoggingDebugSession {
@@ -57,7 +60,7 @@ class MockDebugSession extends LoggingDebugSession {
 	 * We configure the default implementation of a debug adapter here.
 	 */
 	public constructor() {
-		super("log.txt");
+		super("mock-debug.txt");
 
 		// this debugger uses zero-based lines and columns
 		this.setDebuggerLinesStartAt1(false);
@@ -88,6 +91,10 @@ class MockDebugSession extends LoggingDebugSession {
 	}
 
 	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
+
+		if (args.trace) {
+			Logger.setup(Logger.LogLevel.Verbose, /*logToFile=*/false);
+		}
 
 		this._sourceFile = args.program;
 		this._sourceLines = readFileSync(this._sourceFile).toString().split('\n');

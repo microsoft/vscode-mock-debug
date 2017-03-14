@@ -1,7 +1,7 @@
 {
 	"name": "mock-debug",
 	"displayName": "Mock Debug",
-	"version": "0.18.0",
+	"version": "0.18.1",
 	"publisher": "andreweinand",
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"author": {
@@ -25,8 +25,8 @@
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
 	"dependencies": {
-		"vscode-debugprotocol": "^1.17.0",
-		"vscode-debugadapter": "^1.17.0"
+		"vscode-debugprotocol": "^1.18.0-pre.2",
+		"vscode-debugadapter": "^1.18.0-pre.4"
 	},
 	"devDependencies": {
 		"@types/es6-collections": "^0.5.29",
@@ -93,6 +93,11 @@
 							"stopOnEntry": {
 								"type": "boolean",
 								"description": "Automatically stop after launch.",
+								"default": true
+							},
+							"trace": {
+								"type": "boolean",
+								"description": "Enable logging of the Debug Adapter Protocol.",
 								"default": true
 							}
 						}
