@@ -41,6 +41,7 @@ suite('Node Debug Adapter', () => {
 
 		test('should return supported features', () => {
 			return dc.initializeRequest().then(response => {
+				response.body = response.body || {};
 				assert.equal(response.body.supportsConfigurationDoneRequest, true);
 			});
 		});

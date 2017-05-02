@@ -3,9 +3,9 @@
  *--------------------------------------------------------*/
 
 import {
-	Logger,
+	Logger, logger,
 	DebugSession, LoggingDebugSession,
-	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent, Event,
+	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent,
 	Thread, StackFrame, Scope, Source, Handles, Breakpoint
 } from 'vscode-debugadapter';
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -78,6 +78,8 @@ class MockDebugSession extends LoggingDebugSession {
 		// The frontend will end the configuration sequence by calling 'configurationDone' request.
 		this.sendEvent(new InitializedEvent());
 
+		response.body = response.body || {};
+
 		// This debug adapter implements the configurationDoneRequest.
 		response.body.supportsConfigurationDoneRequest = true;
 
@@ -92,9 +94,8 @@ class MockDebugSession extends LoggingDebugSession {
 
 	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
 
-		if (args.trace) {
-			Logger.setup(Logger.LogLevel.Verbose, /*logToFile=*/false);
-		}
+		// make sure to 'Stop' the buffered logging if 'trace' is not set
+		logger.setup(args.trace ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
 
 		this._sourceFile = args.program;
 		this._sourceLines = readFileSync(this._sourceFile).toString().split('\n');
@@ -113,26 +114,28 @@ class MockDebugSession extends LoggingDebugSession {
 
 	protected setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): void {
 
-		var path = args.source.path;
-		var clientLines = args.lines;
+		const path = <string>args.source.path;
+		const clientLines = args.lines || [];
 
 		// read file contents into array for direct access
-		var lines = readFileSync(path).toString().split('\n');
+		const lines = readFileSync(path).toString().split('\n');
 
-		var breakpoints = new Array<Breakpoint>();
+		const breakpoints = new Array<Breakpoint>();
 
 		// verify breakpoint locations
-		for (var i = 0; i < clientLines.length; i++) {
-			var l = this.convertClientLineToDebugger(clientLines[i]);
-			var verified = false;
+		for (let i = 0; i < clientLines.length; i++) {
+			let l = this.convertClientLineToDebugger(clientLines[i]);
+			let verified = false;
 			if (l < lines.length) {
 				const line = lines[l].trim();
 				// if a line is empty or starts with '+' we don't allow to set a breakpoint but move the breakpoint down
-				if (line.length == 0 || line.indexOf("+") == 0)
+				if (line.length === 0 || line.indexOf("+") === 0) {
 					l++;
+				}
 				// if a line starts with '-' we don't allow to set a breakpoint but move the breakpoint up
-				if (line.indexOf("-") == 0)
+				if (line.indexOf("-") === 0) {
 					l--;
+				}
 				// don't set 'verified' to true if the line contains the word 'lazy'
 				// in this case the breakpoint will be verified 'lazy' after hitting it once.
 				if (line.indexOf("lazy") < 0) {
@@ -205,9 +208,9 @@ class MockDebugSession extends LoggingDebugSession {
 
 	protected variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments): void {
 
-		const variables = [];
+		const variables = new Array<DebugProtocol.Variable>();
 		const id = this._variableHandles.get(args.variablesReference);
-		if (id != null) {
+		if (id !== null) {
 			variables.push({
 				name: id + "_i",
 				type: "integer",
@@ -242,7 +245,7 @@ class MockDebugSession extends LoggingDebugSession {
 
 	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {
 
-		for (var ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
+		for (let ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
 			if (this.fireEventsForLine(response, ln)) {
 				return;
 			}
@@ -254,7 +257,7 @@ class MockDebugSession extends LoggingDebugSession {
 
 	protected reverseContinueRequest(response: DebugProtocol.ReverseContinueResponse, args: DebugProtocol.ReverseContinueArguments) : void {
 
-		for (var ln = this._currentLine-1; ln >= 0; ln--) {
+		for (let ln = this._currentLine-1; ln >= 0; ln--) {
 			if (this.fireEventsForLine(response, ln)) {
 				return;
 			}
