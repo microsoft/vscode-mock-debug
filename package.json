@@ -40,11 +40,11 @@
 		"tslint": "^5.1.0"
 	},
 	"scripts": {
-		"prepublish": "node ./node_modules/typescript/bin/tsc -p ./src",
-		"compile": "node ./node_modules/typescript/bin/tsc -p ./src",
+		"prepublish": "tsc -p ./src",
+		"compile": "tsc -p ./src",
 		"tslint": "tslint ./src/**/*.ts",
-		"watch": "node ./node_modules/typescript/bin/tsc -w -p ./src",
-		"test": "node ./node_modules/mocha/bin/mocha -u tdd ./out/tests/",
+		"watch": "tsc -w -p ./src",
+		"test": "mocha -u tdd ./out/tests/",
 		"postinstall": "node ./node_modules/vscode/bin/install"
 	},
 	"main": "./out/extension",
