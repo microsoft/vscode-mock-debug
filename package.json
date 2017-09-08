@@ -35,7 +35,8 @@
 		"mocha": "^3.5.0",
 		"vscode": "^1.1.5",
 		"vscode-debugadapter-testsupport": "^1.23.0",
-		"tslint": "^5.7.0"
+		"tslint": "^5.7.0",
+		"vsce": "^1.30.0"
 	},
 	"scripts": {
 		"prepublish": "tsc -p ./src",
@@ -43,7 +44,9 @@
 		"tslint": "tslint ./src/**/*.ts",
 		"watch": "tsc -w -p ./src",
 		"test": "mocha -u tdd ./out/tests/",
-		"postinstall": "node ./node_modules/vscode/bin/install"
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"package": "vsce package",
+		"publish": "vsce publish"
 	},
 	"main": "./out/extension",
 	"activationEvents": [
