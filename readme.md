@@ -12,7 +12,7 @@ adapter for VS Code. It can be used as a starting point for developing a real ad
 More information about how to develop a new debug adapter can be found
 [here](https://code.visualstudio.com/docs/extensions/example-debuggers).
 Or discuss debug adapters on Gitter:
-[![Gitter Chat](http://img.shields.io/badge/chat-online-brightgreen.svg)](https://gitter.im/Microsoft/vscode)
+[![Gitter Chat](https://img.shields.io/badge/chat-online-brightgreen.svg)](https://gitter.im/Microsoft/vscode)
 
 ## Using Mock Debug
 
