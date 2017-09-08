@@ -12,7 +12,7 @@
 		"vscode": "^1.1.0",
 		"node": "^6.5.0"
 	},
-	"icon": "images/mock-debug-icon.svg",
+	"icon": "images/mock-debug-icon.png",
 	"categories": [
 		"Debuggers"
 	],
@@ -25,19 +25,17 @@
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
 	"dependencies": {
-		"vscode-debugprotocol": "^1.19.0",
-		"vscode-debugadapter": "^1.19.0"
+		"vscode-debugprotocol": "^1.23.0",
+		"vscode-debugadapter": "^1.23.0"
 	},
 	"devDependencies": {
-		"@types/es6-collections": "^0.5.29",
-		"@types/es6-promise": "^0.0.32",
-		"@types/mocha": "^2.2.33",
 		"@types/node": "^6.0.50",
-		"typescript": "^2.2.1",
-		"mocha": "^3.1.2",
-		"vscode": "^1.0.3",
-		"vscode-debugadapter-testsupport": "^1.19.0",
-		"tslint": "^5.1.0"
+		"@types/mocha": "^2.2.42",
+		"typescript": "^2.5.2",
+		"mocha": "^3.5.0",
+		"vscode": "^1.1.5",
+		"vscode-debugadapter-testsupport": "^1.23.0",
+		"tslint": "^5.7.0"
 	},
 	"scripts": {
 		"prepublish": "tsc -p ./src",

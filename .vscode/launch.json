@@ -10,7 +10,6 @@
 			"args": [
 				"--extensionDevelopmentPath=${workspaceRoot}"
 			],
-			"sourceMaps": true,
 			"outFiles": [ "${workspaceRoot}/out/**/*.js" ]
 		},
 		{
@@ -20,7 +19,6 @@
 			"cwd": "${workspaceRoot}",
 			"program": "${workspaceRoot}/src/mockDebug.ts",
 			"args": [ "--server=4711" ],
-			"sourceMaps": true,
 			"outFiles": [ "${workspaceRoot}/out/**/*.js" ]
 		},
 		{
@@ -35,7 +33,6 @@
 				"--colors",
 				"./out/tests/"
 			],
-			"sourceMaps": true,
 			"outFiles": [ "${workspaceRoot}/out/**/*.js" ],
 			"internalConsoleOptions": "openOnSessionStart"
 		},
