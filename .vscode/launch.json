@@ -40,7 +40,7 @@
 			"type": "mock",
 			"request": "launch",
 			"name": "Mock Sample",
-			"program": "${workspaceRoot}/${command.AskForProgramName}",
+			"program": "${workspaceRoot}/${command:AskForProgramName}",
 			"stopOnEntry": true
 		}
 	],
