@@ -38,7 +38,7 @@ class MockDebugSession extends LoggingDebugSession {
 	private __currentLine = 0;
 	private get _currentLine() : number {
 		return this.__currentLine;
-    }
+	}
 	private set _currentLine(line: number) {
 		this.__currentLine = line;
 		this.log('line', line);
