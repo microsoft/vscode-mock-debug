@@ -1,7 +1,7 @@
 {
 	"name": "mock-debug",
 	"displayName": "Mock Debug",
-	"version": "0.19.0",
+	"version": "0.20.0",
 	"publisher": "andreweinand",
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"author": {
@@ -71,6 +71,8 @@
 					"AskForProgramName": "extension.mock-debug.getProgramName"
 				},
 
+				"initialConfigurations": "extension.mock-debug.provideInitialConfigurations",
+
 				"configurationSnippets": [
 					{
 						"label": "Mock Debug: Launch",
@@ -105,8 +107,7 @@
 							}
 						}
 					}
-				},
-				"initialConfigurations": "extension.mock-debug.provideInitialConfigurations"
+				}
 			}
 		]
 	}
