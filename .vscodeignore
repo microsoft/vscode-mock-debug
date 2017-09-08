@@ -4,7 +4,4 @@
 appveyor.yml
 src/**/*
 out/tests/**/*
-node_modules/**/*
 **/*.js.map
-!node_modules/vscode-debugprotocol/**/*
-!node_modules/vscode-debugadapter/**/*
