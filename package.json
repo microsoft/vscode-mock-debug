@@ -9,7 +9,7 @@
 		"email": "aweinand@microsoft.com"
 	},
 	"engines": {
-		"vscode": "^1.17.0",
+		"vscode": "^1.1.0",
 		"node": "^6.5.0"
 	},
 	"icon": "images/mock-debug-icon.png",
@@ -50,8 +50,8 @@
 	},
 	"main": "./out/extension",
 	"activationEvents": [
-		"onDebug",
-		"onCommand:extension.mock-debug.getProgramName"
+		"onCommand:extension.mock-debug.getProgramName",
+		"onCommand:extension.mock-debug.provideInitialConfigurations"
 	],
 	"contributes": {
 		"breakpoints": [
@@ -67,13 +67,11 @@
 				"program": "./out/mockDebug.js",
 				"runtime": "node",
 
-				"languages": [
-					"markdown"
-				],
-
 				"variables": {
 					"AskForProgramName": "extension.mock-debug.getProgramName"
 				},
+
+				"initialConfigurations": "extension.mock-debug.provideInitialConfigurations",
 
 				"configurationSnippets": [
 					{
