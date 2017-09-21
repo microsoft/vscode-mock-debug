@@ -122,11 +122,6 @@ export class MockRuntime extends EventEmitter {
 
 	// private methods
 
-	private emitEvent(event: string) {
-		//setImmediate(() => this.emit(event));
-		this.emit(event);
-	}
-
 	/**
 	 * Run through the file.
 	 * If stepEvent is specified only run a single step and emit the stepEvent.
@@ -141,7 +136,7 @@ export class MockRuntime extends EventEmitter {
 			}
 			// no more lines: stop at first line
 			this._currentLine = 0;
-			this.emitEvent('stopOnEntry');
+			this.emit('stopOnEntry');
 		} else {
 			for (let ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
 				if (this.fireEventsForLine(ln, stepEvent)) {
@@ -150,7 +145,7 @@ export class MockRuntime extends EventEmitter {
 				}
 			}
 			// no more lines: run to end
-			this.emitEvent('end');
+			this.emit('end');
 		}
 	}
 
@@ -196,7 +191,7 @@ export class MockRuntime extends EventEmitter {
 
 		// if word 'exception' found in source -> throw exception
 		if (line.indexOf('exception') >= 0) {
-			this.emitEvent('stopOnException');
+			this.emit('stopOnException');
 			return true;
 		}
 
@@ -207,7 +202,7 @@ export class MockRuntime extends EventEmitter {
 			if (bps.length > 0) {
 
 				// send 'stopped' event
-				this.emitEvent('stopOnBreakpoint');
+				this.emit('stopOnBreakpoint');
 
 				// the following shows the use of 'breakpoint' events to update properties of a breakpoint in the UI
 				// if breakpoint is not yet verified, verify it now and send a 'breakpoint' update event
@@ -221,7 +216,7 @@ export class MockRuntime extends EventEmitter {
 
 		// non-empty line
 		if (stepEvent && line.length > 0) {
-			this.emitEvent(stepEvent);
+			this.emit(stepEvent);
 			return true;
 		}
 
