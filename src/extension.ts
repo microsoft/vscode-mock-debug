@@ -12,8 +12,8 @@ const initialConfigurations = {
 		{
 			type: 'mock',
 			request: 'launch',
-			name: 'Mock Debug',
-			program: '${workspaceRoot}/readme.md',
+			name: 'Ask for file name',
+			program: '${workspaceRoot}/${command:AskForProgramName}',
 			stopOnEntry: true
 		}
 	]
