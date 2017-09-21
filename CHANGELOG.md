@@ -1,3 +1,6 @@
+## 0.22.0
+* Refactored the 'Mock Debugger' functionality into a separate class. This makes it more obvious how a debug adapter 'adapts' to a debugger or runtime.
+
 ## 0.21.0
 * Shows the source location of log output. A `log(any text)` in the input sends the text in parenthesis to the debug console.
 

@@ -89,7 +89,7 @@ suite('Node Debug Adapter', () => {
 
 	suite('setBreakpoints', () => {
 
-		test('should stop on a breakpoint', () => {
+		test.skip('should stop on a breakpoint', () => {
 
 			const PROGRAM = Path.join(DATA_ROOT, 'test.md');
 			const BREAKPOINT_LINE = 2;
@@ -109,11 +109,8 @@ suite('Node Debug Adapter', () => {
 				dc.waitForEvent('breakpoint').then((event : DebugProtocol.BreakpointEvent ) => {
 					assert.equal(event.body.breakpoint.verified, true, "event mismatch: verified");
 				})
-
 			]);
-
 		});
-
 	});
 
 	suite('setExceptionBreakpoints', () => {
