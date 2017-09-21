@@ -35,14 +35,7 @@ class MockDebugSession extends LoggingDebugSession {
 	private _breakpointId = 1000;
 
 	// This is the next line that will be 'executed'
-	private __currentLine = 0;
-	private get _currentLine() : number {
-		return this.__currentLine;
-	}
-	private set _currentLine(line: number) {
-		this.__currentLine = line;
-		this.log('line', line);
-	}
+	private _currentLine = 0;
 
 	// the initial (and one and only) file we are 'debugging'
 	private _sourceFile: string;
@@ -181,9 +174,7 @@ class MockDebugSession extends LoggingDebugSession {
 		// every word of the current line becomes a stack frame.
 		for (let i= startFrame; i < endFrame; i++) {
 			const name = words[i];	// use a word of the line as the stackframe name
-			frames.push(new StackFrame(i, `${name}(${i})`, new Source(basename(this._sourceFile),
-				this.convertDebuggerPathToClient(this._sourceFile)),
-				this.convertDebuggerLineToClient(this._currentLine), 0));
+			frames.push(new StackFrame(i, `${name}(${i})`, this.createSource(this._sourceFile), this.convertDebuggerLineToClient(this._currentLine), 0));
 		}
 		response.body = {
 			stackFrames: frames,
@@ -309,6 +300,10 @@ class MockDebugSession extends LoggingDebugSession {
 	 */
 	private fireStepEvent(response: DebugProtocol.Response, ln: number): boolean {
 
+		if (this.fireEventsForLine(response, ln)) {
+			return true;
+		}
+
 		if (this._sourceLines[ln].trim().length > 0) {	// non-empty line
 			this._currentLine = ln;
 			this.sendResponse(response);
@@ -320,6 +315,7 @@ class MockDebugSession extends LoggingDebugSession {
 
 	/**
 	 * Fire StoppedEvent if line has a breakpoint or the word 'exception' is found.
+	 * Returns true if a response has been sent.
 	 */
 	private fireEventsForLine(response: DebugProtocol.Response, ln: number): boolean {
 
@@ -346,22 +342,28 @@ class MockDebugSession extends LoggingDebugSession {
 			}
 		}
 
+		const matches = /log\((.*)\)/.exec(this._sourceLines[ln]);
+		if (matches && matches.length === 2) {
+			const e: DebugProtocol.OutputEvent = new OutputEvent(`${matches[1]}\n`);
+			e.body.source = this.createSource(this._sourceFile);
+			e.body.line = this.convertDebuggerLineToClient(ln);
+			e.body.column = this.convertDebuggerColumnToClient(matches.index);
+			this.sendEvent(e);
+		}
+
 		// if word 'exception' found in source -> throw exception
 		if (this._sourceLines[ln].indexOf("exception") >= 0) {
 			this._currentLine = ln;
 			this.sendResponse(response);
 			this.sendEvent(new StoppedEvent("exception", MockDebugSession.THREAD_ID));
-			this.log('exception in line', ln);
 			return true;
 		}
 
 		return false;
 	}
 
-	private log(msg: string, line: number) {
-		const e = new OutputEvent(`${msg}: ${line}\n`);
-		(<DebugProtocol.OutputEvent>e).body.variablesReference = this._variableHandles.create("args");
-		this.sendEvent(e);	// print current line on debug console
+	private createSource(filePath: string): Source {
+		return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath));
 	}
 }
 
