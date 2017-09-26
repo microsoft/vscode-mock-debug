@@ -233,8 +233,32 @@ class MockDebugSession extends LoggingDebugSession {
 
 	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
 
+		let reply: string | undefined = undefined;
+
+		if (args.context === 'repl') {
+			const matches = /new +([0-9]+)/.exec(args.expression);
+			if (matches && matches.length === 2) {
+				const mbp = this._runtime.setBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));
+				const bp = <DebugProtocol.Breakpoint> new Breakpoint(mbp.verified, this.convertDebuggerLineToClient(mbp.line), undefined, this.createSource(this._runtime.sourceFile));
+				bp.id= mbp.id;
+				this.sendEvent(new BreakpointEvent('new', bp));
+				reply = `breakpoint created`;
+			} else {
+				const matches = /del +([0-9]+)/.exec(args.expression);
+				if (matches && matches.length === 2) {
+					const mbp = this._runtime.clearBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));
+					if (mbp) {
+						const bp = <DebugProtocol.Breakpoint> new Breakpoint(false);
+						bp.id= mbp.id;
+						this.sendEvent(new BreakpointEvent('removed', bp));
+						reply = `breakpoint deleted`;
+					}
+				}
+			}
+		}
+
 		response.body = {
-			result: `evaluate(context: '${args.context}', '${args.expression}')`,
+			result: reply ? reply : `evaluate(context: '${args.context}', '${args.expression}')`,
 			variablesReference: 0
 		};
 		this.sendResponse(response);

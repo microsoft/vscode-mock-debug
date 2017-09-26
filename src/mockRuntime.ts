@@ -18,6 +18,9 @@ export class MockRuntime extends EventEmitter {
 
 	// the initial (and one and only) file we are 'debugging'
 	private _sourceFile: string;
+	public get sourceFile() {
+		return this._sourceFile;
+	}
 
 	// the contents (= lines) of the one and only file
 	private _sourceLines = new Array<string>();
@@ -96,7 +99,7 @@ export class MockRuntime extends EventEmitter {
 	}
 
 	/*
-	 * Returns the actual line.
+	 * Set breakpoint in file with given line.
 	 */
 	public setBreakPoint(path: string, line: number) : MockBreakpoint {
 
@@ -111,6 +114,22 @@ export class MockRuntime extends EventEmitter {
 		this.verifyBreakpoints(path);
 
 		return bp;
+	}
+
+	/*
+	 * Clear breakpoint in file with given line.
+	 */
+	public clearBreakPoint(path: string, line: number) : MockBreakpoint | undefined {
+		let bps = this._breakPoints.get(path);
+		if (bps) {
+			const index = bps.findIndex(bp => bp.line === line);
+			if (index >= 0) {
+				const bp = bps[index];
+				bps.splice(index, 1);
+				return bp;
+			}
+		}
+		return undefined;
 	}
 
 	/*
