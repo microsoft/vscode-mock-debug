@@ -14,7 +14,10 @@ import { MockRuntime, MockBreakpoint } from './mockRuntime';
 
 
 /**
- * This interface should always match the schema found in the mock-debug extension manifest.
+ * This interface describes the mock-debug specific launch attributes
+ * (which are not part of the Debug Adapter Protocol).
+ * The schema for these attributes lives in the package.json of the mock-debug extension.
+ * The interface should always match this schema.
  */
 interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	/** An absolute path to the "program" to debug. */
@@ -87,9 +90,10 @@ class MockDebugSession extends LoggingDebugSession {
 		// The frontend will end the configuration sequence by calling 'configurationDone' request.
 		this.sendEvent(new InitializedEvent());
 
+		// build and return the capabilities of this debug adapter:
 		response.body = response.body || {};
 
-		// This debug adapter implements the configurationDoneRequest.
+		// the adapter implements the configurationDoneRequest.
 		response.body.supportsConfigurationDoneRequest = true;
 
 		// make VS Code to use 'evaluate' when hovering over source
@@ -236,6 +240,7 @@ class MockDebugSession extends LoggingDebugSession {
 		let reply: string | undefined = undefined;
 
 		if (args.context === 'repl') {
+			// 'evaluate' supports to create and delete breakpoints from the 'repl':
 			const matches = /new +([0-9]+)/.exec(args.expression);
 			if (matches && matches.length === 2) {
 				const mbp = this._runtime.setBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));

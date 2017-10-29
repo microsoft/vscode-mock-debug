@@ -155,7 +155,7 @@ export class MockRuntime extends EventEmitter {
 			}
 			// no more lines: stop at first line
 			this._currentLine = 0;
-			this.emit('stopOnEntry');
+			this.sendEvent('stopOnEntry');
 		} else {
 			for (let ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
 				if (this.fireEventsForLine(ln, stepEvent)) {
@@ -164,7 +164,7 @@ export class MockRuntime extends EventEmitter {
 				}
 			}
 			// no more lines: run to end
-			this.emit('end');
+			this.sendEvent('end');
 		}
 	}
 
@@ -187,7 +187,7 @@ export class MockRuntime extends EventEmitter {
 					// in this case the breakpoint will be verified 'lazy' after hitting it once.
 					if (srcLine.indexOf('lazy') < 0) {
 						bp.verified = true;
-						this.emit('breakpointValidated', bp);
+						this.sendEvent('breakpointValidated', bp);
 					}
 				}
 			});
@@ -205,12 +205,12 @@ export class MockRuntime extends EventEmitter {
 		// if 'log(...)' found in source -> send argument to debug console
 		const matches = /log\((.*)\)/.exec(line);
 		if (matches && matches.length === 2) {
-			this.emit('output', matches[1], this._sourceFile, ln, matches.index)
+			this.sendEvent('output', matches[1], this._sourceFile, ln, matches.index)
 		}
 
 		// if word 'exception' found in source -> throw exception
 		if (line.indexOf('exception') >= 0) {
-			this.emit('stopOnException');
+			this.sendEvent('stopOnException');
 			return true;
 		}
 
@@ -221,13 +221,13 @@ export class MockRuntime extends EventEmitter {
 			if (bps.length > 0) {
 
 				// send 'stopped' event
-				this.emit('stopOnBreakpoint');
+				this.sendEvent('stopOnBreakpoint');
 
 				// the following shows the use of 'breakpoint' events to update properties of a breakpoint in the UI
 				// if breakpoint is not yet verified, verify it now and send a 'breakpoint' update event
 				if (!bps[0].verified) {
 					bps[0].verified = true;
-					this.emit('breakpointValidated', bps[0]);
+					this.sendEvent('breakpointValidated', bps[0]);
 				}
 				return true;
 			}
@@ -235,11 +235,17 @@ export class MockRuntime extends EventEmitter {
 
 		// non-empty line
 		if (stepEvent && line.length > 0) {
-			this.emit(stepEvent);
+			this.sendEvent(stepEvent);
 			return true;
 		}
 
 		// nothing interesting found -> continue
 		return false;
+	}
+
+	private sendEvent(event: string, ... args: any[]) {
+		setImmediate(_ => {
+			this.emit(event, ...args);
+		});
 	}
 }

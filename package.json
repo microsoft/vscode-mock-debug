@@ -1,7 +1,7 @@
 {
 	"name": "mock-debug",
 	"displayName": "Mock Debug",
-	"version": "0.23.0",
+	"version": "0.24.0",
 	"publisher": "andreweinand",
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"author": {
@@ -9,8 +9,8 @@
 		"email": "aweinand@microsoft.com"
 	},
 	"engines": {
-		"vscode": "^1.1.0",
-		"node": "^6.5.0"
+		"vscode": "^1.17.0",
+		"node": "^7.9.0"
 	},
 	"icon": "images/mock-debug-icon.png",
 	"categories": [
@@ -50,14 +50,12 @@
 	},
 	"main": "./out/extension",
 	"activationEvents": [
-		"onCommand:extension.mock-debug.getProgramName",
-		"onCommand:extension.mock-debug.provideInitialConfigurations"
+		"onDebug",
+		"onCommand:extension.mock-debug.getProgramName"
 	],
 	"contributes": {
 		"breakpoints": [
-			{
-				"language": "markdown"
-			}
+			{ "language": "markdown" }
 		],
 		"debuggers": [
 			{
@@ -66,25 +64,6 @@
 
 				"program": "./out/mockDebug.js",
 				"runtime": "node",
-
-				"variables": {
-					"AskForProgramName": "extension.mock-debug.getProgramName"
-				},
-
-				"initialConfigurations": "extension.mock-debug.provideInitialConfigurations",
-
-				"configurationSnippets": [
-					{
-						"label": "Mock Debug: Launch",
-						"description": "A new configuration for launching a mock debug program",
-						"body": {
-							"type": "mock",
-							"request": "launch",
-							"name": "${2:Launch Program}",
-							"program": "^\"\\${workspaceRoot}/${1:Program}\""
-						}
-					}
-				],
 
 				"configurationAttributes": {
 					"launch": {
@@ -107,6 +86,33 @@
 							}
 						}
 					}
+				},
+
+				"initialConfigurations": [
+					{
+						"type": "mock",
+						"request": "launch",
+						"name": "Ask for file name",
+						"program": "${workspaceRoot}/${command:AskForProgramName}",
+						"stopOnEntry": true
+					}
+				],
+
+				"configurationSnippets": [
+					{
+						"label": "Mock Debug: Launch",
+						"description": "A new configuration for launching a mock debug program",
+						"body": {
+							"type": "mock",
+							"request": "launch",
+							"name": "${2:Launch Program}",
+							"program": "^\"\\${workspaceRoot}/${1:Program}\""
+						}
+					}
+				],
+
+				"variables": {
+					"AskForProgramName": "extension.mock-debug.getProgramName"
 				}
 			}
 		]

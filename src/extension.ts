@@ -5,19 +5,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
-
-const initialConfigurations = {
-	version: '0.2.0',
-	configurations: [
-		{
-			type: 'mock',
-			request: 'launch',
-			name: 'Ask for file name',
-			program: '${workspaceRoot}/${command:AskForProgramName}',
-			stopOnEntry: true
-		}
-	]
-};
+import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -28,15 +16,40 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('extension.mock-debug.provideInitialConfigurations', () => {
-		return [
-			'// Use IntelliSense to learn about possible Mock debug attributes.',
-			'// Hover to view descriptions of existing attributes.',
-			JSON.stringify(initialConfigurations, null, '\t')
-		].join('\n');
-	}));
+	// register a configuration provider for 'mock' debug type
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', new MockConfigurationProvider()));
 }
 
 export function deactivate() {
 	// nothing to do
+}
+
+class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
+
+	/**
+	 * Massage a debug configuration just before a debug session is being launched,
+	 * e.g. add all missing attributes to the debug configuration.
+	 */
+	resolveDebugConfiguration(folder: WorkspaceFolder | undefined, config: DebugConfiguration, token?: CancellationToken): ProviderResult<DebugConfiguration> {
+
+		// if launch.json is missing or empty
+		if (!config.type && !config.request && !config.name) {
+			const editor = vscode.window.activeTextEditor;
+			if (editor && editor.document.languageId === 'markdown' ) {
+				config.type = 'mock';
+				config.name = 'Launch';
+				config.request = 'launch';
+				config.program = '${file}';
+				config.stopOnEntry = true;
+			}
+		}
+
+		if (!config.program) {
+			return vscode.window.showInformationMessage("Cannot find a program to debug").then(_ => {
+				return undefined;	// abort launch
+			});
+		}
+
+		return config;
+	}
 }
