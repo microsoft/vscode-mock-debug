@@ -23,7 +23,7 @@ export class MockRuntime extends EventEmitter {
 	}
 
 	// the contents (= lines) of the one and only file
-	private _sourceLines = new Array<string>();
+	private _sourceLines: string[];
 
 	// This is the next line that will be 'executed'
 	private _currentLine = 0;
@@ -45,8 +45,7 @@ export class MockRuntime extends EventEmitter {
 	 */
 	public start(program: string, stopOnEntry: boolean) {
 
-		this._sourceFile = program;
-		this._sourceLines = readFileSync(this._sourceFile).toString().split('\n');
+		this.loadSource(program);
 		this._currentLine = -1;
 
 		this.verifyBreakpoints(this._sourceFile);
@@ -141,6 +140,13 @@ export class MockRuntime extends EventEmitter {
 
 	// private methods
 
+	private loadSource(file: string) {
+		if (this._sourceFile !== file) {
+			this._sourceFile = file;
+			this._sourceLines = readFileSync(this._sourceFile).toString().split('\n');
+		}
+	}
+
 	/**
 	 * Run through the file.
 	 * If stepEvent is specified only run a single step and emit the stepEvent.
@@ -171,6 +177,7 @@ export class MockRuntime extends EventEmitter {
 	private verifyBreakpoints(path: string) : void {
 		let bps = this._breakPoints.get(path);
 		if (bps) {
+			this.loadSource(path);
 			bps.forEach(bp => {
 				if (!bp.verified && bp.line < this._sourceLines.length) {
 					const srcLine = this._sourceLines[bp.line].trim();

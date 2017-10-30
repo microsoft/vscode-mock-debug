@@ -89,7 +89,7 @@ suite('Node Debug Adapter', () => {
 
 	suite('setBreakpoints', () => {
 
-		test.skip('should stop on a breakpoint', () => {
+		test('should stop on a breakpoint', () => {
 
 			const PROGRAM = Path.join(DATA_ROOT, 'test.md');
 			const BREAKPOINT_LINE = 2;
