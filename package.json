@@ -30,13 +30,13 @@
 	},
 	"devDependencies": {
 		"@types/node": "^6.0.50",
-		"@types/mocha": "^2.2.42",
-		"typescript": "^2.5.2",
+		"@types/mocha": "^2.2.44",
+		"typescript": "^2.5.3",
 		"mocha": "^3.5.0",
-		"vscode": "^1.1.5",
+		"vscode": "^1.1.6",
 		"vscode-debugadapter-testsupport": "^1.24.0",
-		"tslint": "^5.7.0",
-		"vsce": "^1.31.0"
+		"tslint": "^5.8.0",
+		"vsce": "^1.31.1"
 	},
 	"scripts": {
 		"prepublish": "tsc -p ./src",
