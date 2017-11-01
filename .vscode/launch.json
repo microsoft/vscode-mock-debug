@@ -8,39 +8,39 @@
 			"preLaunchTask": "npm",
 			"runtimeExecutable": "${execPath}",
 			"args": [
-				"--extensionDevelopmentPath=${workspaceRoot}"
+				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
-			"outFiles": [ "${workspaceRoot}/out/**/*.js" ]
+			"outFiles": [ "${workspaceFolder}/out/**/*.js" ]
 		},
 		{
 			"type": "node",
 			"request": "launch",
 			"name": "Server",
-			"cwd": "${workspaceRoot}",
-			"program": "${workspaceRoot}/src/mockDebug.ts",
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/src/mockDebug.ts",
 			"args": [ "--server=4711" ],
-			"outFiles": [ "${workspaceRoot}/out/**/*.js" ]
+			"outFiles": [ "${workspaceFolder}/out/**/*.js" ]
 		},
 		{
 			"type": "node",
 			"request": "launch",
 			"name": "Tests",
-			"cwd": "${workspaceRoot}",
-			"program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
 			"args": [
 				"-u", "tdd",
 				"--timeout", "999999",
 				"--colors",
 				"./out/tests/"
 			],
-			"outFiles": [ "${workspaceRoot}/out/**/*.js" ],
+			"outFiles": [ "${workspaceFolder}/out/**/*.js" ],
 			"internalConsoleOptions": "openOnSessionStart"
 		},
 		{
 			"type": "mock",
 			"request": "launch",
 			"name": "Mock Sample",
-			"program": "${workspaceRoot}/${command:AskForProgramName}",
+			"program": "${workspaceFolder}/${command:AskForProgramName}",
 			"stopOnEntry": true
 		}
 	],

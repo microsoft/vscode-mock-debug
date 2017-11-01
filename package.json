@@ -1,13 +1,16 @@
 {
 	"name": "mock-debug",
 	"displayName": "Mock Debug",
-	"version": "0.24.0",
+	"version": "0.25.0",
 	"publisher": "andreweinand",
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"author": {
 		"name": "Microsoft Corporation",
 		"email": "aweinand@microsoft.com"
 	},
+	"keywords": [
+		"multi-root ready"
+	],
 	"engines": {
 		"vscode": "^1.17.0",
 		"node": "^7.9.0"
@@ -72,7 +75,7 @@
 							"program": {
 								"type": "string",
 								"description": "Absolute path to a text file.",
-								"default": "${workspaceRoot}/${command:AskForProgramName}"
+								"default": "${workspaceFolder}/${command:AskForProgramName}"
 							},
 							"stopOnEntry": {
 								"type": "boolean",
@@ -93,7 +96,7 @@
 						"type": "mock",
 						"request": "launch",
 						"name": "Ask for file name",
-						"program": "${workspaceRoot}/${command:AskForProgramName}",
+						"program": "${workspaceFolder}/${command:AskForProgramName}",
 						"stopOnEntry": true
 					}
 				],
@@ -106,7 +109,7 @@
 							"type": "mock",
 							"request": "launch",
 							"name": "${2:Launch Program}",
-							"program": "^\"\\${workspaceRoot}/${1:Program}\""
+							"program": "^\"\\${workspaceFolder}/${1:Program}\""
 						}
 					}
 				],
