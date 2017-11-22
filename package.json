@@ -28,8 +28,8 @@
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
 	"dependencies": {
-		"vscode-debugprotocol": "^1.24.0",
-		"vscode-debugadapter": "^1.24.0"
+		"vscode-debugprotocol": "^1.25.0-pre.0",
+		"vscode-debugadapter": "^1.25.0-pre.0"
 	},
 	"devDependencies": {
 		"@types/node": "^6.0.50",
@@ -58,19 +58,21 @@
 	],
 	"contributes": {
 		"breakpoints": [
-			{ "language": "markdown" }
+			{
+				"language": "markdown"
+			}
 		],
 		"debuggers": [
 			{
 				"type": "mock",
 				"label": "Mock Debug",
-
 				"program": "./out/mockDebug.js",
 				"runtime": "node",
-
 				"configurationAttributes": {
 					"launch": {
-						"required": [ "program" ],
+						"required": [
+							"program"
+						],
 						"properties": {
 							"program": {
 								"type": "string",
@@ -90,7 +92,6 @@
 						}
 					}
 				},
-
 				"initialConfigurations": [
 					{
 						"type": "mock",
@@ -100,7 +101,6 @@
 						"stopOnEntry": true
 					}
 				],
-
 				"configurationSnippets": [
 					{
 						"label": "Mock Debug: Launch",
@@ -113,7 +113,6 @@
 						}
 					}
 				],
-
 				"variables": {
 					"AskForProgramName": "extension.mock-debug.getProgramName"
 				}
