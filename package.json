@@ -8,11 +8,12 @@
 		"name": "Microsoft Corporation",
 		"email": "aweinand@microsoft.com"
 	},
+	"license": "MIT",
 	"keywords": [
 		"multi-root ready"
 	],
 	"engines": {
-		"vscode": "^1.17.0",
+		"vscode": "^1.18.0",
 		"node": "^7.9.0"
 	},
 	"icon": "images/mock-debug-icon.png",
@@ -32,7 +33,7 @@
 		"vscode-debugadapter": "1.25.0"
 	},
 	"devDependencies": {
-		"@types/node": "6.0.50",
+		"@types/node": "7.0.43",
 		"@types/mocha": "2.2.45",
 		"typescript": "2.6.2",
 		"mocha": "4.0.1",
