@@ -1,5 +1,8 @@
+## 0.26.0
+* Improved the launch configuration snippet and added a `"stopOnEntry": true`.
+
 ## 0.25.0
-* Added the the `"multi-root ready"` keyword.
+* Added the `"multi-root ready"` keyword.
 
 ## 0.24.0
 * Add support for starting a debug session without a launch configuration.
