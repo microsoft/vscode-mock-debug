@@ -6,6 +6,8 @@
 
 import * as vscode from 'vscode';
 import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
+import { MockDebugSession } from './mockDebug';
+import * as Net from 'net';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -23,6 +25,8 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 	// nothing to do
 }
+
+let serverRunning = false;
 
 class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 
@@ -49,6 +53,24 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 				return undefined;	// abort launch
 			});
 		}
+
+		const PORT = 55555;
+
+		if (!serverRunning) {
+			serverRunning = true;
+
+			// start as a server
+			Net.createServer(socket => {
+				socket.on('end', () => {
+					console.error('>> client connection closed\n');
+				});
+				const session = new MockDebugSession();
+				session.setRunAsServer(true);
+				session.start(<NodeJS.ReadableStream>socket, socket);
+			}).listen(PORT);
+
+		}
+		config.debugServer = PORT;
 
 		return config;
 	}
