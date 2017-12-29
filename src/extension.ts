@@ -19,16 +19,18 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	// register a configuration provider for 'mock' debug type
-	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', new MockConfigurationProvider()));
+	const provider = new MockConfigurationProvider()
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', provider));
+	context.subscriptions.push(provider);
 }
 
 export function deactivate() {
 	// nothing to do
 }
 
-let serverRunning = false;
-
 class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
+
+	private _server?: Net.Server;
 
 	/**
 	 * Massage a debug configuration just before a debug session is being launched,
@@ -54,13 +56,10 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 			});
 		}
 
-		const PORT = 55555;
+		const PORT = 55555; // todo: find unused port
 
-		if (!serverRunning) {
-			serverRunning = true;
-
-			// start as a server
-			Net.createServer(socket => {
+		if (!this._server) {
+			this._server = Net.createServer(socket => {
 				socket.on('end', () => {
 					console.error('>> client connection closed\n');
 				});
@@ -70,8 +69,15 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 			}).listen(PORT);
 
 		}
+
 		config.debugServer = PORT;
 
 		return config;
+	}
+
+	dispose() {
+		if (this._server) {
+			this._server.close();
+		}
 	}
 }
