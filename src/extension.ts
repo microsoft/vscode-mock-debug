@@ -8,6 +8,7 @@ import * as vscode from 'vscode';
 import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
 import { MockDebugSession } from './mockDebug';
 import * as Net from 'net';
+const getPort = require('get-port');
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -31,12 +32,13 @@ export function deactivate() {
 class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 
 	private _server?: Net.Server;
+	private _port?: number;
 
 	/**
 	 * Massage a debug configuration just before a debug session is being launched,
 	 * e.g. add all missing attributes to the debug configuration.
 	 */
-	resolveDebugConfiguration(folder: WorkspaceFolder | undefined, config: DebugConfiguration, token?: CancellationToken): ProviderResult<DebugConfiguration> {
+	async resolveDebugConfiguration(folder: WorkspaceFolder | undefined, config: DebugConfiguration, token?: CancellationToken): Promise<DebugConfiguration | undefined> {
 
 		// if launch.json is missing or empty
 		if (!config.type && !config.request && !config.name) {
@@ -56,9 +58,8 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 			});
 		}
 
-		const PORT = 55555; // todo: find unused port
-
 		if (!this._server) {
+			this._port = await getPort();
 			this._server = Net.createServer(socket => {
 				socket.on('end', () => {
 					console.error('>> client connection closed\n');
@@ -66,11 +67,10 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 				const session = new MockDebugSession();
 				session.setRunAsServer(true);
 				session.start(<NodeJS.ReadableStream>socket, socket);
-			}).listen(PORT);
-
+			}).listen(this._port);
 		}
 
-		config.debugServer = PORT;
+		config.debugServer = this._port;
 
 		return config;
 	}
