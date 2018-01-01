@@ -29,7 +29,6 @@
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
 	"dependencies": {
-		"get-port": "3.2.0",
 		"vscode-debugadapter": "1.25.0",
 		"vscode-debugprotocol": "1.25.0"
 	},
