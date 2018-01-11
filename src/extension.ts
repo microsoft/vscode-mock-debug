@@ -58,9 +58,6 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 
 		if (!this._server) {
 			this._server = Net.createServer(socket => {
-				socket.on('end', () => {
-					console.error('>> client connection closed\n');
-				});
 				const session = new MockDebugSession();
 				session.setRunAsServer(true);
 				session.start(<NodeJS.ReadableStream>socket, socket);

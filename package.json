@@ -29,7 +29,7 @@
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
 	"dependencies": {
-		"vscode-debugadapter": "1.25.0",
+		"vscode-debugadapter": "1.26.0-pre.0",
 		"vscode-debugprotocol": "1.25.0"
 	},
 	"devDependencies": {
