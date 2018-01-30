@@ -3,11 +3,11 @@
  *--------------------------------------------------------*/
 
 'use strict';
-
 import * as vscode from 'vscode';
-import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
+import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken, DebugAdapterExecutable, ExtensionContext } from 'vscode';
+import { join } from 'path';
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('extension.mock-debug.getProgramName', config => {
 		return vscode.window.showInputBox({
@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	// register a configuration provider for 'mock' debug type
-	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', new MockConfigurationProvider()));
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', new MockConfigurationProvider(context)));
 }
 
 export function deactivate() {
@@ -25,6 +25,10 @@ export function deactivate() {
 }
 
 class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
+
+	constructor(private context: ExtensionContext) {
+		// noop
+	}
 
 	/**
 	 * Massage a debug configuration just before a debug session is being launched,
@@ -35,7 +39,7 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 		// if launch.json is missing or empty
 		if (!config.type && !config.request && !config.name) {
 			const editor = vscode.window.activeTextEditor;
-			if (editor && editor.document.languageId === 'markdown' ) {
+			if (editor && editor.document.languageId === 'markdown') {
 				config.type = 'mock';
 				config.name = 'Launch';
 				config.request = 'launch';
@@ -51,5 +55,10 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 		}
 
 		return config;
+	}
+
+	// An alternative way to specify the program and runtime (which are already set in the package.json)
+	debugAdapterExecutable?(folder: WorkspaceFolder | undefined, token?: CancellationToken): ProviderResult<DebugAdapterExecutable> {
+		return new DebugAdapterExecutable('node', [join(this.context.extensionPath, 'out', 'mockDebug.js')]);
 	}
 }
