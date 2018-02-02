@@ -6,6 +6,10 @@
 
 import * as vscode from 'vscode';
 import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
+import { MockDebugSession } from './mockDebug';
+import * as Net from 'net';
+
+const EMBED_DEBUG_ADAPTER = false;
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -17,7 +21,9 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	// register a configuration provider for 'mock' debug type
-	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', new MockConfigurationProvider()));
+	const provider = new MockConfigurationProvider()
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', provider));
+	context.subscriptions.push(provider);
 }
 
 export function deactivate() {
@@ -25,6 +31,8 @@ export function deactivate() {
 }
 
 class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
+
+	private _server?: Net.Server;
 
 	/**
 	 * Massage a debug configuration just before a debug session is being launched,
@@ -50,6 +58,24 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 			});
 		}
 
+		if (EMBED_DEBUG_ADAPTER) {
+			if (!this._server) {
+				this._server = Net.createServer(socket => {
+					const session = new MockDebugSession();
+					session.setRunAsServer(true);
+					session.start(<NodeJS.ReadableStream>socket, socket);
+				}).listen(0);
+			}
+
+			config.debugServer = this._server.address().port;
+		}
+
 		return config;
+	}
+
+	dispose() {
+		if (this._server) {
+			this._server.close();
+		}
 	}
 }
