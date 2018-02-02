@@ -59,7 +59,10 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 		}
 
 		if (EMBED_DEBUG_ADAPTER) {
+			// start port listener on launch of first debug session
 			if (!this._server) {
+
+				// start listening on a random port
 				this._server = Net.createServer(socket => {
 					const session = new MockDebugSession();
 					session.setRunAsServer(true);
@@ -67,6 +70,7 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 				}).listen(0);
 			}
 
+			// make VS Code connect to debug server instead of launching debug adapter
 			config.debugServer = this._server.address().port;
 		}
 
