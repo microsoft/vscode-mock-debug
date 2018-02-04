@@ -36,6 +36,9 @@ export class MockDebugSession extends LoggingDebugSession {
 	// a Mock runtime (or debugger)
 	private _runtime: MockRuntime;
 
+	private _launchArgs: LaunchRequestArguments;
+	private _isConfigurationDone:boolean = false;
+
 	private _variableHandles = new Handles<string>();
 
 	/**
@@ -110,8 +113,24 @@ export class MockDebugSession extends LoggingDebugSession {
 		// make sure to 'Stop' the buffered logging if 'trace' is not set
 		logger.setup(args.trace ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
 
-		// start the program in the runtime
-		this._runtime.start(args.program, !!args.stopOnEntry);
+		if (this._isConfigurationDone) {
+			// Configuration is done, start the runtime
+			this.startRuntime(args);
+		} else {
+			// Configuration hasn't finished - save the args for later
+			this._launchArgs = args;
+		}
+
+		this.sendResponse(response);
+	}
+
+	protected configurationDoneRequest(response: DebugProtocol.ConfigurationDoneResponse, args: DebugProtocol.ConfigurationDoneArguments): void {
+
+		this._isConfigurationDone = true;
+		if (this._launchArgs != null) {
+			// If we received a launch request before finishing configuration, start the runtime using the cached arguments now
+			this._runtime.start(this._launchArgs.program, !!this._launchArgs.stopOnEntry);
+		}
 
 		this.sendResponse(response);
 	}
@@ -273,5 +292,9 @@ export class MockDebugSession extends LoggingDebugSession {
 
 	private createSource(filePath: string): Source {
 		return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, 'mock-adapter-data');
+	}
+
+	private startRuntime(launchArgs: LaunchRequestArguments) {
+		this._runtime.start(launchArgs.program, !!launchArgs.stopOnEntry);
 	}
 }

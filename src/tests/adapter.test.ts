@@ -68,8 +68,9 @@ suite('Node Debug Adapter', () => {
 			const PROGRAM = Path.join(DATA_ROOT, 'test.md');
 
 			return Promise.all([
-				dc.configurationSequence(),
-				dc.launch({ program: PROGRAM }),
+				dc.launch({ program: PROGRAM, trace: true }).then(response => {
+					dc.configurationDoneRequest();
+				}),
 				dc.waitForEvent('terminated')
 			]);
 		});
@@ -80,8 +81,9 @@ suite('Node Debug Adapter', () => {
 			const ENTRY_LINE = 1;
 
 			return Promise.all([
-				dc.configurationSequence(),
-				dc.launch({ program: PROGRAM, stopOnEntry: true }),
+				dc.launch({ program: PROGRAM, stopOnEntry: true }).then(response => {
+					dc.configurationDoneRequest();
+				}),
 				dc.assertStoppedLocation('entry', { line: ENTRY_LINE } )
 			]);
 		});
