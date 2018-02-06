@@ -11,6 +11,7 @@ import {
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { basename } from 'path';
 import { MockRuntime, MockBreakpoint } from './mockRuntime';
+const { Subject } = require('await-notify');
 
 
 /**
@@ -37,6 +38,8 @@ export class MockDebugSession extends LoggingDebugSession {
 	private _runtime: MockRuntime;
 
 	private _variableHandles = new Handles<string>();
+
+	private _configurationDone = new Subject();
 
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
@@ -85,11 +88,6 @@ export class MockDebugSession extends LoggingDebugSession {
 	 */
 	protected initializeRequest(response: DebugProtocol.InitializeResponse, args: DebugProtocol.InitializeRequestArguments): void {
 
-		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
-		// we request them early by sending an 'initializeRequest' to the frontend.
-		// The frontend will end the configuration sequence by calling 'configurationDone' request.
-		this.sendEvent(new InitializedEvent());
-
 		// build and return the capabilities of this debug adapter:
 		response.body = response.body || {};
 
@@ -103,12 +101,31 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body.supportsStepBack = true;
 
 		this.sendResponse(response);
+
+		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
+		// we request them early by sending an 'initializeRequest' to the frontend.
+		// The frontend will end the configuration sequence by calling 'configurationDone' request.
+		this.sendEvent(new InitializedEvent());
 	}
 
-	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
+	/**
+	 * Called at the end of the configuration sequence.
+	 * Indicates that all breakpoints etc. have been sent to the DA and that the 'launch' can start.
+	 */
+	protected configurationDoneRequest(response: DebugProtocol.ConfigurationDoneResponse, args: DebugProtocol.ConfigurationDoneArguments): void {
+		super.configurationDoneRequest(response, args);
+
+		// notify the launchRequest that configuration has finished
+		this._configurationDone.notify();
+	}
+
+	protected async launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments) {
 
 		// make sure to 'Stop' the buffered logging if 'trace' is not set
 		logger.setup(args.trace ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
+
+		// wait until configuration has finished (and configurationDoneRequest has been called)
+		await this._configurationDone.wait(1000);
 
 		// start the program in the runtime
 		this._runtime.start(args.program, !!args.stopOnEntry);

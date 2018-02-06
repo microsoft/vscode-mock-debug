@@ -29,8 +29,9 @@
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
 	"dependencies": {
-		"vscode-debugprotocol": "1.26.0",
-		"vscode-debugadapter": "1.26.0"
+		"await-notify": "1.0.1",
+		"vscode-debugadapter": "1.26.0",
+		"vscode-debugprotocol": "1.26.0"
 	},
 	"devDependencies": {
 		"@types/node": "7.0.43",
