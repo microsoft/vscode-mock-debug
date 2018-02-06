@@ -9,6 +9,11 @@ import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken 
 import { MockDebugSession } from './mockDebug';
 import * as Net from 'net';
 
+/*
+ * Set the following compile time flag to true if the
+ * debug adapter should run inside the extension host.
+ * Please note: the test suite does no longer work in this mode.
+ */
 const EMBED_DEBUG_ADAPTER = false;
 
 export function activate(context: vscode.ExtensionContext) {
