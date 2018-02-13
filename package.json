@@ -1,7 +1,7 @@
 {
 	"name": "mock-debug",
 	"displayName": "Mock Debug",
-	"version": "0.26.0",
+	"version": "0.27.0",
 	"publisher": "andreweinand",
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"author": {
@@ -28,6 +28,16 @@
 	"bugs": {
 		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
 	},
+	"scripts": {
+		"prepublish": "tsc -p ./src",
+		"compile": "tsc -p ./src",
+		"tslint": "tslint ./src/**/*.ts",
+		"watch": "tsc -w -p ./src",
+		"test": "mocha -u tdd ./out/tests/",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"package": "vsce package",
+		"publish": "vsce publish"
+	},
 	"dependencies": {
 		"await-notify": "1.0.1",
 		"vscode-debugadapter": "1.26.0",
@@ -42,16 +52,6 @@
 		"vscode-debugadapter-testsupport": "1.26.0",
 		"tslint": "5.8.0",
 		"vsce": "1.35.0"
-	},
-	"scripts": {
-		"prepublish": "tsc -p ./src",
-		"compile": "tsc -p ./src",
-		"tslint": "tslint ./src/**/*.ts",
-		"watch": "tsc -w -p ./src",
-		"test": "mocha -u tdd ./out/tests/",
-		"postinstall": "node ./node_modules/vscode/bin/install",
-		"package": "vsce package",
-		"publish": "vsce publish"
 	},
 	"main": "./out/extension",
 	"activationEvents": [
