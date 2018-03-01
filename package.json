@@ -40,18 +40,18 @@
 	},
 	"dependencies": {
 		"await-notify": "1.0.1",
-		"vscode-debugadapter": "1.26.0",
-		"vscode-debugprotocol": "1.26.0"
+		"vscode-debugadapter": "1.27.0",
+		"vscode-debugprotocol": "1.27.0"
 	},
 	"devDependencies": {
-		"@types/node": "7.0.43",
-		"@types/mocha": "2.2.45",
+		"@types/node": "7.0.55",
+		"@types/mocha": "2.2.48",
 		"typescript": "2.6.2",
-		"mocha": "4.0.1",
+		"mocha": "5.0.1",
 		"vscode": "1.1.10",
-		"vscode-debugadapter-testsupport": "1.26.0",
-		"tslint": "5.8.0",
-		"vsce": "1.35.0"
+		"vscode-debugadapter-testsupport": "1.27.0",
+		"tslint": "5.9.1",
+		"vsce": "1.37.5"
 	},
 	"main": "./out/extension",
 	"activationEvents": [
