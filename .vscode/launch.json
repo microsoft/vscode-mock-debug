@@ -17,7 +17,7 @@
 			"request": "launch",
 			"name": "Server",
 			"cwd": "${workspaceFolder}",
-			"program": "${workspaceFolder}/src/mockDebug.ts",
+			"program": "${workspaceFolder}/src/debugAdapter.ts",
 			"args": [ "--server=4711" ],
 			"outFiles": [ "${workspaceFolder}/out/**/*.js" ]
 		},
