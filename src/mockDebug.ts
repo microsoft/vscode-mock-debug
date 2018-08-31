@@ -5,7 +5,7 @@
 import {
 	Logger, logger,
 	LoggingDebugSession,
-	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent,
+	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent, Event,
 	Thread, StackFrame, Scope, Source, Handles, Breakpoint
 } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
@@ -87,6 +87,8 @@ export class MockDebugSession extends LoggingDebugSession {
 	 * to interrogate the features the debug adapter provides.
 	 */
 	protected initializeRequest(response: DebugProtocol.InitializeResponse, args: DebugProtocol.InitializeRequestArguments): void {
+
+		this.sendEvent(new Event("hello", { foo: "bar" }));
 
 		// build and return the capabilities of this debug adapter:
 		response.body = response.body || {};

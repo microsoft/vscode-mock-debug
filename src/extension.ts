@@ -25,6 +25,10 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	}));
 
+	vscode.debug.onDidReceiveDebugSessionCustomEvent(e => {
+		console.log("custom event");
+	});
+
 	// register a configuration provider for 'mock' debug type
 	const provider = new MockConfigurationProvider()
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', provider));
