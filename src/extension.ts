@@ -14,7 +14,7 @@ import * as Net from 'net';
  * debug adapter should run inside the extension host.
  * Please note: the test suite does no longer work in this mode.
  */
-const EMBED_DEBUG_ADAPTER = false;
+const EMBED_DEBUG_ADAPTER = true;
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -25,8 +25,13 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	}));
 
-	vscode.debug.onDidReceiveDebugSessionCustomEvent(e => {
+	vscode.debug.onDidReceiveDebugSessionCustomEvent(event => {
 		console.log("custom event");
+
+		event.session.customRequest(
+			"apexRequest",
+			{ result: "ok" }
+		);
 	});
 
 	// register a configuration provider for 'mock' debug type
