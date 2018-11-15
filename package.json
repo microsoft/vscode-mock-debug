@@ -13,8 +13,8 @@
 		"multi-root ready"
 	],
 	"engines": {
-		"vscode": "^1.18.0",
-		"node": "^7.9.0"
+		"vscode": "^1.29.0",
+		"node": "^8.9.3"
 	},
 	"icon": "images/mock-debug-icon.png",
 	"categories": [
@@ -40,13 +40,12 @@
 	},
 	"dependencies": {
 		"await-notify": "1.0.1",
-		"vscode-debugadapter": "1.32.1",
-		"vscode-debugprotocol": "1.32.0"
+		"vscode-debugadapter": "1.32.1"
 	},
 	"devDependencies": {
-		"@types/node": "7.0.55",
+		"@types/node": "8.9.3",
 		"@types/mocha": "5.2.5",
-		"typescript": "3.1.4",
+		"typescript": "3.1.6",
 		"mocha": "5.2.0",
 		"vscode": "1.1.21",
 		"vscode-debugadapter-testsupport": "1.32.0",
