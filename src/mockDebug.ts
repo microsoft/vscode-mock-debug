@@ -6,7 +6,7 @@ import {
 	Logger, logger,
 	LoggingDebugSession,
 	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent,
-	Thread, StackFrame, Scope, Source, Handles, Breakpoint
+	Thread, StackFrame, Scope, Source, Handles, Breakpoint, LoadedSourceEvent
 } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { basename } from 'path';
@@ -57,15 +57,19 @@ export class MockDebugSession extends LoggingDebugSession {
 		// setup event handlers
 		this._runtime.on('stopOnEntry', () => {
 			this.sendEvent(new StoppedEvent('entry', MockDebugSession.THREAD_ID));
+			this.sendLoadedSourceEventnew();
 		});
 		this._runtime.on('stopOnStep', () => {
 			this.sendEvent(new StoppedEvent('step', MockDebugSession.THREAD_ID));
+			this.sendLoadedSourceEventnew();
 		});
 		this._runtime.on('stopOnBreakpoint', () => {
 			this.sendEvent(new StoppedEvent('breakpoint', MockDebugSession.THREAD_ID));
+			this.sendLoadedSourceEventnew();
 		});
 		this._runtime.on('stopOnException', () => {
 			this.sendEvent(new StoppedEvent('exception', MockDebugSession.THREAD_ID));
+			this.sendLoadedSourceEventnew();
 		});
 		this._runtime.on('breakpointValidated', (bp: MockBreakpoint) => {
 			this.sendEvent(new BreakpointEvent('changed', <DebugProtocol.Breakpoint>{ verified: bp.verified, id: bp.id }));
@@ -100,6 +104,8 @@ export class MockDebugSession extends LoggingDebugSession {
 		// make VS Code to show a 'step back' button
 		response.body.supportsStepBack = true;
 
+		response.body.supportsLoadedSourcesRequest = true;
+
 		this.sendResponse(response);
 
 		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
@@ -131,6 +137,10 @@ export class MockDebugSession extends LoggingDebugSession {
 		this._runtime.start(args.program, !!args.stopOnEntry);
 
 		this.sendResponse(response);
+
+		// setInterval(_ => {
+		// 	this.changedSource();
+		// }, 2000);
 	}
 
 	protected setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): void {
@@ -252,12 +262,27 @@ export class MockDebugSession extends LoggingDebugSession {
 		this.sendResponse(response);
 	}
 
+	private LoadedSources: Source[] = [];
+
+	protected loadedSourcesRequest(response: DebugProtocol.LoadedSourcesResponse, args: DebugProtocol.LoadedSourcesArguments) {
+		response.body = { sources: this.LoadedSources };
+		this.sendResponse(response);
+	}
+
 	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
 
 		let reply: string | undefined = undefined;
 
 		if (args.context === 'repl') {
 			// 'evaluate' supports to create and delete breakpoints from the 'repl':
+
+			if (args.expression === 'a') {
+				this.addChildSource();
+			} else if (args.expression === 'r') {
+				this.removeChildSource();
+			}
+
+			/*
 			const matches = /new +([0-9]+)/.exec(args.expression);
 			if (matches && matches.length === 2) {
 				const mbp = this._runtime.setBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));
@@ -277,6 +302,7 @@ export class MockDebugSession extends LoggingDebugSession {
 					}
 				}
 			}
+			*/
 		}
 
 		response.body = {
@@ -290,5 +316,88 @@ export class MockDebugSession extends LoggingDebugSession {
 
 	private createSource(filePath: string): Source {
 		return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, 'mock-adapter-data');
+	}
+
+	n = 1000;
+
+	protected sourceRequest(response: DebugProtocol.SourceResponse, args: DebugProtocol.SourceArguments): void {
+		const ref = args.source ? args.source.sourceReference : args.sourceReference;
+		const path = args.source ? args.source.path : 'no path';
+		const name = args.source ? args.source.name : 'no name';
+		if (ref) {
+			response.body = {
+				content: `name: ${name}\npath: ${path}\nreference ${ref}\ntimestamp: ${Date.now().toString()}`,
+				mimeType: 'text/plain'
+			};
+		}
+		this.sendResponse(response);
+	}
+
+	private sendLoadedSourceEventnew() {
+
+		const ref = this.n++;
+
+		const filePath = `/foo/bar-${ref}`;
+
+		const s = new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), ref);
+
+		const ss: DebugProtocol.Source = s;
+		ss.sources = [];
+		for (let i = 0; i < 0; i++) {
+			const f = `${filePath}-source-${i}`;
+			ss.sources.push(new Source(basename(f), this.convertDebuggerPathToClient(f)));
+		}
+
+		this.LoadedSources.push(s);
+		this.sendEvent(new LoadedSourceEvent('new', s));
+
+		setInterval(_ => {
+			this.changedSource(s);
+		}, 2000);
+	}
+
+	private addChildSource() {
+
+		if (this.LoadedSources.length > 0) {
+
+			const s = this.LoadedSources[0];
+
+			const ss: DebugProtocol.Source = <DebugProtocol.Source> s;
+
+			if (!ss.sources) {
+				ss.sources = [];
+			}
+
+			// add source
+			const f = `${s.path}-source-${ss.sources.length}`;
+			ss.sources.push(new Source(basename(f), this.convertDebuggerPathToClient(f)));
+
+			this.sendEvent(new LoadedSourceEvent('changed', s));
+		}
+	}
+
+	private removeChildSource() {
+
+		if (this.LoadedSources.length > 0) {
+
+			const s = this.LoadedSources[0];
+
+			const ss: DebugProtocol.Source = <DebugProtocol.Source> s;
+
+			if (!ss.sources) {
+				ss.sources = [];
+			}
+
+			// remove source
+			ss.sources.pop();
+
+			this.sendEvent(new LoadedSourceEvent('changed', s));
+		}
+	}
+
+	private changedSource(s: Source) {
+		if (this.LoadedSources.length > 0) {
+			this.sendEvent(new LoadedSourceEvent('changed', s));
+		}
 	}
 }
