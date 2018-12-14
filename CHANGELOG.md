@@ -1,5 +1,8 @@
-## 0.28.0
+## 0.29.0
 * Move off proposed API for the EMBED_DEBUG_ADAPTER mode: embedded debug adapter now uses vscode.DebugAdapterDescriptorFactory.
+
+## 0.28.0
+* Update dependencies.
 
 ## 0.27.0
 * Update dependencies.
