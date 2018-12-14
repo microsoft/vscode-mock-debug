@@ -13,7 +13,7 @@
 		"multi-root ready"
 	],
 	"engines": {
-		"vscode": "^1.29.0",
+		"vscode": "^1.30.0-insider",
 		"node": "^8.9.3"
 	},
 	"icon": "images/mock-debug-icon.png",
@@ -40,7 +40,7 @@
 	},
 	"dependencies": {
 		"await-notify": "1.0.1",
-		"vscode-debugadapter": "1.32.1"
+		"vscode-debugadapter": "1.33.0"
 	},
 	"devDependencies": {
 		"@types/node": "8.9.3",
@@ -48,9 +48,9 @@
 		"typescript": "3.1.6",
 		"mocha": "5.2.0",
 		"vscode": "1.1.21",
-		"vscode-debugadapter-testsupport": "1.32.0",
+		"vscode-debugadapter-testsupport": "1.33.0",
 		"tslint": "5.11.0",
-		"vsce": "1.53.0"
+		"vsce": "1.53.2"
 	},
 	"main": "./out/extension",
 	"activationEvents": [

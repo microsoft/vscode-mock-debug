@@ -2248,10 +2248,10 @@ vinyl@^2.0.0, vinyl@^2.0.1, vinyl@^2.0.2:
     remove-trailing-separator "^1.0.1"
     replace-ext "^1.0.0"
 
-vsce@1.53.0:
-  version "1.53.0"
-  resolved "https://registry.yarnpkg.com/vsce/-/vsce-1.53.0.tgz#a460535737b362071a4ab99376df506a5bfcd3af"
-  integrity sha512-okap3jGyz6JeUNJon09MJbjsyAq3zeEJj3YpbYGjslDNn+0g5HikK1VGykNcpVTy5imYdwBAuIDubsm3xPFTEA==
+vsce@1.53.2:
+  version "1.53.2"
+  resolved "https://registry.yarnpkg.com/vsce/-/vsce-1.53.2.tgz#50ec10cf698638ce37fa191caf7faf259c8d23df"
+  integrity sha512-yo7ctgQPK7hKnez/be3Tj7RG3eZzgkFhx/27y9guwzhMxHfjlU1pusAsFT8wBEZKZlYA5HNJAx8oClw4WDWi+A==
   dependencies:
     cheerio "^1.0.0-rc.1"
     commander "^2.8.1"
@@ -2271,25 +2271,25 @@ vsce@1.53.0:
     yauzl "^2.3.1"
     yazl "^2.2.2"
 
-vscode-debugadapter-testsupport@1.32.0:
-  version "1.32.0"
-  resolved "https://registry.yarnpkg.com/vscode-debugadapter-testsupport/-/vscode-debugadapter-testsupport-1.32.0.tgz#3d5f49577a58f0eea6478570dd1332dad9b7d83c"
-  integrity sha512-I+NgaQ14Ww1gF8vOsnwDT6JCojHx5ximObfEgNU3C5L5JaPsyMictgalOqd2Y/WGQpCAMIF9GAElrCjWSr+Scg==
+vscode-debugadapter-testsupport@1.33.0:
+  version "1.33.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugadapter-testsupport/-/vscode-debugadapter-testsupport-1.33.0.tgz#7509ca7c2cb3c7f5f8d8e502e790c3cc1e7973a1"
+  integrity sha512-HusC7JpYQyVGzV08hYgjv+9Cm0v+6/ZbXxAlQLMFXjQNZgbFCrk2kTflurxrQCt+beb05cjin9RbSFWWaYH8PQ==
   dependencies:
-    vscode-debugprotocol "1.32.0"
+    vscode-debugprotocol "1.33.0"
 
-vscode-debugadapter@1.32.1:
-  version "1.32.1"
-  resolved "https://registry.yarnpkg.com/vscode-debugadapter/-/vscode-debugadapter-1.32.1.tgz#622496e5ee93fd80dcf90817ac2f7ede0529da1f"
-  integrity sha512-D7hpwmh4mPNJXLavginjGYbeIpSJj7L/FhfB4EqEnJH2om8jTvnMq6NvOyuHONn6YzarS/L3oAye7RNro9iviw==
+vscode-debugadapter@1.33.0:
+  version "1.33.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugadapter/-/vscode-debugadapter-1.33.0.tgz#6e86888bbe12088f79b1a4b56233ab10f74faa8f"
+  integrity sha512-GsSD6PyVokjyW+7LU3FRXbu8SINv9muQtMQEDvwB6SIGQfrQzld8kECpQRr71j3mgXW+sTY+44/XMzueeaU6/Q==
   dependencies:
     mkdirp "^0.5.1"
-    vscode-debugprotocol "1.32.0"
+    vscode-debugprotocol "1.33.0"
 
-vscode-debugprotocol@1.32.0:
-  version "1.32.0"
-  resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.32.0.tgz#cca9eccb3f73ded5e525e01621a72ca2bb577dc3"
-  integrity sha512-x3+HV+BkLqfl1ZuDJEILAv1sT5mDceuPThDXD12hwXAEjAdfc6MLQFvaoVPuO6C6gb+lHQTd0R9FNkCflEJHbA==
+vscode-debugprotocol@1.33.0:
+  version "1.33.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.33.0.tgz#334d2e76ac965f33437a0298441facdcad377d99"
+  integrity sha512-d+l4lrEz6OP2kmGpweqe37x9H7icAMV8S4m8azTWGAIlNJxBP4rlSTnZa7NMLcbgqWkWG9lTGY7fJ+rSPaW7yg==
 
 vscode@1.1.21:
   version "1.1.21"
