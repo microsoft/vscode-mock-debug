@@ -1,3 +1,11 @@
+
+
+## 0.31.0
+* Added code to show how to control what debug executable is used.
+
+## 0.30.0
+* Updated dependencies.
+
 ## 0.29.0
 * Move off proposed API for the EMBED_DEBUG_ADAPTER mode: embedded debug adapter now uses vscode.DebugAdapterDescriptorFactory.
 

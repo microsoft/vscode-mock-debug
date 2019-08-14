@@ -30,9 +30,35 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', provider));
 
 	if (EMBED_DEBUG_ADAPTER) {
+		// The following use of a DebugAdapter factory shows how to run the debug adapter inside the extension host (and not as a separate process).
 		const factory = new MockDebugAdapterDescriptorFactory();
 		context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('mock', factory));
 		context.subscriptions.push(factory);
+	} else {
+		// The following use of a DebugAdapter factory shows how to control what debug adapter executable is used.
+		// Since the code implements the default behavior, it is absolutely not neccessary and we show it here only for educational purpose.
+		context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('mock', {
+			createDebugAdapterDescriptor: (session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable | undefined) => {
+				// param "executable" contains the executable optionally specified in the package.json (if any)
+
+				// use the executable specified in the package.json if it exists or determine it based on some other information (e.g. the session)
+				if (!executable) {
+					const command = "absolute path to my DA executable";
+					const args = [
+						"some args",
+						"another arg"
+					];
+					const options = {
+						cwd: "working directory for executable",
+						env: { "VAR": "some value" }
+					};
+					executable = new vscode.DebugAdapterExecutable(command, args, options);
+				}
+
+				// make VS Code launch the DA executable
+				return executable;
+			}
+		}));
 	}
 }
 
