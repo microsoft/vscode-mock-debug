@@ -35,6 +35,7 @@ export class MockRuntime extends EventEmitter {
 	// so that the frontend can match events with breakpoints.
 	private _breakpointId = 1;
 
+	private _breakAddresses = new Set<string>();
 
 	constructor() {
 		super();
@@ -138,6 +139,24 @@ export class MockRuntime extends EventEmitter {
 		this._breakPoints.delete(path);
 	}
 
+	/*
+	 * Set data breakpoint.
+	 */
+	public setDataBreakpoint(address: string): boolean {
+		if (address) {
+			this._breakAddresses.add(address);
+			return true;
+		}
+		return false;
+	}
+
+	/*
+	 * Clear all data breakpoints.
+	 */
+	public clearAllDataBreakpoints(): void {
+		this._breakAddresses.clear();
+	}
+
 	// private methods
 
 	private loadSource(file: string) {
@@ -213,6 +232,15 @@ export class MockRuntime extends EventEmitter {
 		const matches = /log\((.*)\)/.exec(line);
 		if (matches && matches.length === 2) {
 			this.sendEvent('output', matches[1], this._sourceFile, ln, matches.index)
+		}
+
+		// if a word in a line matches a data breakpoint, fire a 'dataBreakpoint' event
+		const words = line.split(" ");
+		for (let word of words) {
+			if (this._breakAddresses.has(word)) {
+				this.sendEvent('stopOnDataBreakpoint');
+				return true;
+			}
 		}
 
 		// if word 'exception' found in source -> throw exception

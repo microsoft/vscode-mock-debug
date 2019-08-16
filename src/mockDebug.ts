@@ -64,6 +64,9 @@ export class MockDebugSession extends LoggingDebugSession {
 		this._runtime.on('stopOnBreakpoint', () => {
 			this.sendEvent(new StoppedEvent('breakpoint', MockDebugSession.THREAD_ID));
 		});
+		this._runtime.on('stopOnDataBreakpoint', () => {
+			this.sendEvent(new StoppedEvent('data breakpoint', MockDebugSession.THREAD_ID));
+		});
 		this._runtime.on('stopOnException', () => {
 			this.sendEvent(new StoppedEvent('exception', MockDebugSession.THREAD_ID));
 		});
@@ -99,6 +102,10 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// make VS Code to show a 'step back' button
 		response.body.supportsStepBack = true;
+
+		// make VS Code to support data breakpoints
+		response.body.supportsDataBreakpoints = true;
+		response.body.supportsSetVariable = true;
 
 		this.sendResponse(response);
 
@@ -207,6 +214,12 @@ export class MockDebugSession extends LoggingDebugSession {
 				variablesReference: 0
 			});
 			variables.push({
+				name: id + "_i",
+				type: "integer",
+				value: "123",
+				variablesReference: 0
+			});
+			variables.push({
 				name: id + "_f",
 				type: "float",
 				value: "3.14",
@@ -283,6 +296,59 @@ export class MockDebugSession extends LoggingDebugSession {
 			result: reply ? reply : `evaluate(context: '${args.context}', '${args.expression}')`,
 			variablesReference: 0
 		};
+		this.sendResponse(response);
+	}
+
+	protected dataBreakpointInfoRequest(response: DebugProtocol.DataBreakpointInfoResponse, args: DebugProtocol.DataBreakpointInfoArguments): void {
+
+		response.body = {
+            dataId: null,
+            description: "cannot break on data access",
+            accessTypes: undefined,
+            canPersist: false
+        };
+
+		if (args.variablesReference && args.name) {
+			const id = this._variableHandles.get(args.variablesReference);
+			if (id.startsWith("global_")) {
+				response.body.dataId = args.name;
+				response.body.description = args.name;
+				response.body.accessTypes = [ "read" ];
+			}
+		}
+
+		this.sendResponse(response);
+	}
+
+	protected setDataBreakpointsRequest(response: DebugProtocol.SetDataBreakpointsResponse, args: DebugProtocol.SetDataBreakpointsArguments): void {
+
+		// clear all data breakpoints
+		this._runtime.clearAllDataBreakpoints();
+
+		response.body = {
+			breakpoints: []
+		};
+
+		for (let dbp of args.breakpoints) {
+			// assume that id is the "address" to break on
+			const ok = this._runtime.setDataBreakpoint(dbp.dataId);
+			response.body.breakpoints.push({
+				verified: ok
+			});
+		}
+
+		this.sendResponse(response);
+	}
+
+	protected setVariableRequest(response: DebugProtocol.SetVariableResponse, args: DebugProtocol.SetVariableArguments): void {
+
+		const r = <DebugProtocol.DataBreakpointInfoResponse> {};
+		this.dataBreakpointInfoRequest(r, args);
+		this.sendEvent(new OutputEvent(JSON.stringify(r, undefined, 2) + "\n"));
+		if (r.body.dataId) {
+			this.setDataBreakpointsRequest(<DebugProtocol.SetDataBreakpointsResponse>{}, { breakpoints: [ { dataId: r.body.dataId } ] });
+		}
+
 		this.sendResponse(response);
 	}
 

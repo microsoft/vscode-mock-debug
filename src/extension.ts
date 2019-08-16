@@ -14,7 +14,7 @@ import * as Net from 'net';
  * debug adapter should run inside the extension host.
  * Please note: the test suite does not (yet) work in this mode.
  */
-const EMBED_DEBUG_ADAPTER = false;
+const EMBED_DEBUG_ADAPTER = true;
 
 export function activate(context: vscode.ExtensionContext) {
 
