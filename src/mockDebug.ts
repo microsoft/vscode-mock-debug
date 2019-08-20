@@ -106,6 +106,10 @@ export class MockDebugSession extends LoggingDebugSession {
 		// make VS Code to support data breakpoints
 		response.body.supportsDataBreakpoints = true;
 
+		// make VS Code to support completion in REPL
+		response.body.supportsCompletionsRequest = true;
+		response.body.completionTriggerCharacters = [ ".", "[" ];
+
 		this.sendResponse(response);
 
 		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
@@ -337,6 +341,27 @@ export class MockDebugSession extends LoggingDebugSession {
 			});
 		}
 
+		this.sendResponse(response);
+	}
+
+	protected completionsRequest(response: DebugProtocol.CompletionsResponse, args: DebugProtocol.CompletionsArguments): void {
+
+		response.body = {
+			targets: [
+				{
+					label: "item 10",
+					sortText: "10"
+				},
+				{
+					label: "item 1",
+					sortText: "01"
+				},
+				{
+					label: "item 2",
+					sortText: "02"
+				}
+			]
+		};
 		this.sendResponse(response);
 	}
 
