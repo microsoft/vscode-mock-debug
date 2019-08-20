@@ -105,7 +105,6 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// make VS Code to support data breakpoints
 		response.body.supportsDataBreakpoints = true;
-		response.body.supportsSetVariable = true;
 
 		this.sendResponse(response);
 
@@ -336,18 +335,6 @@ export class MockDebugSession extends LoggingDebugSession {
 			response.body.breakpoints.push({
 				verified: ok
 			});
-		}
-
-		this.sendResponse(response);
-	}
-
-	protected setVariableRequest(response: DebugProtocol.SetVariableResponse, args: DebugProtocol.SetVariableArguments): void {
-
-		const r = <DebugProtocol.DataBreakpointInfoResponse> {};
-		this.dataBreakpointInfoRequest(r, args);
-		this.sendEvent(new OutputEvent(JSON.stringify(r, undefined, 2) + "\n"));
-		if (r.body.dataId) {
-			this.setDataBreakpointsRequest(<DebugProtocol.SetDataBreakpointsResponse>{}, { breakpoints: [ { dataId: r.body.dataId } ] });
 		}
 
 		this.sendResponse(response);
