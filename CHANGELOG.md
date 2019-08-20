@@ -1,4 +1,6 @@
 
+## 0.32.0
+* Add support for data breakpoints.
 
 ## 0.31.0
 * Added code to show how to control what debug executable is used.
