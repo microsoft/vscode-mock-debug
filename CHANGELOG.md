@@ -1,4 +1,7 @@
 
+## 0.34.0
+* Add support for persisted data breakpoints.
+
 ## 0.33.0
 * Add support for (sorted) REPL completions.
 
