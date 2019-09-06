@@ -13,6 +13,9 @@ import { basename } from 'path';
 import { MockRuntime, MockBreakpoint } from './mockRuntime';
 const { Subject } = require('await-notify');
 
+function timeout(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 /**
  * This interface describes the mock-debug specific launch attributes
@@ -40,6 +43,9 @@ export class MockDebugSession extends LoggingDebugSession {
 	private _variableHandles = new Handles<string>();
 
 	private _configurationDone = new Subject();
+
+	private _cancelationTokens = new Map<number, boolean>();
+	private _isLongrunning = new Map<number, boolean>();
 
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
@@ -110,6 +116,9 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body.supportsCompletionsRequest = true;
 		response.body.completionTriggerCharacters = [ ".", "[" ];
 
+		// make VS Code to send cancelRequests
+		response.body.supportsCancelRequest = true;
+
 		this.sendResponse(response);
 
 		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
@@ -168,7 +177,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 	protected threadsRequest(response: DebugProtocol.ThreadsResponse): void {
 
-		// runtime supports now threads so just return a default thread.
+		// runtime supports no threads so just return a default thread.
 		response.body = {
 			threads: [
 				new Thread(MockDebugSession.THREAD_ID, "thread 1")
@@ -194,52 +203,84 @@ export class MockDebugSession extends LoggingDebugSession {
 
 	protected scopesRequest(response: DebugProtocol.ScopesResponse, args: DebugProtocol.ScopesArguments): void {
 
-		const frameReference = args.frameId;
-		const scopes = new Array<Scope>();
-		scopes.push(new Scope("Local", this._variableHandles.create("local_" + frameReference), false));
-		scopes.push(new Scope("Global", this._variableHandles.create("global_" + frameReference), true));
-
 		response.body = {
-			scopes: scopes
+			scopes: [
+				new Scope("Local", this._variableHandles.create("local"), false),
+				new Scope("Global", this._variableHandles.create("global"), true)
+			]
 		};
 		this.sendResponse(response);
 	}
 
-	protected variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments): void {
+	protected async variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request) {
 
-		const variables = new Array<DebugProtocol.Variable>();
-		const id = this._variableHandles.get(args.variablesReference);
-		if (id !== null) {
-			variables.push({
-				name: id + "_i",
-				type: "integer",
-				value: "123",
-				variablesReference: 0
-			});
-			variables.push({
-				name: id + "_i",
-				type: "integer",
-				value: "123",
-				variablesReference: 0
-			});
-			variables.push({
-				name: id + "_f",
-				type: "float",
-				value: "3.14",
-				variablesReference: 0
-			});
-			variables.push({
-				name: id + "_s",
-				type: "string",
-				value: "hello world",
-				variablesReference: 0
-			});
-			variables.push({
-				name: id + "_o",
-				type: "object",
-				value: "Object",
-				variablesReference: this._variableHandles.create("object_")
-			});
+		const variables: DebugProtocol.Variable[] = [];
+
+		if (this._isLongrunning.get(args.variablesReference)) {
+			// long running
+
+			if (request) {
+				this._cancelationTokens.set(request.seq, false);
+			}
+
+			for (let i = 0; i < 100; i++) {
+				await timeout(1000);
+				variables.push({
+					name: `i_${i}`,
+					type: "integer",
+					value: `${i}`,
+					variablesReference: 0
+				});
+				if (request && this._cancelationTokens.get(request.seq)) {
+					break;
+				}
+			}
+
+			if (request) {
+				this._cancelationTokens.delete(request.seq);
+			}
+
+		} else {
+
+			const id = this._variableHandles.get(args.variablesReference);
+
+			if (id) {
+				variables.push({
+					name: id + "_i",
+					type: "integer",
+					value: "123",
+					variablesReference: 0
+				});
+				variables.push({
+					name: id + "_f",
+					type: "float",
+					value: "3.14",
+					variablesReference: 0
+				});
+				variables.push({
+					name: id + "_s",
+					type: "string",
+					value: "hello world",
+					variablesReference: 0
+				});
+				variables.push({
+					name: id + "_o",
+					type: "object",
+					value: "Object",
+					variablesReference: this._variableHandles.create(id + "_o")
+				});
+
+				// cancelation support for long running requests
+				const nm = id + "_long_running";
+				const ref = this._variableHandles.create(id + "_lr");
+				variables.push({
+					name: nm,
+					type: "object",
+					value: "Object",
+					variablesReference: ref
+				});
+				this._isLongrunning.set(ref, true);
+			}
 		}
 
 		response.body = {
@@ -363,6 +404,12 @@ export class MockDebugSession extends LoggingDebugSession {
 			]
 		};
 		this.sendResponse(response);
+	}
+
+	protected cancelRequest(response: DebugProtocol.CancelResponse, args: DebugProtocol.CancelArguments) {
+		if (args.requestId) {
+			this._cancelationTokens.set(args.requestId, true);
+		}
 	}
 
 	//---- helpers
