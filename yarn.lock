@@ -1565,25 +1565,25 @@ vsce@1.66.0:
     yauzl "^2.3.1"
     yazl "^2.2.2"
 
-vscode-debugadapter-testsupport@1.37.0-pre.1:
-  version "1.37.0-pre.1"
-  resolved "https://registry.yarnpkg.com/vscode-debugadapter-testsupport/-/vscode-debugadapter-testsupport-1.37.0-pre.1.tgz#d054f983bec023eb60bb0e3229fc4fed2c3d1433"
-  integrity sha512-j63mc6hpPhl3S7RTyURXA9Z6H3I0+ACres0oKqZM+g8rWkTCJ76k0qVmI3QbohXK4goDgnuqq/RMVXEw+LYueg==
+vscode-debugadapter-testsupport@1.37.0-pre.3:
+  version "1.37.0-pre.3"
+  resolved "https://registry.yarnpkg.com/vscode-debugadapter-testsupport/-/vscode-debugadapter-testsupport-1.37.0-pre.3.tgz#414b681a9ed97a44f99493c6d7365a455f88eb6e"
+  integrity sha512-whfn9KI8nCoFRZUsUaDOvtZr/moSEj7kZzBfv0R+DRGYVq+gPj37nARuR4eNNVg5nObceQEhsSXLf6S25d6gxw==
   dependencies:
-    vscode-debugprotocol "1.37.0-pre.1"
+    vscode-debugprotocol "1.37.0-pre.3"
 
-vscode-debugadapter@1.37.0-pre.2:
-  version "1.37.0-pre.2"
-  resolved "https://registry.yarnpkg.com/vscode-debugadapter/-/vscode-debugadapter-1.37.0-pre.2.tgz#ac585b6c06f87e8be1e532770c6db5e4f5437a79"
-  integrity sha512-EEdsSzfJbiijmkw3fFrPb7U/JCirqi7KHKqECU4ouH1SrqmeFsRDYZJ2U2hBqwaUaQiafukfosbxg18KP5hYVg==
+vscode-debugadapter@1.37.0-pre.4:
+  version "1.37.0-pre.4"
+  resolved "https://registry.yarnpkg.com/vscode-debugadapter/-/vscode-debugadapter-1.37.0-pre.4.tgz#0d0a6d387cfd34855644070b916bbbecda9d6c7f"
+  integrity sha512-MoPsaYv4vzk91LWJK5NvpIdqViMmSSUoWr6+8VELcXSto1K2YVkqv8Ish3k2SFeAJgrm6CRaF0x+Xqk27PpLzQ==
   dependencies:
     mkdirp "^0.5.1"
-    vscode-debugprotocol "1.37.0-pre.1"
+    vscode-debugprotocol "1.37.0-pre.3"
 
-vscode-debugprotocol@1.37.0-pre.1:
-  version "1.37.0-pre.1"
-  resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.37.0-pre.1.tgz#d3eec750c1726f101c4dc5df15a816af41faf78a"
-  integrity sha512-IV9TDVra4xwbt+p61k2fj/bIS/OJJCs01Fwlyjal7PHk2EgA5nvFb+YL28SpcejwABU7ZMYQRvfvgdyhGAsl8A==
+vscode-debugprotocol@1.37.0-pre.3:
+  version "1.37.0-pre.3"
+  resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.37.0-pre.3.tgz#d4135263bcf99d250dead4fad2f5ada2f1890063"
+  integrity sha512-AuZ7P8vssPdG6fhp7O5/6eML3vXAtwGZLQeFJqCtvNcAtJ2dVcuWETdpm6PM2Bprg9YCmOqxOTGpC5rkuULAHg==
 
 vscode-test@^0.4.1:
   version "0.4.3"

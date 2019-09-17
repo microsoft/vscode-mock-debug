@@ -119,6 +119,9 @@ export class MockDebugSession extends LoggingDebugSession {
 		// make VS Code to send cancelRequests
 		response.body.supportsCancelRequest = true;
 
+		// make VS Code send the breakpointLocations request
+		response.body.supportsBreakpointLocationsRequest = true;
+
 		this.sendResponse(response);
 
 		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
@@ -172,6 +175,22 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body = {
 			breakpoints: actualBreakpoints
 		};
+		this.sendResponse(response);
+	}
+
+	protected breakpointLocationsRequest(response: DebugProtocol.BreakpointLocationsResponse, args: DebugProtocol.BreakpointLocationsArguments, request?: DebugProtocol.Request): void {
+
+		if (args.source.path) {
+			const bps = this._runtime.getBreakpoints(args.source.path, args.line);
+			response.body.breakpoints = bps.map(col => {
+				return {
+					line: args.line,
+					column: col
+				}
+			});
+		} else {
+			response.body.breakpoints = [];
+		}
 		this.sendResponse(response);
 	}
 
