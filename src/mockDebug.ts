@@ -181,15 +181,19 @@ export class MockDebugSession extends LoggingDebugSession {
 	protected breakpointLocationsRequest(response: DebugProtocol.BreakpointLocationsResponse, args: DebugProtocol.BreakpointLocationsArguments, request?: DebugProtocol.Request): void {
 
 		if (args.source.path) {
-			const bps = this._runtime.getBreakpoints(args.source.path, args.line);
-			response.body.breakpoints = bps.map(col => {
-				return {
-					line: args.line,
-					column: col
-				}
-			});
+			const bps = this._runtime.getBreakpoints(args.source.path, this.convertClientLineToDebugger(args.line));
+			response.body = {
+				breakpoints: bps.map(col => {
+					return {
+						line: args.line,
+						column: this.convertDebuggerColumnToClient(col)
+					}
+				})
+			};
 		} else {
-			response.body.breakpoints = [];
+			response.body = {
+				breakpoints: []
+			};
 		}
 		this.sendResponse(response);
 	}
