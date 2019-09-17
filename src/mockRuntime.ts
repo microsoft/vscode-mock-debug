@@ -98,6 +98,26 @@ export class MockRuntime extends EventEmitter {
 		};
 	}
 
+	public getBreakpoints(path: string, line: number): number[] {
+
+		const l = this._sourceLines[line];
+
+		let sawSpace = true;
+		const bps: number[] = [];
+		for (let i = 0; i < l.length; i++) {
+			if (l[i] !== ' ') {
+				if (sawSpace) {
+					bps.push(i);
+					sawSpace = false;
+				}
+			} else {
+				sawSpace = true;
+			}
+		}
+
+		return bps;
+	}
+
 	/*
 	 * Set breakpoint in file with given line.
 	 */
