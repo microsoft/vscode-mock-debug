@@ -1,4 +1,8 @@
 
+## 0.35.0
+* Support the 'breakpointLocations' request.
+* Make 'variables' request cancelable.
+
 ## 0.34.0
 * Add support for persisted data breakpoints.
 
