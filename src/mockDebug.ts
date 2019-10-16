@@ -377,7 +377,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		if (args.variablesReference && args.name) {
 			const id = this._variableHandles.get(args.variablesReference);
-			if (id.startsWith("global_")) {
+			if (id === "global") {
 				response.body.dataId = args.name;
 				response.body.description = args.name;
 				response.body.accessTypes = [ "read" ];
