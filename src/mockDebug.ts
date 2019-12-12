@@ -381,7 +381,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				response.body.dataId = args.name;
 				response.body.description = args.name;
 				response.body.accessTypes = [ "read" ];
-				response.body.canPersist = false;
+				response.body.canPersist = true;
 			}
 		}
 
