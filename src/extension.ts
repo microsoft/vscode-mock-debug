@@ -13,7 +13,7 @@ import * as Net from 'net';
  * The compile time flag 'runMode' controls how the debug adapter is run.
  * Please note: the test suite only supports 'external' mode.
  */
-const runMode : 'external' | 'server' | 'inline' = 'external';
+const runMode: 'external' | 'server' | 'inline' = 'external';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -29,26 +29,28 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', provider));
 
 	// debug adapters can be run in different ways by using a vscode.DebugAdapterDescriptorFactory:
-	let factory : any;
+	let factory: vscode.DebugAdapterDescriptorFactory;
 	switch (runMode) {
-		case 'external':
-			// how to run the debug adapter as a separate process
-			factory = new DebugAdapterExecutableFactory();
-			break;
-
 		case 'server':
-			// how to run the debug adapter as a server inside the extension and communicating via a socket
+			// run the debug adapter as a server inside the extension and communicating via a socket
 			factory = new MockDebugAdapterDescriptorFactory();
 			break;
 
 		case 'inline':
-			// how to run the debug adapter inside the extension
+			// run the debug adapter inside the extension and directly talk to it
 			factory = new InlineDebugAdapterFactory();
+			break;
+
+		case 'external': default:
+			// run the debug adapter as a separate process
+			factory = new DebugAdapterExecutableFactory();
 			break;
 		}
 
-		context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('mock', factory));
+	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('mock', factory));
+	if ('dispose' in factory) {
 		context.subscriptions.push(factory);
+	}
 }
 
 export function deactivate() {
@@ -143,6 +145,6 @@ class InlineDebugAdapterFactory implements vscode.DebugAdapterDescriptorFactory 
 
 	createDebugAdapterDescriptor(_session: vscode.DebugSession): ProviderResult<vscode.DebugAdapterDescriptor> {
 		// since DebugAdapterInlineImplementation is proposed API, a cast to <any> is required for now
-		return <any> new vscode.DebugAdapterInlineImplementation(<any> new MockDebugSession());
+		return <any>new vscode.DebugAdapterInlineImplementation(new MockDebugSession());
 	}
 }

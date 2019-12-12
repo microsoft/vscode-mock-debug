@@ -1,4 +1,7 @@
 
+## 0.36.0
+* Extend the run mode by an 'inline' run mode (in addition to 'external' and 'server').
+
 ## 0.35.0
 * Support the 'breakpointLocations' request.
 * Make 'variables' request cancelable.
