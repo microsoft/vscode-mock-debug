@@ -144,7 +144,6 @@ class MockDebugAdapterDescriptorFactory implements vscode.DebugAdapterDescriptor
 class InlineDebugAdapterFactory implements vscode.DebugAdapterDescriptorFactory {
 
 	createDebugAdapterDescriptor(_session: vscode.DebugSession): ProviderResult<vscode.DebugAdapterDescriptor> {
-		// since DebugAdapterInlineImplementation is proposed API, a cast to <any> is required for now
-		return <any>new vscode.DebugAdapterInlineImplementation(new MockDebugSession());
+		return new vscode.DebugAdapterInlineImplementation(new MockDebugSession());
 	}
 }
