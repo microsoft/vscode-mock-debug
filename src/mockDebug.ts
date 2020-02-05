@@ -13,7 +13,7 @@ import { basename } from 'path';
 import { MockRuntime, MockBreakpoint } from './mockRuntime';
 const { Subject } = require('await-notify');
 
-function timeout(ms) {
+function timeout(ms: number) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 

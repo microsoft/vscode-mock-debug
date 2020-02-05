@@ -1591,25 +1591,25 @@ vsce@1.66.0:
     yauzl "^2.3.1"
     yazl "^2.2.2"
 
-vscode-debugadapter-testsupport@1.37.0:
-  version "1.37.0"
-  resolved "https://registry.yarnpkg.com/vscode-debugadapter-testsupport/-/vscode-debugadapter-testsupport-1.37.0.tgz#7f8822c451d9b2240702a8605345afed93c244da"
-  integrity sha512-WzE27nn+QOdIF9f4A0ZQA9sUF4fpAT4DPVzJf7TRvOvsku03HGaydf5tyGaSIEFxLYqUNkZ2ipQqQBDnWKjDjA==
+vscode-debugadapter-testsupport@1.40.1:
+  version "1.40.1"
+  resolved "https://registry.yarnpkg.com/vscode-debugadapter-testsupport/-/vscode-debugadapter-testsupport-1.40.1.tgz#bf05f6fc6f14077db81cde76cb6ce37738033d7a"
+  integrity sha512-jx9f/rSZ6DRSWcoYssIOVUwFIP8E93/YIVPF/wleBaeuJ+ovMy0COZ16LajlPDxFXCwAz+g+WiUeA6kULACzhA==
   dependencies:
-    vscode-debugprotocol "1.37.0"
+    vscode-debugprotocol "1.38.0"
 
-vscode-debugadapter@1.38.0-pre.4:
-  version "1.38.0-pre.4"
-  resolved "https://registry.yarnpkg.com/vscode-debugadapter/-/vscode-debugadapter-1.38.0-pre.4.tgz#050e7ac3926745d6006e3f68d8324f38a1d99d4e"
-  integrity sha512-IeGDAdc2rpsxbJWj/cW2uSRiEH1PExi5XOQzFlMSmW3mk7JkASdBw+8zk2J+Ye4P21wXYr8ytlwzJGjZDD1enw==
+vscode-debugadapter@1.38.0:
+  version "1.38.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugadapter/-/vscode-debugadapter-1.38.0.tgz#764a2cef6634cf17c35e1ca97fa1faa253ac87c1"
+  integrity sha512-rm4qmbqj8aAaE8sUt4hX2HZUi7Nmtmf10fiGPqbLZWSFPrBi6myxhrQ0HPeG6Xep5rEgrGzVwCJ/lSGPz2ja1A==
   dependencies:
     mkdirp "^0.5.1"
-    vscode-debugprotocol "1.37.0"
+    vscode-debugprotocol "1.38.0"
 
-vscode-debugprotocol@1.37.0:
-  version "1.37.0"
-  resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.37.0.tgz#e8c4694a078d18ea1a639553a7a241b35c1e6f6d"
-  integrity sha512-ppZLEBbFRVNsK0YpfgFi/x2CDyihx0F+UpdKmgeJcvi05UgSXYdO0n9sDVYwoGvvYQPvlpDQeWuY0nloOC4mPA==
+vscode-debugprotocol@1.38.0:
+  version "1.38.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.38.0.tgz#7a9bcd457e6642f48fabef114c0fa1c25a2fb1e7"
+  integrity sha512-oam9iSjNfXSn71a8bmNsXv8k/rIKSOcllIPrFnNgxd1EMBpfnum+gb7lmRpcH0zSjGb+OH8Ncn8B5tv8srWbNQ==
 
 vscode-test@^0.4.1:
   version "0.4.3"
