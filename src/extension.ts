@@ -51,12 +51,37 @@ export function activate(context: vscode.ExtensionContext) {
 	if ('dispose' in factory) {
 		context.subscriptions.push(factory);
 	}
+
+	// override VS Code's default implementation of the debug hover
+	vscode.languages.registerEvaluatableExpressionProvider('markdown', new SimpleEvaluatableExpressionProvider());
 }
 
 export function deactivate() {
 	// nothing to do
 }
 
+class SimpleEvaluatableExpressionProvider implements vscode.EvaluatableExpressionProvider {
+
+	provideEvaluatableExpression(document: vscode.TextDocument, position: vscode.Position, token): vscode.ProviderResult<vscode.EvaluatableExpression> {
+
+		const lineContent = document.lineAt(position.line).text;
+
+		let expression = /\w+/g;
+		let result: RegExpExecArray | null = null;
+
+		// find the word under the cursor
+		while (result = expression.exec(lineContent)) {
+			let start = result.index;
+			let end = start + result[0].length - 1;
+
+			if (start <= position.character && end >= position.character) {
+				return new vscode.EvaluatableExpression(new vscode.Range(position.line, start, position.line, end));
+			}
+		}
+
+		return undefined;
+	}
+}
 
 class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 

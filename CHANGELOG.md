@@ -1,4 +1,7 @@
 
+## 0.37.0
+* Add a simple vscode.EvaluatableExpressionProvider to show how to control what gets shown in a debug hover.
+
 ## 0.36.0
 * Extend the run mode by an 'inline' run mode (in addition to 'external' and 'server').
 
