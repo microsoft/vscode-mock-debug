@@ -1,4 +1,7 @@
 
+## 0.38.0
+* Exercise the new group feature of output events: 'log(start)' or 'log(startCollapsed)' starts a group, 'log(end)' ends a group.
+
 ## 0.37.0
 * Add a simple vscode.EvaluatableExpressionProvider to show how to control what gets shown in a debug hover.
 

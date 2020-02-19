@@ -81,6 +81,12 @@ export class MockDebugSession extends LoggingDebugSession {
 		});
 		this._runtime.on('output', (text, filePath, line, column) => {
 			const e: DebugProtocol.OutputEvent = new OutputEvent(`${text}\n`);
+
+			if (text === 'start' || text === 'startCollapsed' || text === 'end') {
+				e.body.group = text;
+				e.body.output = `group-${text}\n`;
+			}
+
 			e.body.source = this.createSource(filePath);
 			e.body.line = this.convertDebuggerLineToClient(line);
 			e.body.column = this.convertDebuggerColumnToClient(column);

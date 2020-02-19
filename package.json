@@ -39,7 +39,7 @@
 	},
 	"dependencies": {
 		"await-notify": "1.0.1",
-		"vscode-debugadapter": "1.38.0"
+		"vscode-debugadapter": "1.39.0-pre.0"
 	},
 	"devDependencies": {
 		"@types/node": "10.12.12",
@@ -47,7 +47,7 @@
 		"typescript": "3.5.3",
 		"mocha": "6.2.0",
 		"vscode": "1.1.36",
-		"vscode-debugadapter-testsupport": "1.40.1",
+		"vscode-debugadapter-testsupport": "1.40.2-pre.0",
 		"tslint": "5.18.0",
 		"vsce": "1.66.0"
 	},
