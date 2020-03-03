@@ -55,7 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// override VS Code's default implementation of the debug hover
 	vscode.languages.registerEvaluatableExpressionProvider('markdown', {
 		provideEvaluatableExpression(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.EvaluatableExpression> {
-			const wordRange = document.getWordRangeAtPosition(position)
+			const wordRange = document.getWordRangeAtPosition(position);
 			return wordRange ? new vscode.EvaluatableExpression(wordRange) : undefined;
 		}
 	});
