@@ -33,21 +33,20 @@
 		"tslint": "tslint ./src/**/*.ts",
 		"watch": "tsc -w -p ./src",
 		"test": "mocha -u tdd ./out/tests/",
-		"postinstall": "node ./node_modules/vscode/bin/install",
 		"package": "vsce package",
 		"publish": "vsce publish"
 	},
 	"dependencies": {
 		"await-notify": "1.0.1",
-		"vscode-debugadapter": "1.39.0-pre.0"
+		"vscode-debugadapter": "1.39.1"
 	},
 	"devDependencies": {
 		"@types/node": "10.12.12",
 		"@types/mocha": "5.2.7",
+		"@types/vscode": "^1.43.0",
 		"typescript": "3.5.3",
 		"mocha": "6.2.0",
-		"vscode": "1.1.36",
-		"vscode-debugadapter-testsupport": "1.40.2-pre.0",
+		"vscode-debugadapter-testsupport": "1.40.2",
 		"tslint": "5.18.0",
 		"vsce": "1.66.0"
 	},
