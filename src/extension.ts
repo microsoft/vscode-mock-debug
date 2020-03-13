@@ -13,7 +13,7 @@ import * as Net from 'net';
  * The compile time flag 'runMode' controls how the debug adapter is run.
  * Please note: the test suite only supports 'external' mode.
  */
-const runMode: 'external' | 'server' | 'inline' = 'external';
+const runMode: 'external' | 'server' | 'inline' = 'inline';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -53,12 +53,14 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 
 	// override VS Code's default implementation of the debug hover
+	/*
 	vscode.languages.registerEvaluatableExpressionProvider('markdown', {
 		provideEvaluatableExpression(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.EvaluatableExpression> {
 			const wordRange = document.getWordRangeAtPosition(position);
 			return wordRange ? new vscode.EvaluatableExpression(wordRange) : undefined;
 		}
 	});
+	*/
 }
 
 export function deactivate() {

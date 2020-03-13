@@ -34,9 +34,9 @@
   integrity sha512-Pr+6JRiKkfsFvmU/LK68oBRCQeEg36TyAbPhc2xpez24OOZZCuoIhWGTd39VZy6nGafSbxzGouFPTFD/rR1A0A==
 
 "@types/vscode@^1.43.0":
-  version "1.42.0"
-  resolved "https://registry.yarnpkg.com/@types/vscode/-/vscode-1.42.0.tgz#0ad891a9487e91e34be7c56985058a179031eb76"
-  integrity sha512-ds6TceMsh77Fs0Mq0Vap6Y72JbGWB8Bay4DrnJlf5d9ui2RSe1wis13oQm+XhguOeH1HUfLGzaDAoupTUtgabw==
+  version "1.43.0"
+  resolved "https://registry.yarnpkg.com/@types/vscode/-/vscode-1.43.0.tgz#22276e60034c693b33117f1068ffaac0e89522db"
+  integrity sha512-kIaR9qzd80rJOxePKpCB/mdy00mz8Apt2QA5Y6rdrKFn13QNFNeP3Hzmsf37Bwh/3cS7QjtAeGSK7wSqAU0sYQ==
 
 ansi-colors@3.2.3:
   version "3.2.3"
@@ -1149,25 +1149,25 @@ vsce@1.66.0:
     yauzl "^2.3.1"
     yazl "^2.2.2"
 
-vscode-debugadapter-testsupport@1.40.2:
-  version "1.40.2"
-  resolved "https://registry.yarnpkg.com/vscode-debugadapter-testsupport/-/vscode-debugadapter-testsupport-1.40.2.tgz#701d5bb67fa856feb22c0fcd289b6137451a7c72"
-  integrity sha512-HN1KoQUtFwCfPz2r1XaOtw3aUPpkgDPPRpLSGjCbOGRYhUJKlnLEwSaq4djVvZsfav6Zfd9QaBoaBNy03eBTvg==
+vscode-debugadapter-testsupport@1.40.3-pre.0:
+  version "1.40.3-pre.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugadapter-testsupport/-/vscode-debugadapter-testsupport-1.40.3-pre.0.tgz#a87a8fc9e4e0a29550e721560d320654314b10b4"
+  integrity sha512-T5APveA4v7UAw8asxlzF2mHPP8EV4jpK4QUVj2MVd9gQFZckpl6ZQ72qToiFfxAthXjpE9WVMXQCJauscvce9A==
   dependencies:
-    vscode-debugprotocol "1.39.0"
+    vscode-debugprotocol "1.40.0-pre.0"
 
-vscode-debugadapter@1.39.1:
-  version "1.39.1"
-  resolved "https://registry.yarnpkg.com/vscode-debugadapter/-/vscode-debugadapter-1.39.1.tgz#c5d2565a1f27c95c6d2fc7a893ce94942570dc95"
-  integrity sha512-+WYpOcY0PiAEBILf6nIwbNVF8ig8gugWTKWhQ7Ds1884JXpVL336pG0xH66Nc1Z1W/KSzuXarm1gtccdwl6PKw==
+vscode-debugadapter@1.40.0-pre.1:
+  version "1.40.0-pre.1"
+  resolved "https://registry.yarnpkg.com/vscode-debugadapter/-/vscode-debugadapter-1.40.0-pre.1.tgz#25f947d0313f51ef9da370c59d87a6609d08dc57"
+  integrity sha512-TdipTiDHfg3/4bXJOSG+mSKWqFARZ7TwQLNEdIvenbwppdjJ1t5VOfhHNQ0l5kkxx8Xs29iK1Yf7uPEXu+2nqg==
   dependencies:
     mkdirp "^0.5.1"
-    vscode-debugprotocol "1.39.0"
+    vscode-debugprotocol "1.40.0-pre.0"
 
-vscode-debugprotocol@1.39.0:
-  version "1.39.0"
-  resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.39.0.tgz#0c639178d0d5ea7de7903b6478b53d2bc0d77461"
-  integrity sha512-Wkvgtuz90vjtQBcvw9Z+BYa4dA6W+sHwHMpqvJVNmwWSuT3JZdl0XDhZNLqtMXkVF4okxtAe0MmbupPSt+gnAQ==
+vscode-debugprotocol@1.40.0-pre.0:
+  version "1.40.0-pre.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.40.0-pre.0.tgz#54300191649d4b3fa671b83fb6ea25c5f7622ff5"
+  integrity sha512-2ghen3Pcnxrw2+ZK0HuG/NQqhT0lAHfZodLQinBMWNbApucKva4jjTfUUoU69m39O46J0ENdVQeFTAL2oyy6Zg==
 
 which-module@^2.0.0:
   version "2.0.0"

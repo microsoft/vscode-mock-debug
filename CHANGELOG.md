@@ -1,4 +1,7 @@
 
+## 0.40.0
+* Exercise progress events: typing "progress" in the REPL starts a sequence of (cancellable) progress events if the clients supports this via the `supportsProgressReporting` client capability.
+
 ## 0.38.0
 * Exercise the new group feature of output events: 'log(start)' or 'log(startCollapsed)' starts a group, 'log(end)' ends a group.
 
