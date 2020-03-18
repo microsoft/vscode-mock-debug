@@ -403,6 +403,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		startEvent.body.cancellable = this._isProgressCancellable;
 		this._isProgressCancellable = !this._isProgressCancellable;
 		this.sendEvent(startEvent);
+		this.sendEvent(new OutputEvent(`start progress: ${ID}\n`));
 
 		let endMessage = 'progress ended';
 
@@ -412,10 +413,12 @@ export class MockDebugSession extends LoggingDebugSession {
 			if (this._cancelledProgressId === ID) {
 				endMessage = 'progress cancelled';
 				this._cancelledProgressId = undefined;
+				this.sendEvent(new OutputEvent(`cancel progress: ${ID}\n`));
 				break;
 			}
 		}
 		this.sendEvent(new ProgressEndEvent(ID, endMessage));
+		this.sendEvent(new OutputEvent(`end progress: ${ID}\n`));
 
 		this._cancelledProgressId = undefined;
 	}
