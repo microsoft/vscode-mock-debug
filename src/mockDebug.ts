@@ -409,6 +409,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			if (this._cancelledProgressId === ID) {
 				endMessage = 'progress cancelled';
 				this._cancelledProgressId = undefined;
+				break;
 			}
 		}
 		this.sendEvent(new ProgressEndEvent(ID, endMessage));
