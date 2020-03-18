@@ -51,6 +51,7 @@ export class MockDebugSession extends LoggingDebugSession {
 	private _reportProgress = false;
 	private _progressId = 10000;
 	private _cancelledProgressId: string | undefined = undefined;
+	private _isProgressCancellable = true;
 
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
@@ -397,8 +398,10 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		await timeout(100);
 
-		const startEvent: DebugProtocol.ProgressStartEvent = new ProgressStartEvent(ID, 'Some debug progress');
-		startEvent.body.cancellable = true;
+		const title = this._isProgressCancellable ? 'Cancellable operation' : 'Long running operation';
+		const startEvent: DebugProtocol.ProgressStartEvent = new ProgressStartEvent(ID, title);
+		startEvent.body.cancellable = this._isProgressCancellable;
+		this._isProgressCancellable = !this._isProgressCancellable;
 		this.sendEvent(startEvent);
 
 		let endMessage = 'progress ended';
