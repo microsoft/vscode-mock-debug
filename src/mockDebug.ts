@@ -480,6 +480,17 @@ export class MockDebugSession extends LoggingDebugSession {
 				{
 					label: "item 2",
 					sortText: "02"
+				},
+				{
+					label: "array[]",
+					selectionStart: 6,
+					sortText: "03"
+				},
+				{
+					label: "func(arg)",
+					selectionStart: 5,
+					selectionLength: 3,
+					sortText: "04"
 				}
 			]
 		};
