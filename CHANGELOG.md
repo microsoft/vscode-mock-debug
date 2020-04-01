@@ -1,5 +1,5 @@
 
-## 0.40.0
+## 0.39.0
 * Exercise progress events: typing "progress" in the REPL starts a sequence of (cancellable) progress events if the clients supports this via the `supportsProgressReporting` client capability.
 * Exersise new completion item attributes `selectionStart` and `selectionLength`: "array[]" moves cursor between the brackets and "func(arg)" selects "arg".
 
