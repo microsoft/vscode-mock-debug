@@ -53,6 +53,7 @@
 	"main": "./out/extension",
 	"activationEvents": [
 		"onDebug",
+		"onDebugDynamicConfigurations",
 		"onCommand:extension.mock-debug.getProgramName"
 	],
 	"contributes": {
