@@ -30,13 +30,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// register a dynamic configuration provider for 'mock' debug type
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', {
-		provideDebugConfigurations(folder: WorkspaceFolder | undefined, token?: CancellationToken): ProviderResult<DebugConfiguration[]> {
+		provideDebugConfigurations(folder: WorkspaceFolder | undefined): ProviderResult<DebugConfiguration[]> {
 			return [
 				{
 					name: "Dynamic Launch",
 					request: "launch",
 					type: "node",
-
+					program: "${file}"
 				}
 			];
 		}
