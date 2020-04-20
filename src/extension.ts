@@ -28,6 +28,20 @@ export function activate(context: vscode.ExtensionContext) {
 	const provider = new MockConfigurationProvider();
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', provider));
 
+	// register a dynamic configuration provider for 'mock' debug type
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', {
+		provideDebugConfigurations(folder: WorkspaceFolder | undefined, token?: CancellationToken): ProviderResult<DebugConfiguration[]> {
+			return [
+				{
+					name: "Dynamic Launch",
+					request: "launch",
+					type: "node",
+
+				}
+			];
+		}
+	}, vscode.DebugConfigurationProviderScope.Dynamic));
+
 	// debug adapters can be run in different ways by using a vscode.DebugAdapterDescriptorFactory:
 	let factory: vscode.DebugAdapterDescriptorFactory;
 	switch (runMode) {
