@@ -37,6 +37,18 @@ export function activate(context: vscode.ExtensionContext) {
 					request: "launch",
 					type: "node",
 					program: "${file}"
+				},
+				{
+					name: "Another Dynamic Launch",
+					request: "launch",
+					type: "node",
+					program: "${file}"
+				},
+				{
+					name: "Mock Launch",
+					request: "launch",
+					type: "node",
+					program: "${file}"
 				}
 			];
 		}
