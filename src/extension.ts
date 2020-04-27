@@ -52,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			];
 		}
-	}, vscode.DebugConfigurationProviderTrigger.Dynamic));
+	}, vscode.DebugConfigurationProviderTriggerKind.Dynamic));
 
 	// debug adapters can be run in different ways by using a vscode.DebugAdapterDescriptorFactory:
 	let factory: vscode.DebugAdapterDescriptorFactory;
