@@ -67,9 +67,9 @@ export class MockDebugSession extends LoggingDebugSession {
 		this._runtime = new MockRuntime();
 
 		// setup event handlers
-		this._runtime.on('stopOnEntry', () => {
-			this.sendEvent(new StoppedEvent('entry', MockDebugSession.THREAD_ID));
-		});
+		// this._runtime.on('stopOnEntry', () => {
+		// 	this.sendEvent(new StoppedEvent('entry', MockDebugSession.THREAD_ID));
+		// });
 		this._runtime.on('stopOnStep', () => {
 			this.sendEvent(new StoppedEvent('step', MockDebugSession.THREAD_ID));
 		});
@@ -188,9 +188,9 @@ export class MockDebugSession extends LoggingDebugSession {
 		});
 
 		// send back the actual breakpoint positions
-		response.body = {
-			breakpoints: actualBreakpoints
-		};
+		// response.body = {
+		// 	breakpoints: actualBreakpoints
+		// };
 		this.sendResponse(response);
 	}
 
