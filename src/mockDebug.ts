@@ -138,6 +138,9 @@ export class MockDebugSession extends LoggingDebugSession {
 		// make VS Code send the breakpointLocations request
 		response.body.supportsBreakpointLocationsRequest = true;
 
+		// make VS Code provide "Step in Target" functionality
+		response.body.supportsStepInTargetsRequest = true;
+
 		this.sendResponse(response);
 
 		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
@@ -234,7 +237,13 @@ export class MockDebugSession extends LoggingDebugSession {
 		const stk = this._runtime.stack(startFrame, endFrame);
 
 		response.body = {
-			stackFrames: stk.frames.map(f => new StackFrame(f.index, f.name, this.createSource(f.file), this.convertDebuggerLineToClient(f.line))),
+			stackFrames: stk.frames.map(f => {
+				const sf = new StackFrame(f.index, f.name, this.createSource(f.file), this.convertDebuggerLineToClient(f.line));
+				if (typeof f.column === 'number') {
+					sf.column = this.convertDebuggerColumnToClient(f.column);
+				}
+				return sf;
+			}),
 			totalFrames: stk.count
 		};
 		this.sendResponse(response);
@@ -345,6 +354,24 @@ export class MockDebugSession extends LoggingDebugSession {
 
 	protected stepBackRequest(response: DebugProtocol.StepBackResponse, args: DebugProtocol.StepBackArguments): void {
 		this._runtime.step(true);
+		this.sendResponse(response);
+	}
+
+	protected stepInTargetsRequest(response: DebugProtocol.StepInTargetsResponse, args: DebugProtocol.StepInTargetsArguments) {
+		const targets = this._runtime.getStepInTargets(args.frameId);
+		response.body = {
+			targets: targets.map(t => { return { id: t.id, label: t.label }} )
+		};
+		this.sendResponse(response);
+	}
+
+	protected stepInRequest(response: DebugProtocol.StepInResponse, args: DebugProtocol.StepInArguments): void {
+		this._runtime.stepIn(args.targetId);
+		this.sendResponse(response);
+	}
+
+	protected stepOutRequest(response: DebugProtocol.StepOutResponse, args: DebugProtocol.StepOutArguments): void {
+		this._runtime.stepOut();
 		this.sendResponse(response);
 	}
 

@@ -27,6 +27,7 @@ export class MockRuntime extends EventEmitter {
 
 	// This is the next line that will be 'executed'
 	private _currentLine = 0;
+	private _currentColumn: number | undefined;
 
 	// maps from sourceFile to array of Mock breakpoints
 	private _breakPoints = new Map<string, MockBreakpoint[]>();
@@ -75,6 +76,59 @@ export class MockRuntime extends EventEmitter {
 	}
 
 	/**
+	 * "Step into" for Mock debug means: go to next character
+	 */
+	public stepIn(targetId: number | undefined) {
+		if (typeof targetId === 'number') {
+			this._currentColumn = targetId;
+			this.sendEvent('stopOnStep');
+		} else {
+			if (typeof this._currentColumn === 'number') {
+				if (this._currentColumn <= this._sourceLines[this._currentLine].length) {
+					this._currentColumn += 1;
+				}
+			} else {
+				this._currentColumn = 1;
+			}
+			this.sendEvent('stopOnStep');
+		}
+	}
+
+	/**
+	 * "Step out" for Mock debug means: go to previous character
+	 */
+	public stepOut() {
+		if (typeof this._currentColumn === 'number') {
+			this._currentColumn -= 1;
+			if (this._currentColumn === 0) {
+				this._currentColumn = undefined;
+			}
+		}
+		this.sendEvent('stopOnStep');
+	}
+
+	public getStepInTargets(frameId: number): { id: number, label: string}[] {
+
+		const line = this._sourceLines[this._currentLine].trim();
+
+		// every word of the current line becomes a stack frame.
+		const words = line.split(/\s+/);
+
+		// return nothing if frameId is out of range
+		if (frameId < 0 || frameId >= words.length) {
+			return [];
+		}
+
+		// pick the frame for the given frameId
+		const frame = words[frameId];
+
+		const pos = line.indexOf(frame);
+
+		// make every character of the frame a potential "step in" target
+		return frame.split('').map((c, ix) => { return { id: pos + ix, label: c }});
+	}
+
+	/**
 	 * Returns a fake 'stacktrace' where every 'stackframe' is a word from the current line.
 	 */
 	public stack(startFrame: number, endFrame: number): any {
@@ -85,12 +139,16 @@ export class MockRuntime extends EventEmitter {
 		// every word of the current line becomes a stack frame.
 		for (let i = startFrame; i < Math.min(endFrame, words.length); i++) {
 			const name = words[i];	// use a word of the line as the stackframe name
-			frames.push({
+			const stackFrame: any = {
 				index: i,
 				name: `${name}(${i})`,
 				file: this._sourceFile,
 				line: this._currentLine
-			});
+			};
+			if (typeof this._currentColumn === 'number') {
+				stackFrame.column = this._currentColumn;
+			}
+			frames.push(stackFrame);
 		}
 		return {
 			frames: frames,
@@ -195,16 +253,19 @@ export class MockRuntime extends EventEmitter {
 			for (let ln = this._currentLine-1; ln >= 0; ln--) {
 				if (this.fireEventsForLine(ln, stepEvent)) {
 					this._currentLine = ln;
+					this._currentColumn = undefined;
 					return;
 				}
 			}
 			// no more lines: stop at first line
 			this._currentLine = 0;
+			this._currentColumn = undefined;
 			this.sendEvent('stopOnEntry');
 		} else {
 			for (let ln = this._currentLine+1; ln < this._sourceLines.length; ln++) {
 				if (this.fireEventsForLine(ln, stepEvent)) {
 					this._currentLine = ln;
+					this._currentColumn = undefined;
 					return true;
 				}
 			}
