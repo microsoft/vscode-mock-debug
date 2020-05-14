@@ -125,7 +125,7 @@ export class MockRuntime extends EventEmitter {
 		const pos = line.indexOf(frame);
 
 		// make every character of the frame a potential "step in" target
-		return frame.split('').map((c, ix) => { return { id: pos + ix, label: c }});
+		return frame.split('').map((c, ix) => { return { id: pos + ix, label: `target: ${c}` }});
 	}
 
 	/**
