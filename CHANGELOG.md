@@ -1,4 +1,7 @@
 
+## 0.42.0
+* Add "run" and "debug" actions to editor title
+
 ## 0.41.0
 * Add support for StepIn and StepOut: StepIn moves execution one character to the right, StepIn to the left
 * Add support for StepInTargets: every word in the stopped line is considered one stack frame; StepInTargets returns targets for every character of the stack frame with the given frameId.

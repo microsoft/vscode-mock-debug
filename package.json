@@ -1,7 +1,7 @@
 {
 	"name": "mock-debug",
 	"displayName": "Mock Debug",
-	"version": "0.41.0",
+	"version": "0.42.0",
 	"publisher": "andreweinand",
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"author": {
@@ -13,7 +13,7 @@
 		"multi-root ready"
 	],
 	"engines": {
-		"vscode": "^1.44.0"
+		"vscode": "^1.46.0"
 	},
 	"icon": "images/mock-debug-icon.png",
 	"categories": [
@@ -54,9 +54,37 @@
 	"activationEvents": [
 		"onDebug",
 		"onDebugDynamicConfigurations:mock",
-		"onCommand:extension.mock-debug.getProgramName"
+		"onCommand:extension.mock-debug.getProgramName",
+		"onCommand:extension.mock-debug.runEditorContents",
+		"onCommand:extension.mock-debug.debugEditorContents"
 	],
 	"contributes": {
+		"menus": {
+			"editor/title": [
+				{
+					"command": "extension.mock-debug.runEditorContents",
+					"when": "resourceLangId == markdown",
+					"group": "navigation@1"
+				},
+				{
+					"command": "extension.mock-debug.debugEditorContents",
+					"when": "resourceLangId == markdown",
+					"group": "navigation@2"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "extension.mock-debug.debugEditorContents",
+				"title": "Debug editor contents",
+				"icon": "$(bug)"
+			},
+			{
+				"command": "extension.mock-debug.runEditorContents",
+				"title": "Run editor contents",
+				"icon": "$(play)"
+			}
+		],
 		"breakpoints": [
 			{
 				"language": "markdown"

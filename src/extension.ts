@@ -17,6 +17,26 @@ const runMode: 'external' | 'server' | 'inline' = 'inline';
 
 export function activate(context: vscode.ExtensionContext) {
 
+	context.subscriptions.push(
+		vscode.commands.registerCommand('extension.mock-debug.runEditorContents', (resource: vscode.Uri) => {
+			vscode.debug.startDebugging(undefined, {
+				type: 'mock',
+				name: 'Debug file',
+				request: 'launch',
+				program: resource.fsPath,
+				noDebug: true
+			});
+		}),
+		vscode.commands.registerCommand('extension.mock-debug.debugEditorContents', (resource: vscode.Uri) => {
+			vscode.debug.startDebugging(undefined, {
+				type: 'mock',
+				name: 'Debug file',
+				request: 'launch',
+				program: resource.fsPath
+			});
+		})
+	);
+
 	context.subscriptions.push(vscode.commands.registerCommand('extension.mock-debug.getProgramName', config => {
 		return vscode.window.showInputBox({
 			placeHolder: "Please enter the name of a markdown file in the workspace folder",
@@ -71,7 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
 			// run the debug adapter as a separate process
 			factory = new DebugAdapterExecutableFactory();
 			break;
-		}
+	}
 
 	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('mock', factory));
 	if ('dispose' in factory) {
