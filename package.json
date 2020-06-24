@@ -1,7 +1,7 @@
 {
 	"name": "mock-debug",
 	"displayName": "Mock Debug",
-	"version": "0.42.1",
+	"version": "0.42.2",
 	"publisher": "andreweinand",
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"author": {
@@ -70,12 +70,12 @@
 				{
 					"command": "extension.mock-debug.runEditorContents",
 					"when": "resourceLangId == markdown",
-					"group": "navigation@1"
+					"group": "navigation@-2"
 				},
 				{
 					"command": "extension.mock-debug.debugEditorContents",
 					"when": "resourceLangId == markdown",
-					"group": "navigation@2"
+					"group": "navigation@-1"
 				}
 			]
 		},
@@ -83,7 +83,7 @@
 			{
 				"command": "extension.mock-debug.debugEditorContents",
 				"title": "Debug Editor Contents",
-				"icon": "$(bug)"
+				"icon": "$(debug-alt)"
 			},
 			{
 				"command": "extension.mock-debug.runEditorContents",
