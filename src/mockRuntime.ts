@@ -38,6 +38,8 @@ export class MockRuntime extends EventEmitter {
 
 	private _breakAddresses = new Set<string>();
 
+	private _noDebug = false;
+
 	constructor() {
 		super();
 	}
@@ -45,7 +47,9 @@ export class MockRuntime extends EventEmitter {
 	/**
 	 * Start executing the given program.
 	 */
-	public start(program: string, stopOnEntry: boolean) {
+	public start(program: string, stopOnEntry: boolean, noDebug: boolean) {
+
+		this._noDebug = noDebug;
 
 		this.loadSource(program);
 		this._currentLine = -1;
@@ -275,6 +279,11 @@ export class MockRuntime extends EventEmitter {
 	}
 
 	private verifyBreakpoints(path: string) : void {
+
+		if (this._noDebug) {
+			return;
+		}
+
 		let bps = this._breakPoints.get(path);
 		if (bps) {
 			this.loadSource(path);
@@ -306,6 +315,10 @@ export class MockRuntime extends EventEmitter {
 	 * Returns true is execution needs to stop.
 	 */
 	private fireEventsForLine(ln: number, stepEvent?: string): boolean {
+
+		if (this._noDebug) {
+			return false;
+		}
 
 		const line = this._sourceLines[ln].trim();
 

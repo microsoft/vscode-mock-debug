@@ -21,16 +21,20 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('extension.mock-debug.runEditorContents', (resource: vscode.Uri) => {
 			vscode.debug.startDebugging(undefined, {
 				type: 'mock',
-				name: 'Debug file',
+				name: 'Run Editor Contents',
 				request: 'launch',
 				program: resource.fsPath,
 				noDebug: true
-			});
+			},/* upcoming proposed API:
+				{
+					noDebug: true
+				}
+			*/);
 		}),
 		vscode.commands.registerCommand('extension.mock-debug.debugEditorContents', (resource: vscode.Uri) => {
 			vscode.debug.startDebugging(undefined, {
 				type: 'mock',
-				name: 'Debug file',
+				name: 'Debug Editor Contents',
 				request: 'launch',
 				program: resource.fsPath
 			});

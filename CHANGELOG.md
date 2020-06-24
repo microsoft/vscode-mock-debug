@@ -1,6 +1,7 @@
 
-## 0.42.0
+## 0.42.1
 * Add "run" and "debug" actions to editor title
+* Implement "Run without debugging"
 
 ## 0.41.0
 * Add support for StepIn and StepOut: StepIn moves execution one character to the right, StepIn to the left
