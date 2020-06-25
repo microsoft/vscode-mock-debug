@@ -18,26 +18,38 @@ const runMode: 'external' | 'server' | 'inline' = 'inline';
 export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('extension.mock-debug.runEditorContents', (resource: vscode.Uri) => {
-			vscode.debug.startDebugging(undefined, {
-				type: 'mock',
-				name: 'Run Editor Contents',
-				request: 'launch',
-				program: resource.fsPath,
-				noDebug: true
-			},/* upcoming proposed API:
-				{
+		vscode.commands.registerCommand('extension.mock-debug.runEditorContents', (resource: vscode.Uri | undefined) => {
+			let targetResource = resource;
+			if (!targetResource && vscode.window.activeTextEditor) {
+				targetResource = vscode.window.activeTextEditor.document.uri;
+			}
+			if (targetResource) {
+				vscode.debug.startDebugging(undefined, {
+					type: 'mock',
+					name: 'Run Editor Contents',
+					request: 'launch',
+					program: targetResource.fsPath,
 					noDebug: true
+				},/* upcoming proposed API:
+					{
+						noDebug: true
+					}
+				*/);
 				}
-			*/);
 		}),
-		vscode.commands.registerCommand('extension.mock-debug.debugEditorContents', (resource: vscode.Uri) => {
-			vscode.debug.startDebugging(undefined, {
-				type: 'mock',
-				name: 'Debug Editor Contents',
-				request: 'launch',
-				program: resource.fsPath
-			});
+		vscode.commands.registerCommand('extension.mock-debug.debugEditorContents', (resource: vscode.Uri | undefined) => {
+			let targetResource = resource;
+			if (!targetResource && vscode.window.activeTextEditor) {
+				targetResource = vscode.window.activeTextEditor.document.uri;
+			}
+			if (targetResource) {
+				vscode.debug.startDebugging(undefined, {
+					type: 'mock',
+					name: 'Debug Editor Contents',
+					request: 'launch',
+					program: targetResource.fsPath
+				});
+			}
 		})
 	);
 

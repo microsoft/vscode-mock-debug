@@ -77,17 +77,31 @@
 					"when": "resourceLangId == markdown",
 					"group": "run@20"
 				}
+			],
+			"commandPalette": [
+				{
+					"command": "extension.mock-debug.debugEditorContents",
+					"when": "resourceLangId == markdown"
+				},
+				{
+					"command": "extension.mock-debug.runEditorContents",
+					"when": "resourceLangId == markdown"
+				}
 			]
 		},
 		"commands": [
 			{
 				"command": "extension.mock-debug.debugEditorContents",
 				"title": "Debug Editor Contents",
+				"category": "Mock Debug",
+				"enablement": "!inDebugMode",
 				"icon": "$(debug-alt)"
 			},
 			{
 				"command": "extension.mock-debug.runEditorContents",
 				"title": "Run Editor Contents",
+				"category": "Mock Debug",
+				"enablement": "!inDebugMode",
 				"icon": "$(play)"
 			}
 		],
