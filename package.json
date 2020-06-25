@@ -70,12 +70,12 @@
 				{
 					"command": "extension.mock-debug.runEditorContents",
 					"when": "resourceLangId == markdown",
-					"group": "navigation@-2"
+					"group": "run@10"
 				},
 				{
 					"command": "extension.mock-debug.debugEditorContents",
 					"when": "resourceLangId == markdown",
-					"group": "navigation@-1"
+					"group": "run@20"
 				}
 			]
 		},
