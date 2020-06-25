@@ -82,12 +82,12 @@
 		"commands": [
 			{
 				"command": "extension.mock-debug.debugEditorContents",
-				"title": "Debug Editor Contents",
+				"title": "Debug File",
 				"icon": "$(debug-alt)"
 			},
 			{
 				"command": "extension.mock-debug.runEditorContents",
-				"title": "Run Editor Contents",
+				"title": "Run File",
 				"icon": "$(play)"
 			}
 		],
