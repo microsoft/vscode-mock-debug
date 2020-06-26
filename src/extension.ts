@@ -26,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
 			if (targetResource) {
 				vscode.debug.startDebugging(undefined, {
 					type: 'mock',
-					name: 'Run Editor Contents',
+					name: 'Run File',
 					request: 'launch',
 					program: targetResource.fsPath,
 					noDebug: true
@@ -45,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
 			if (targetResource) {
 				vscode.debug.startDebugging(undefined, {
 					type: 'mock',
-					name: 'Debug Editor Contents',
+					name: 'Debug File',
 					request: 'launch',
 					program: targetResource.fsPath
 				});
