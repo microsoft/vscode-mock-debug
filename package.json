@@ -92,14 +92,14 @@
 		"commands": [
 			{
 				"command": "extension.mock-debug.debugEditorContents",
-				"title": "Debug Editor Contents",
+				"title": "Debug File",
 				"category": "Mock Debug",
 				"enablement": "!inDebugMode",
 				"icon": "$(debug-alt)"
 			},
 			{
 				"command": "extension.mock-debug.runEditorContents",
-				"title": "Run Editor Contents",
+				"title": "Run File",
 				"category": "Mock Debug",
 				"enablement": "!inDebugMode",
 				"icon": "$(play)"
