@@ -274,7 +274,7 @@ export class MockRuntime extends EventEmitter {
 				}
 			}
 			// no more lines: run to end
-			this.sendEvent('end');
+			setTimeout(() => this.sendEvent('end'), 5000); // prevent exiting as soon as we continue
 		}
 	}
 
