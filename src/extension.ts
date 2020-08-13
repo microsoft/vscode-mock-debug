@@ -164,7 +164,7 @@ class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFact
 			];
 			const options = {
 				cwd: "working directory for executable",
-				env: { "VAR": "some value" }
+				env: { "envVariable": "some value" }
 			};
 			executable = new vscode.DebugAdapterExecutable(command, args, options);
 		}
@@ -185,12 +185,12 @@ class MockDebugAdapterDescriptorFactory implements vscode.DebugAdapterDescriptor
 			this.server = Net.createServer(socket => {
 				const session = new MockDebugSession();
 				session.setRunAsServer(true);
-				session.start(<NodeJS.ReadableStream>socket, socket);
+				session.start(socket as NodeJS.ReadableStream, socket);
 			}).listen(0);
 		}
 
 		// make VS Code connect to debug server
-		return new vscode.DebugAdapterServer((<Net.AddressInfo>this.server.address()).port);
+		return new vscode.DebugAdapterServer((this.server.address() as Net.AddressInfo).port);
 	}
 
 	dispose() {

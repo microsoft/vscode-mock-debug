@@ -106,8 +106,9 @@ suite('Node Debug Adapter', () => {
 
 				dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAKPOINT_LINE, verified: false } ),
 
-				dc.waitForEvent('breakpoint').then((event : DebugProtocol.BreakpointEvent ) => {
-					assert.equal(event.body.breakpoint.verified, true, "event mismatch: verified");
+				dc.waitForEvent('breakpoint').then(event => {
+					const bpevent = event as DebugProtocol.BreakpointEvent;
+					assert.strictEqual(bpevent.body.breakpoint.verified, true, "event mismatch: verified");
 				})
 			]);
 		});

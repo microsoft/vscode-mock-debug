@@ -5,10 +5,28 @@
 import { readFileSync } from 'fs';
 import { EventEmitter } from 'events';
 
-export interface MockBreakpoint {
+export interface IMockBreakpoint {
 	id: number;
 	line: number;
 	verified: boolean;
+}
+
+interface IStepInTargets {
+	id: number;
+	label: string;
+}
+
+interface IStackFrame {
+	index: number;
+	name: string;
+	file: string;
+	line: number;
+	column?: number;
+}
+
+interface IStack {
+	count: number;
+	frames: IStackFrame[];
 }
 
 /**
@@ -17,20 +35,20 @@ export interface MockBreakpoint {
 export class MockRuntime extends EventEmitter {
 
 	// the initial (and one and only) file we are 'debugging'
-	private _sourceFile: string;
+	private _sourceFile: string = '';
 	public get sourceFile() {
 		return this._sourceFile;
 	}
 
 	// the contents (= lines) of the one and only file
-	private _sourceLines: string[];
+	private _sourceLines: string[] = [];
 
 	// This is the next line that will be 'executed'
 	private _currentLine = 0;
 	private _currentColumn: number | undefined;
 
 	// maps from sourceFile to array of Mock breakpoints
-	private _breakPoints = new Map<string, MockBreakpoint[]>();
+	private _breakPoints = new Map<string, IMockBreakpoint[]>();
 
 	// since we want to send breakpoint events, we will assign an id to every event
 	// so that the frontend can match events with breakpoints.
@@ -111,7 +129,7 @@ export class MockRuntime extends EventEmitter {
 		this.sendEvent('stopOnStep');
 	}
 
-	public getStepInTargets(frameId: number): { id: number, label: string}[] {
+	public getStepInTargets(frameId: number): IStepInTargets[] {
 
 		const line = this._sourceLines[this._currentLine].trim();
 
@@ -129,21 +147,26 @@ export class MockRuntime extends EventEmitter {
 		const pos = line.indexOf(frame);
 
 		// make every character of the frame a potential "step in" target
-		return frame.split('').map((c, ix) => { return { id: pos + ix, label: `target: ${c}` }});
+		return frame.split('').map((c, ix) => {
+			return {
+				id: pos + ix,
+				label: `target: ${c}`
+			};
+		});
 	}
 
 	/**
 	 * Returns a fake 'stacktrace' where every 'stackframe' is a word from the current line.
 	 */
-	public stack(startFrame: number, endFrame: number): any {
+	public stack(startFrame: number, endFrame: number): IStack {
 
 		const words = this._sourceLines[this._currentLine].trim().split(/\s+/);
 
-		const frames = new Array<any>();
+		const frames = new Array<IStackFrame>();
 		// every word of the current line becomes a stack frame.
 		for (let i = startFrame; i < Math.min(endFrame, words.length); i++) {
 			const name = words[i];	// use a word of the line as the stackframe name
-			const stackFrame: any = {
+			const stackFrame: IStackFrame = {
 				index: i,
 				name: `${name}(${i})`,
 				file: this._sourceFile,
@@ -183,12 +206,12 @@ export class MockRuntime extends EventEmitter {
 	/*
 	 * Set breakpoint in file with given line.
 	 */
-	public setBreakPoint(path: string, line: number) : MockBreakpoint {
+	public setBreakPoint(path: string, line: number): IMockBreakpoint {
 
-		const bp = <MockBreakpoint> { verified: false, line, id: this._breakpointId++ };
+		const bp: IMockBreakpoint = { verified: false, line, id: this._breakpointId++ };
 		let bps = this._breakPoints.get(path);
 		if (!bps) {
-			bps = new Array<MockBreakpoint>();
+			bps = new Array<IMockBreakpoint>();
 			this._breakPoints.set(path, bps);
 		}
 		bps.push(bp);
@@ -201,8 +224,8 @@ export class MockRuntime extends EventEmitter {
 	/*
 	 * Clear breakpoint in file with given line.
 	 */
-	public clearBreakPoint(path: string, line: number) : MockBreakpoint | undefined {
-		let bps = this._breakPoints.get(path);
+	public clearBreakPoint(path: string, line: number): IMockBreakpoint | undefined {
+		const bps = this._breakPoints.get(path);
 		if (bps) {
 			const index = bps.findIndex(bp => bp.line === line);
 			if (index >= 0) {
@@ -278,13 +301,13 @@ export class MockRuntime extends EventEmitter {
 		}
 	}
 
-	private verifyBreakpoints(path: string) : void {
+	private verifyBreakpoints(path: string): void {
 
 		if (this._noDebug) {
 			return;
 		}
 
-		let bps = this._breakPoints.get(path);
+		const bps = this._breakPoints.get(path);
 		if (bps) {
 			this.loadSource(path);
 			bps.forEach(bp => {
@@ -325,12 +348,12 @@ export class MockRuntime extends EventEmitter {
 		// if 'log(...)' found in source -> send argument to debug console
 		const matches = /log\((.*)\)/.exec(line);
 		if (matches && matches.length === 2) {
-			this.sendEvent('output', matches[1], this._sourceFile, ln, matches.index)
+			this.sendEvent('output', matches[1], this._sourceFile, ln, matches.index);
 		}
 
 		// if a word in a line matches a data breakpoint, fire a 'dataBreakpoint' event
 		const words = line.split(" ");
-		for (let word of words) {
+		for (const word of words) {
 			if (this._breakAddresses.has(word)) {
 				this.sendEvent('stopOnDataBreakpoint');
 				return true;

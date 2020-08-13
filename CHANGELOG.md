@@ -1,4 +1,9 @@
 
+## 0.42.2
+* Project hygiene: get rid of all warnings
+* use eslint instead of tslint
+* align with latest yeoman generator for VS Code
+
 ## 0.42.1
 * Add "run" and "debug" actions to editor title
 * Implement "Run without debugging"

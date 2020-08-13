@@ -11,8 +11,8 @@ import {
 } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { basename } from 'path';
-import { MockRuntime, MockBreakpoint } from './mockRuntime';
-const { Subject } = require('await-notify');
+import { MockRuntime, IMockBreakpoint } from './mockRuntime';
+import { Subject } from 'await-notify';
 
 function timeout(ms: number) {
 	return new Promise(resolve => setTimeout(resolve, ms));
@@ -24,7 +24,7 @@ function timeout(ms: number) {
  * The schema for these attributes lives in the package.json of the mock-debug extension.
  * The interface should always match this schema.
  */
-interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
+interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	/** An absolute path to the "program" to debug. */
 	program: string;
 	/** Automatically stop target after launch. If not specified, target does not stop. */
@@ -32,13 +32,13 @@ interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	/** enable logging the Debug Adapter Protocol */
 	trace?: boolean;
 	/** run without debugging */
-	noDebug?: boolean
+	noDebug?: boolean;
 }
 
 export class MockDebugSession extends LoggingDebugSession {
 
 	// we don't support multiple threads, so we can use a hardcoded ID for the default thread
-	private static THREAD_ID = 1;
+	private static threadID = 1;
 
 	// a Mock runtime (or debugger)
 	private _runtime: MockRuntime;
@@ -70,22 +70,22 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// setup event handlers
 		this._runtime.on('stopOnEntry', () => {
-			this.sendEvent(new StoppedEvent('entry', MockDebugSession.THREAD_ID));
+			this.sendEvent(new StoppedEvent('entry', MockDebugSession.threadID));
 		});
 		this._runtime.on('stopOnStep', () => {
-			this.sendEvent(new StoppedEvent('step', MockDebugSession.THREAD_ID));
+			this.sendEvent(new StoppedEvent('step', MockDebugSession.threadID));
 		});
 		this._runtime.on('stopOnBreakpoint', () => {
-			this.sendEvent(new StoppedEvent('breakpoint', MockDebugSession.THREAD_ID));
+			this.sendEvent(new StoppedEvent('breakpoint', MockDebugSession.threadID));
 		});
 		this._runtime.on('stopOnDataBreakpoint', () => {
-			this.sendEvent(new StoppedEvent('data breakpoint', MockDebugSession.THREAD_ID));
+			this.sendEvent(new StoppedEvent('data breakpoint', MockDebugSession.threadID));
 		});
 		this._runtime.on('stopOnException', () => {
-			this.sendEvent(new StoppedEvent('exception', MockDebugSession.THREAD_ID));
+			this.sendEvent(new StoppedEvent('exception', MockDebugSession.threadID));
 		});
-		this._runtime.on('breakpointValidated', (bp: MockBreakpoint) => {
-			this.sendEvent(new BreakpointEvent('changed', <DebugProtocol.Breakpoint>{ verified: bp.verified, id: bp.id }));
+		this._runtime.on('breakpointValidated', (bp: IMockBreakpoint) => {
+			this.sendEvent(new BreakpointEvent('changed', { verified: bp.verified, id: bp.id } as DebugProtocol.Breakpoint));
 		});
 		this._runtime.on('output', (text, filePath, line, column) => {
 			const e: DebugProtocol.OutputEvent = new OutputEvent(`${text}\n`);
@@ -162,7 +162,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		this._configurationDone.notify();
 	}
 
-	protected async launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments) {
+	protected async launchRequest(response: DebugProtocol.LaunchResponse, args: ILaunchRequestArguments) {
 
 		// make sure to 'Stop' the buffered logging if 'trace' is not set
 		logger.setup(args.trace ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
@@ -178,7 +178,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 	protected setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): void {
 
-		const path = <string>args.source.path;
+		const path = args.source.path as string;
 		const clientLines = args.lines || [];
 
 		// clear all breakpoints for this file
@@ -186,8 +186,8 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// set and verify breakpoint locations
 		const actualBreakpoints = clientLines.map(l => {
-			let { verified, line, id } = this._runtime.setBreakPoint(path, this.convertClientLineToDebugger(l));
-			const bp = <DebugProtocol.Breakpoint> new Breakpoint(verified, this.convertDebuggerLineToClient(line));
+			const { verified, line, id } = this._runtime.setBreakPoint(path, this.convertClientLineToDebugger(l));
+			const bp = new Breakpoint(verified, this.convertDebuggerLineToClient(line)) as DebugProtocol.Breakpoint;
 			bp.id= id;
 			return bp;
 		});
@@ -208,7 +208,7 @@ export class MockDebugSession extends LoggingDebugSession {
 					return {
 						line: args.line,
 						column: this.convertDebuggerColumnToClient(col)
-					}
+					};
 				})
 			};
 		} else {
@@ -224,7 +224,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		// runtime supports no threads so just return a default thread.
 		response.body = {
 			threads: [
-				new Thread(MockDebugSession.THREAD_ID, "thread 1")
+				new Thread(MockDebugSession.threadID, "thread 1")
 			]
 		};
 		this.sendResponse(response);
@@ -344,7 +344,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		this.sendResponse(response);
 	}
 
-	protected reverseContinueRequest(response: DebugProtocol.ReverseContinueResponse, args: DebugProtocol.ReverseContinueArguments) : void {
+	protected reverseContinueRequest(response: DebugProtocol.ReverseContinueResponse, args: DebugProtocol.ReverseContinueArguments): void {
 		this._runtime.continue(true);
 		this.sendResponse(response);
  	}
@@ -362,7 +362,9 @@ export class MockDebugSession extends LoggingDebugSession {
 	protected stepInTargetsRequest(response: DebugProtocol.StepInTargetsResponse, args: DebugProtocol.StepInTargetsArguments) {
 		const targets = this._runtime.getStepInTargets(args.frameId);
 		response.body = {
-			targets: targets.map(t => { return { id: t.id, label: t.label }} )
+			targets: targets.map(t => {
+				return { id: t.id, label: t.label };
+			})
 		};
 		this.sendResponse(response);
 	}
@@ -386,7 +388,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			const matches = /new +([0-9]+)/.exec(args.expression);
 			if (matches && matches.length === 2) {
 				const mbp = this._runtime.setBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));
-				const bp = <DebugProtocol.Breakpoint> new Breakpoint(mbp.verified, this.convertDebuggerLineToClient(mbp.line), undefined, this.createSource(this._runtime.sourceFile));
+				const bp = new Breakpoint(mbp.verified, this.convertDebuggerLineToClient(mbp.line), undefined, this.createSource(this._runtime.sourceFile)) as DebugProtocol.Breakpoint;
 				bp.id= mbp.id;
 				this.sendEvent(new BreakpointEvent('new', bp));
 				reply = `breakpoint created`;
@@ -395,7 +397,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				if (matches && matches.length === 2) {
 					const mbp = this._runtime.clearBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));
 					if (mbp) {
-						const bp = <DebugProtocol.Breakpoint> new Breakpoint(false);
+						const bp = new Breakpoint(false) as DebugProtocol.Breakpoint;
 						bp.id= mbp.id;
 						this.sendEvent(new BreakpointEvent('removed', bp));
 						reply = `breakpoint deleted`;
@@ -483,7 +485,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			breakpoints: []
 		};
 
-		for (let dbp of args.breakpoints) {
+		for (const dbp of args.breakpoints) {
 			// assume that id is the "address" to break on
 			const ok = this._runtime.setDataBreakpoint(dbp.dataId);
 			response.body.breakpoints.push({
