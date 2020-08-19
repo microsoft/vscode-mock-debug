@@ -86,12 +86,12 @@ export function activate(context: vscode.ExtensionContext) {
 	let factory: vscode.DebugAdapterDescriptorFactory;
 	switch (runMode) {
 		case 'server':
-			// run the debug adapter as a server inside the extension and communicating via a socket
+			// run the debug adapter as a server inside the extension and communicate via a socket
 			factory = new MockDebugAdapterServerDescriptorFactory();
 			break;
 
 		case 'namedPipeServer':
-			// run the debug adapter as a server inside the extension and communicating via a named pipe (Windows)/UNIX domain socket (non-Windows)
+			// run the debug adapter as a server inside the extension and communicate via a named pipe (Windows) or UNIX domain socket (non-Windows)
 			factory = new MockDebugAdapterNamedPipeServerDescriptorFactory();
 			break;
 
@@ -228,7 +228,9 @@ class MockDebugAdapterNamedPipeServerDescriptorFactory implements vscode.DebugAd
 		}
 
 		// make VS Code connect to debug server
-		return new vscode.DebugAdapterNamedPipeServer(this.server.address() as string);
+		// TODO: enable named pipe support as soon as VS Code 1.49 is out
+		//return new vscode.DebugAdapterNamedPipeServer(this.server.address() as string);
+		return undefined;
 	}
 
 	dispose() {
