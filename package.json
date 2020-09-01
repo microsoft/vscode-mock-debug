@@ -76,6 +76,12 @@
 					"when": "resourceLangId == markdown",
 					"group": "1_run@20"
 				}
+			],
+			"debug/variables/context": [
+				{
+					"command": "extension.mock-debug.showAsHex",
+					"when": "debugConfigurationType == 'mock' && debugProtocolVariableMenuContext == 'simple'"
+				}
 			]
 		},
 		"commands": [
@@ -88,6 +94,10 @@
 				"command": "extension.mock-debug.runEditorContents",
 				"title": "Run File",
 				"icon": "$(play)"
+			},
+			{
+				"command": "extension.mock-debug.showAsHex",
+				"title": "Show as Hex"
 			}
 		],
 		"breakpoints": [

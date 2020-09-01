@@ -299,8 +299,9 @@ export class MockDebugSession extends LoggingDebugSession {
 					name: id + "_i",
 					type: "integer",
 					value: "123",
+					__vscodeVariableMenuContext: "simple",
 					variablesReference: 0
-				});
+				} as DebugProtocol.Variable);
 				variables.push({
 					name: id + "_f",
 					type: "float",
@@ -320,7 +321,7 @@ export class MockDebugSession extends LoggingDebugSession {
 					variablesReference: this._variableHandles.create(id + "_o")
 				});
 
-				// cancelation support for long running requests
+				// cancellation support for long running requests
 				const nm = id + "_long_running";
 				const ref = this._variableHandles.create(id + "_lr");
 				variables.push({

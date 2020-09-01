@@ -42,6 +42,9 @@ export function activate(context: vscode.ExtensionContext) {
 				request: 'launch',
 				program: resource.fsPath
 			});
+		}),
+		vscode.commands.registerCommand('extension.mock-debug.showAsHex', (variable) => {
+			vscode.window.showInformationMessage(`${variable.container.name}: ${variable.variable.name}`);
 		})
 	);
 
