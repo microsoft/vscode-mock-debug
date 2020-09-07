@@ -27,13 +27,10 @@ export function activate(context: vscode.ExtensionContext) {
 				type: 'mock',
 				name: 'Run Editor Contents',
 				request: 'launch',
-				program: resource.fsPath,
-				noDebug: true
-			},/* upcoming proposed API:
-				{
-					noDebug: true
-				}
-			*/);
+				program: resource.fsPath
+			}, {
+				//noDebug: true
+			});
 		}),
 		vscode.commands.registerCommand('extension.mock-debug.debugEditorContents', (resource: vscode.Uri) => {
 			vscode.debug.startDebugging(undefined, {
