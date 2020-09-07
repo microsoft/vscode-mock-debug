@@ -1,4 +1,9 @@
 
+## 0.43.0
+* Added context menu action "Show as Hex" to integer variables in Variables view
+* Added new run option "namedPipeServer" for debug adapter in extension.ts
+* Using new extension API for passing the "noDebug" option to "vscode.debug.startDebugging"
+
 ## 0.42.2
 * Project hygiene: get rid of all warnings
 * use eslint instead of tslint
