@@ -1,166 +1,173 @@
 {
-	"name": "mock-debug",
-	"displayName": "Mock Debug",
-	"version": "0.42.2",
-	"publisher": "andreweinand",
-	"description": "Starter extension for developing debug adapters for VS Code.",
-	"author": {
-		"name": "Microsoft Corporation",
-		"email": "aweinand@microsoft.com"
-	},
-	"license": "MIT",
-	"keywords": [
-		"multi-root ready"
-	],
-	"engines": {
-		"vscode": "^1.46.0"
-	},
-	"icon": "images/mock-debug-icon.png",
-	"categories": [
-		"Debuggers"
-	],
-	"private": true,
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-mock-debug.git"
-	},
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-mock-debug/issues"
-	},
-	"scripts": {
-		"vscode:prepublish": "yarn run compile",
-		"compile": "tsc -p ./",
-		"lint": "eslint src --ext ts",
-		"watch": "tsc -watch -p ./",
-		"pretest": "yarn run compile && yarn run lint",
-		"test": "node ./out/test/runTest.js",
-		"package": "vsce package",
-		"publish": "vsce publish"
-	},
-	"dependencies": {
-		"await-notify": "1.0.1",
-		"vscode-debugadapter": "1.41.1"
-	},
-	"devDependencies": {
-		"@types/vscode": "^1.48.0",
-		"@types/glob": "^7.1.3",
-		"@types/mocha": "^8.0.0",
-		"@types/node": "^14.0.27",
-		"eslint": "^7.6.0",
-		"@typescript-eslint/eslint-plugin": "^3.8.0",
-		"@typescript-eslint/parser": "^3.8.0",
-		"glob": "^7.1.6",
-		"mocha": "^8.0.1",
-		"typescript": "^3.8.3",
-		"vscode-debugadapter-testsupport": "1.41.0",
-		"vsce": "1.78.0"
-	},
-	"main": "./out/extension",
-	"activationEvents": [
-		"onDebug",
-		"onDebugDynamicConfigurations:mock",
-		"onCommand:extension.mock-debug.getProgramName",
-		"onCommand:extension.mock-debug.runEditorContents",
-		"onCommand:extension.mock-debug.debugEditorContents"
-	],
-	"contributes": {
-		"menus": {
-			"editor/title": [
-				{
-					"command": "extension.mock-debug.runEditorContents",
-					"when": "resourceLangId == markdown",
-					"group": "1_run@10"
-				},
-				{
-					"command": "extension.mock-debug.debugEditorContents",
-					"when": "resourceLangId == markdown",
-					"group": "1_run@20"
-				}
-			],
-			"debug/variables/context": [
-				{
-					"command": "extension.mock-debug.showAsHex",
-					"when": "debugConfigurationType == 'mock' && debugProtocolVariableMenuContext == 'simple'"
-				}
-			]
-		},
-		"commands": [
-			{
-				"command": "extension.mock-debug.debugEditorContents",
-				"title": "Debug File",
-				"icon": "$(debug-alt)"
-			},
-			{
-				"command": "extension.mock-debug.runEditorContents",
-				"title": "Run File",
-				"icon": "$(play)"
-			},
-			{
-				"command": "extension.mock-debug.showAsHex",
-				"title": "Show as Hex"
-			}
-		],
-		"breakpoints": [
-			{
-				"language": "markdown"
-			}
-		],
-		"debuggers": [
-			{
-				"type": "mock",
-				"label": "Mock Debug",
-				"program": "./out/debugAdapter.js",
-				"runtime": "node",
-				"configurationAttributes": {
-					"launch": {
-						"required": [
-							"program"
-						],
-						"properties": {
-							"program": {
-								"type": "string",
-								"description": "Absolute path to a text file.",
-								"default": "${workspaceFolder}/${command:AskForProgramName}"
-							},
-							"stopOnEntry": {
-								"type": "boolean",
-								"description": "Automatically stop after launch.",
-								"default": true
-							},
-							"trace": {
-								"type": "boolean",
-								"description": "Enable logging of the Debug Adapter Protocol.",
-								"default": true
-							}
-						}
-					}
-				},
-				"initialConfigurations": [
-					{
-						"type": "mock",
-						"request": "launch",
-						"name": "Ask for file name",
-						"program": "${workspaceFolder}/${command:AskForProgramName}",
-						"stopOnEntry": true
-					}
-				],
-				"configurationSnippets": [
-					{
-						"label": "Mock Debug: Launch",
-						"description": "A new configuration for 'debugging' a user selected markdown file.",
-						"body": {
-							"type": "mock",
-							"request": "launch",
-							"name": "Ask for file name",
-							"program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
-							"stopOnEntry": true
-						}
-					}
-				],
-				"variables": {
-					"AskForProgramName": "extension.mock-debug.getProgramName"
-				}
-			}
-		]
-	}
+  "name": "mock-debug",
+  "displayName": "Mock Debug",
+  "version": "0.43.0",
+  "publisher": "andreweinand",
+  "description": "Starter extension for developing debug adapters for VS Code.",
+  "author": {
+    "name": "Microsoft Corporation",
+    "email": "aweinand@microsoft.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "multi-root ready"
+  ],
+  "engines": {
+    "vscode": "^1.46.0"
+  },
+  "icon": "images/mock-debug-icon.png",
+  "categories": [
+    "Debuggers"
+  ],
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Microsoft/vscode-mock-debug.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Microsoft/vscode-mock-debug/issues"
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "lint": "eslint src --ext ts",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile && yarn run lint",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package",
+    "publish": "vsce publish",
+    "compile-web": "webpack --devtool nosources-source-map --config ./build/web-extension.webpack.config.js",
+    "watch-web": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./build/web-extension.webpack.config.js",
+    "package-web": "webpack --mode production --watch --config ./build/web-extension.webpack.config.js"
+  },
+  "dependencies": {
+    "await-notify": "1.0.1",
+    "vscode-debugadapter": "1.42.0-pre.4"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.48.0",
+    "@types/glob": "^7.1.3",
+    "@types/mocha": "^8.0.0",
+    "@types/node": "^14.0.27",
+    "eslint": "^7.6.0",
+    "@typescript-eslint/eslint-plugin": "^3.8.0",
+    "@typescript-eslint/parser": "^3.8.0",
+    "glob": "^7.1.6",
+    "mocha": "^8.0.1",
+    "typescript": "^3.8.3",
+    "vscode-debugadapter-testsupport": "1.41.0",
+    "vsce": "^1.79.5",
+    "ts-loader": "^8.0.2",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  },
+  "main": "./out/extension",
+  "browser": "./dist/web/extension.js",
+  "activationEvents": [
+    "onDebug",
+    "onDebugDynamicConfigurations:mock",
+    "onCommand:extension.mock-debug.getProgramName",
+    "onCommand:extension.mock-debug.runEditorContents",
+    "onCommand:extension.mock-debug.debugEditorContents"
+  ],
+  "contributes": {
+    "menus": {
+      "editor/title": [
+        {
+          "command": "extension.mock-debug.runEditorContents",
+          "when": "resourceLangId == markdown",
+          "group": "1_run@10"
+        },
+        {
+          "command": "extension.mock-debug.debugEditorContents",
+          "when": "resourceLangId == markdown",
+          "group": "1_run@20"
+        }
+      ],
+      "debug/variables/context": [
+        {
+          "command": "extension.mock-debug.showAsHex",
+          "when": "debugConfigurationType == 'mock' && debugProtocolVariableMenuContext == 'simple'"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "extension.mock-debug.debugEditorContents",
+        "title": "Debug File",
+        "icon": "$(debug-alt)"
+      },
+      {
+        "command": "extension.mock-debug.runEditorContents",
+        "title": "Run File",
+        "icon": "$(play)"
+      },
+      {
+        "command": "extension.mock-debug.showAsHex",
+        "title": "Show as Hex"
+      }
+    ],
+    "breakpoints": [
+      {
+        "language": "markdown"
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "mock",
+        "label": "Mock Debug",
+        "program": "./out/debugAdapter.js",
+        "runtime": "node",
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "program"
+            ],
+            "properties": {
+              "program": {
+                "type": "string",
+                "description": "Absolute path to a text file.",
+                "default": "${workspaceFolder}/${command:AskForProgramName}"
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "Automatically stop after launch.",
+                "default": true
+              },
+              "trace": {
+                "type": "boolean",
+                "description": "Enable logging of the Debug Adapter Protocol.",
+                "default": true
+              }
+            }
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "mock",
+            "request": "launch",
+            "name": "Ask for file name",
+            "program": "${workspaceFolder}/${command:AskForProgramName}",
+            "stopOnEntry": true
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "Mock Debug: Launch",
+            "description": "A new configuration for 'debugging' a user selected markdown file.",
+            "body": {
+              "type": "mock",
+              "request": "launch",
+              "name": "Ask for file name",
+              "program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
+              "stopOnEntry": true
+            }
+          }
+        ],
+        "variables": {
+          "AskForProgramName": "extension.mock-debug.getProgramName"
+        }
+      }
+    ]
+  }
 }

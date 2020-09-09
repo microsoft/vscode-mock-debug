@@ -10,8 +10,9 @@ import { randomBytes } from 'crypto';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { platform } from 'process';
-import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
+import { ProviderResult } from 'vscode';
 import { MockDebugSession } from './mockDebug';
+import { activateMockDebug, workspaceFileAccessor } from './activateMockDebug';
 
 /*
  * The compile time flag 'runMode' controls how the debug adapter is run.
@@ -21,139 +22,32 @@ const runMode: 'external' | 'server' | 'namedPipeServer' | 'inline' = 'inline';
 
 export function activate(context: vscode.ExtensionContext) {
 
-	context.subscriptions.push(
-		vscode.commands.registerCommand('extension.mock-debug.runEditorContents', (resource: vscode.Uri) => {
-			vscode.debug.startDebugging(undefined, {
-				type: 'mock',
-				name: 'Run Editor Contents',
-				request: 'launch',
-				program: resource.fsPath
-			}, {
-				//noDebug: true
-			});
-		}),
-		vscode.commands.registerCommand('extension.mock-debug.debugEditorContents', (resource: vscode.Uri) => {
-			vscode.debug.startDebugging(undefined, {
-				type: 'mock',
-				name: 'Debug Editor Contents',
-				request: 'launch',
-				program: resource.fsPath
-			});
-		}),
-		vscode.commands.registerCommand('extension.mock-debug.showAsHex', (variable) => {
-			vscode.window.showInformationMessage(`${variable.container.name}: ${variable.variable.name}`);
-		})
-	);
-
-	context.subscriptions.push(vscode.commands.registerCommand('extension.mock-debug.getProgramName', config => {
-		return vscode.window.showInputBox({
-			placeHolder: "Please enter the name of a markdown file in the workspace folder",
-			value: "readme.md"
-		});
-	}));
-
-	// register a configuration provider for 'mock' debug type
-	const provider = new MockConfigurationProvider();
-	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', provider));
-
-	// register a dynamic configuration provider for 'mock' debug type
-	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', {
-		provideDebugConfigurations(folder: WorkspaceFolder | undefined): ProviderResult<DebugConfiguration[]> {
-			return [
-				{
-					name: "Dynamic Launch",
-					request: "launch",
-					type: "node",
-					program: "${file}"
-				},
-				{
-					name: "Another Dynamic Launch",
-					request: "launch",
-					type: "node",
-					program: "${file}"
-				},
-				{
-					name: "Mock Launch",
-					request: "launch",
-					type: "node",
-					program: "${file}"
-				}
-			];
-		}
-	}, vscode.DebugConfigurationProviderTriggerKind.Dynamic));
-
 	// debug adapters can be run in different ways by using a vscode.DebugAdapterDescriptorFactory:
-	let factory: vscode.DebugAdapterDescriptorFactory;
 	switch (runMode) {
 		case 'server':
 			// run the debug adapter as a server inside the extension and communicate via a socket
-			factory = new MockDebugAdapterServerDescriptorFactory();
+			activateMockDebug(context, new MockDebugAdapterServerDescriptorFactory());
 			break;
 
 		case 'namedPipeServer':
 			// run the debug adapter as a server inside the extension and communicate via a named pipe (Windows) or UNIX domain socket (non-Windows)
-			factory = new MockDebugAdapterNamedPipeServerDescriptorFactory();
-			break;
-
-		case 'inline':
-			// run the debug adapter inside the extension and directly talk to it
-			factory = new InlineDebugAdapterFactory();
+			activateMockDebug(context, new MockDebugAdapterNamedPipeServerDescriptorFactory());
 			break;
 
 		case 'external': default:
 			// run the debug adapter as a separate process
-			factory = new DebugAdapterExecutableFactory();
+			activateMockDebug(context, new DebugAdapterExecutableFactory());
+			break;
+
+		case 'inline':
+			// run the debug adapter inside the extension and directly talk to it
+			activateMockDebug(context);
 			break;
 	}
-
-	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('mock', factory));
-	if ('dispose' in factory) {
-		context.subscriptions.push(factory);
-	}
-
-	// override VS Code's default implementation of the debug hover
-	/*
-	vscode.languages.registerEvaluatableExpressionProvider('markdown', {
-		provideEvaluatableExpression(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.EvaluatableExpression> {
-			const wordRange = document.getWordRangeAtPosition(position);
-			return wordRange ? new vscode.EvaluatableExpression(wordRange) : undefined;
-		}
-	});
-	*/
 }
 
 export function deactivate() {
 	// nothing to do
-}
-
-class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
-
-	/**
-	 * Massage a debug configuration just before a debug session is being launched,
-	 * e.g. add all missing attributes to the debug configuration.
-	 */
-	resolveDebugConfiguration(folder: WorkspaceFolder | undefined, config: DebugConfiguration, token?: CancellationToken): ProviderResult<DebugConfiguration> {
-
-		// if launch.json is missing or empty
-		if (!config.type && !config.request && !config.name) {
-			const editor = vscode.window.activeTextEditor;
-			if (editor && editor.document.languageId === 'markdown') {
-				config.type = 'mock';
-				config.name = 'Launch';
-				config.request = 'launch';
-				config.program = '${file}';
-				config.stopOnEntry = true;
-			}
-		}
-
-		if (!config.program) {
-			return vscode.window.showInformationMessage("Cannot find a program to debug").then(_ => {
-				return undefined;	// abort launch
-			});
-		}
-
-		return config;
-	}
 }
 
 class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFactory {
@@ -192,7 +86,7 @@ class MockDebugAdapterServerDescriptorFactory implements vscode.DebugAdapterDesc
 		if (!this.server) {
 			// start listening on a random port
 			this.server = Net.createServer(socket => {
-				const session = new MockDebugSession();
+				const session = new MockDebugSession(workspaceFileAccessor);
 				session.setRunAsServer(true);
 				session.start(socket as NodeJS.ReadableStream, socket);
 			}).listen(0);
@@ -221,7 +115,7 @@ class MockDebugAdapterNamedPipeServerDescriptorFactory implements vscode.DebugAd
 			const pipePath = platform === "win32" ? join('\\\\.\\pipe\\', pipeName) : join(tmpdir(), pipeName);
 
 			this.server = Net.createServer(socket => {
-				const session = new MockDebugSession();
+				const session = new MockDebugSession(workspaceFileAccessor);
 				session.setRunAsServer(true);
 				session.start(<NodeJS.ReadableStream>socket, socket);
 			}).listen(pipePath);
@@ -237,12 +131,5 @@ class MockDebugAdapterNamedPipeServerDescriptorFactory implements vscode.DebugAd
 		if (this.server) {
 			this.server.close();
 		}
-	}
-}
-
-class InlineDebugAdapterFactory implements vscode.DebugAdapterDescriptorFactory {
-
-	createDebugAdapterDescriptor(_session: vscode.DebugSession): ProviderResult<vscode.DebugAdapterDescriptor> {
-		return new vscode.DebugAdapterInlineImplementation(new MockDebugSession());
 	}
 }

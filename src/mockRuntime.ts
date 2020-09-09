@@ -2,8 +2,11 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { readFileSync } from 'fs';
 import { EventEmitter } from 'events';
+
+export interface FileAccessor {
+	readFile(path: string): Promise<string>;
+}
 
 export interface IMockBreakpoint {
 	id: number;
@@ -58,21 +61,21 @@ export class MockRuntime extends EventEmitter {
 
 	private _noDebug = false;
 
-	constructor() {
+	constructor(private _fileAccessor: FileAccessor) {
 		super();
 	}
 
 	/**
 	 * Start executing the given program.
 	 */
-	public start(program: string, stopOnEntry: boolean, noDebug: boolean) {
+	public async start(program: string, stopOnEntry: boolean, noDebug: boolean): Promise<void> {
 
 		this._noDebug = noDebug;
 
-		this.loadSource(program);
+		await this.loadSource(program);
 		this._currentLine = -1;
 
-		this.verifyBreakpoints(this._sourceFile);
+		await this.verifyBreakpoints(this._sourceFile);
 
 		if (stopOnEntry) {
 			// we step once
@@ -206,7 +209,7 @@ export class MockRuntime extends EventEmitter {
 	/*
 	 * Set breakpoint in file with given line.
 	 */
-	public setBreakPoint(path: string, line: number): IMockBreakpoint {
+	public async setBreakPoint(path: string, line: number): Promise<IMockBreakpoint> {
 
 		const bp: IMockBreakpoint = { verified: false, line, id: this._breakpointId++ };
 		let bps = this._breakPoints.get(path);
@@ -216,7 +219,7 @@ export class MockRuntime extends EventEmitter {
 		}
 		bps.push(bp);
 
-		this.verifyBreakpoints(path);
+		await this.verifyBreakpoints(path);
 
 		return bp;
 	}
@@ -264,10 +267,11 @@ export class MockRuntime extends EventEmitter {
 
 	// private methods
 
-	private loadSource(file: string) {
+	private async loadSource(file: string): Promise<void> {
 		if (this._sourceFile !== file) {
 			this._sourceFile = file;
-			this._sourceLines = readFileSync(this._sourceFile).toString().split('\n');
+			const contents = await this._fileAccessor.readFile(file);
+			this._sourceLines = contents.split('\n');
 		}
 	}
 
@@ -301,7 +305,7 @@ export class MockRuntime extends EventEmitter {
 		}
 	}
 
-	private verifyBreakpoints(path: string): void {
+	private async verifyBreakpoints(path: string): Promise<void> {
 
 		if (this._noDebug) {
 			return;
@@ -309,7 +313,7 @@ export class MockRuntime extends EventEmitter {
 
 		const bps = this._breakPoints.get(path);
 		if (bps) {
-			this.loadSource(path);
+			await this.loadSource(path);
 			bps.forEach(bp => {
 				if (!bp.verified && bp.line < this._sourceLines.length) {
 					const srcLine = this._sourceLines[bp.line].trim();

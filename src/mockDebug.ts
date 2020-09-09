@@ -11,7 +11,7 @@ import {
 } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { basename } from 'path';
-import { MockRuntime, IMockBreakpoint } from './mockRuntime';
+import { MockRuntime, IMockBreakpoint, FileAccessor } from './mockRuntime';
 import { Subject } from 'await-notify';
 
 function timeout(ms: number) {
@@ -59,14 +59,14 @@ export class MockDebugSession extends LoggingDebugSession {
 	 * Creates a new debug adapter that is used for one debug session.
 	 * We configure the default implementation of a debug adapter here.
 	 */
-	public constructor() {
+	public constructor(fileAccessor: FileAccessor) {
 		super("mock-debug.txt");
 
 		// this debugger uses zero-based lines and columns
 		this.setDebuggerLinesStartAt1(false);
 		this.setDebuggerColumnsStartAt1(false);
 
-		this._runtime = new MockRuntime();
+		this._runtime = new MockRuntime(fileAccessor);
 
 		// setup event handlers
 		this._runtime.on('stopOnEntry', () => {
@@ -171,12 +171,12 @@ export class MockDebugSession extends LoggingDebugSession {
 		await this._configurationDone.wait(1000);
 
 		// start the program in the runtime
-		this._runtime.start(args.program, !!args.stopOnEntry, !!args.noDebug);
+		await this._runtime.start(args.program, !!args.stopOnEntry, !!args.noDebug);
 
 		this.sendResponse(response);
 	}
 
-	protected setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): void {
+	protected async setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): Promise<void> {
 
 		const path = args.source.path as string;
 		const clientLines = args.lines || [];
@@ -185,12 +185,13 @@ export class MockDebugSession extends LoggingDebugSession {
 		this._runtime.clearBreakpoints(path);
 
 		// set and verify breakpoint locations
-		const actualBreakpoints = clientLines.map(l => {
-			const { verified, line, id } = this._runtime.setBreakPoint(path, this.convertClientLineToDebugger(l));
+		const actualBreakpoints0 = clientLines.map(async l => {
+			const { verified, line, id } = await this._runtime.setBreakPoint(path, this.convertClientLineToDebugger(l));
 			const bp = new Breakpoint(verified, this.convertDebuggerLineToClient(line)) as DebugProtocol.Breakpoint;
 			bp.id= id;
 			return bp;
 		});
+		const actualBreakpoints = await Promise.all<DebugProtocol.Breakpoint>(actualBreakpoints0);
 
 		// send back the actual breakpoint positions
 		response.body = {
@@ -380,7 +381,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		this.sendResponse(response);
 	}
 
-	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
+	protected async evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): Promise<void> {
 
 		let reply: string | undefined = undefined;
 
@@ -388,7 +389,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			// 'evaluate' supports to create and delete breakpoints from the 'repl':
 			const matches = /new +([0-9]+)/.exec(args.expression);
 			if (matches && matches.length === 2) {
-				const mbp = this._runtime.setBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));
+				const mbp = await this._runtime.setBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));
 				const bp = new Breakpoint(mbp.verified, this.convertDebuggerLineToClient(mbp.line), undefined, this.createSource(this._runtime.sourceFile)) as DebugProtocol.Breakpoint;
 				bp.id= mbp.id;
 				this.sendEvent(new BreakpointEvent('new', bp));

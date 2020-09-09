@@ -1,8 +1,9 @@
 
 ## 0.43.0
-* Added context menu action "Show as Hex" to integer variables in Variables view
-* Added new run option "namedPipeServer" for debug adapter in extension.ts
-* Using new extension API for passing the "noDebug" option to "vscode.debug.startDebugging"
+* Add context menu action "Show as Hex" to integer variables in Variables view
+* Add new run option "namedPipeServer" for debug adapter in extension.ts
+* Use new extension API for passing the "noDebug" option to "vscode.debug.startDebugging"
+* Support to run Mock Debug in the browser/web worker
 
 ## 0.42.2
 * Project hygiene: get rid of all warnings
