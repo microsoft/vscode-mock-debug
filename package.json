@@ -1,7 +1,7 @@
 {
   "name": "mock-debug",
   "displayName": "Mock Debug",
-  "version": "0.43.0",
+  "version": "0.43.6",
   "publisher": "andreweinand",
   "description": "Starter extension for developing debug adapters for VS Code.",
   "author": {
@@ -28,17 +28,21 @@
     "url": "https://github.com/Microsoft/vscode-mock-debug/issues"
   },
   "scripts": {
-    "vscode:prepublish": "yarn run compile",
+    "vscode:prepublish": "yarn run package-ext && yarn run package-web",
     "compile": "tsc -p ./",
     "lint": "eslint src --ext ts",
-    "watch": "tsc -watch -p ./",
+    "watch": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./build/extension.webpack.config.js",
+    "watch2": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
     "test": "node ./out/test/runTest.js",
     "package": "vsce package",
     "publish": "vsce publish",
+
+    "package-ext": "webpack --mode production --config ./build/extension.webpack.config.js",
+
     "compile-web": "webpack --devtool nosources-source-map --config ./build/web-extension.webpack.config.js",
     "watch-web": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./build/web-extension.webpack.config.js",
-    "package-web": "webpack --mode production --watch --config ./build/web-extension.webpack.config.js"
+    "package-web": "webpack --mode production --config ./build/web-extension.webpack.config.js"
   },
   "dependencies": {
     "await-notify": "1.0.1",
@@ -61,7 +65,7 @@
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
   },
-  "main": "./out/extension",
+  "main": "./dist/ext/extension.js",
   "browser": "./dist/web/extension.js",
   "activationEvents": [
     "onDebug",

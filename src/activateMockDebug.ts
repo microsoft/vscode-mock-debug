@@ -17,8 +17,10 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 				type: 'mock',
 				name: 'Run Editor Contents',
 				request: 'launch',
-				program: resource.fsPath
+				program: resource.toString(),
+				noDebug: true
 			}, {
+				//needs VS Code 1.49
 				//noDebug: true
 			});
 		}),
@@ -27,7 +29,8 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 				type: 'mock',
 				name: 'Debug Editor Contents',
 				request: 'launch',
-				program: resource.fsPath
+				program: resource.toString(),
+				"stopOnEntry": true
 			});
 		}),
 		vscode.commands.registerCommand('extension.mock-debug.showAsHex', (variable) => {
@@ -123,10 +126,14 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 
 export const workspaceFileAccessor: FileAccessor = {
 	async readFile(path: string) {
-		const uri = vscode.Uri.parse(path);
-		const bytes = await vscode.workspace.fs.readFile(uri);
-		const contents = Buffer.from(bytes).toString('utf8');
-		return contents;
+		try {
+			const uri = vscode.Uri.parse(path);
+			const bytes = await vscode.workspace.fs.readFile(uri);
+			const contents = Buffer.from(bytes).toString('utf8');
+			return contents;
+		} catch(e) {
+			return `cannot read '${path}'`;
+		}
 	}
 };
 

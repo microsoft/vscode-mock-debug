@@ -10,7 +10,7 @@
 				"${workspaceFolder}/sampleworkspace"
 			],
 			"outFiles": [
-				"${workspaceFolder}/out/**/*.js"
+				"${workspaceFolder}/dist/ext/**/*.js"
 			],
 			"preLaunchTask": "npm: watch"
 		},
@@ -56,14 +56,8 @@
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"
 			],
-			"internalConsoleOptions": "openOnSessionStart"
-		},
-		{
-			"name": "Mock Sample",
-			"type": "mock",
-			"request": "launch",
-			"program": "${workspaceFolder}/${command:AskForProgramName}",
-			"stopOnEntry": true
+			"internalConsoleOptions": "openOnSessionStart",
+			"preLaunchTask": "npm: compile"
 		}
 	],
 	"compounds": [

@@ -3,16 +3,19 @@
     "tasks": [
         {
             "type": "npm",
+            "script": "compile",
+            "isBackground": false,
+            "problemMatcher": "$tsc-watch"
+        },
+        {
+            "type": "npm",
             "script": "watch",
-            "problemMatcher": "$tsc-watch",
+            "group": "build",
             "isBackground": true,
-            "presentation": {
-                "reveal": "never"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            "problemMatcher": [
+                "$ts-webpack-watch",
+                "$tslint-webpack-watch"
+            ]
         },
         {
             "type": "npm",
