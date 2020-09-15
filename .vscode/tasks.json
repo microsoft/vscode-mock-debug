@@ -5,6 +5,10 @@
             "type": "npm",
             "script": "compile",
             "isBackground": false,
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": "$tsc-watch"
         },
         {
@@ -20,10 +24,6 @@
         {
             "type": "npm",
             "script": "compile-web",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
             "problemMatcher": [
                 "$ts-webpack",
                 "$tslint-webpack"
