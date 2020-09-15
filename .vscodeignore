@@ -10,3 +10,5 @@ sampleworkspace
 node_modules
 tsconfig.json
 out
+sampleWebWorkerWorkspace
+sampleWorkspace
