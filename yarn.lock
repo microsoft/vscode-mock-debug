@@ -61,10 +61,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.27.tgz#a151873af5a5e851b51b3b065c9e63390a9e0eb1"
   integrity sha512-kVrqXhbclHNHGu9ztnAwSncIgJv/FaxmzXJvGXNdcCpV1b8u1/Mi6z6m0vwy0LzKeXFTPLH0NzwmoJ3fNCIq0g==
 
-"@types/vscode@^1.48.0":
-  version "1.48.0"
-  resolved "https://registry.yarnpkg.com/@types/vscode/-/vscode-1.48.0.tgz#c1841ccf80086d53b35a9d7f2eb3b4d949bd2d2f"
-  integrity sha512-sZJKzsJz1gSoFXcOJWw3fnKl2sseUgZmvB4AJZS+Fea+bC/jfGPVhmFL/FfQHld/TKtukVONsmoD3Pkyx9iadg==
+"@types/vscode@^1.49.0":
+  version "1.49.0"
+  resolved "https://registry.yarnpkg.com/@types/vscode/-/vscode-1.49.0.tgz#f3731d97d7e8b2697510eb26f6e6d04ee8c17352"
+  integrity sha512-wfNQmLmm1VdMBr6iuNdprWmC1YdrgZ9dQzadv+l2eSjJlElOdJw8OTm4RU4oGTBcfvG6RZI2jOcppkdSS18mZw==
 
 "@typescript-eslint/eslint-plugin@^3.8.0":
   version "3.9.0"
@@ -3544,7 +3544,7 @@ to-regex@^3.0.1, to-regex@^3.0.2:
     regex-not "^1.0.2"
     safe-regex "^1.1.0"
 
-ts-loader@^8.0.2:
+ts-loader@^8.0.3:
   version "8.0.3"
   resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-8.0.3.tgz#56858f4296edf1ed55e01f8520552984d3f0911c"
   integrity sha512-wsqfnVdB7xQiqhqbz2ZPLGHLPZbHVV5Qn/MNFZkCFxRU1miDyxKORucDGxKtsQJ63Rfza0udiUxWF5nHY6bpdQ==

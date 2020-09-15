@@ -17,11 +17,9 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 				type: 'mock',
 				name: 'Run Editor Contents',
 				request: 'launch',
-				program: resource.toString(),
-				noDebug: true
+				program: resource.toString()
 			}, {
-				//needs VS Code 1.49
-				//noDebug: true
+				noDebug: true
 			});
 		}),
 		vscode.commands.registerCommand('extension.mock-debug.debugEditorContents', (resource: vscode.Uri) => {
