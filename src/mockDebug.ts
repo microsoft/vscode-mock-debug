@@ -6,7 +6,7 @@ import {
 	Logger, logger,
 	LoggingDebugSession,
 	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent,
-	ProgressStartEvent, ProgressUpdateEvent, ProgressEndEvent,
+	ProgressStartEvent, ProgressUpdateEvent, ProgressEndEvent, InvalidatedEvent,
 	Thread, StackFrame, Scope, Source, Handles, Breakpoint
 } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
@@ -54,6 +54,9 @@ export class MockDebugSession extends LoggingDebugSession {
 	private _progressId = 10000;
 	private _cancelledProgressId: string | undefined = undefined;
 	private _isProgressCancellable = true;
+
+	private _showHex = false;
+	private _useInvalidatedEvent = false;
 
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
@@ -113,6 +116,9 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		if (args.supportsProgressReporting) {
 			this._reportProgress = true;
+		}
+		if (args.supportsInvalidatedEvent) {
+			this._useInvalidatedEvent;
 		}
 
 		// build and return the capabilities of this debug adapter:
@@ -296,10 +302,11 @@ export class MockDebugSession extends LoggingDebugSession {
 			const id = this._variableHandles.get(args.variablesReference);
 
 			if (id) {
+				const i = 12345678;
 				variables.push({
 					name: id + "_i",
 					type: "integer",
-					value: "123",
+					value: this._showHex ? '0x' + i.toString(16) : i.toString(10),
 					__vscodeVariableMenuContext: "simple",
 					variablesReference: 0
 				} as DebugProtocol.Variable);
@@ -536,6 +543,15 @@ export class MockDebugSession extends LoggingDebugSession {
 		}
 		if (args.progressId) {
 			this._cancelledProgressId= args.progressId;
+		}
+	}
+
+	protected customRequest(command: string) {
+		if (command === 'toggleFormatting') {
+			this._showHex = ! this._showHex;
+			if (this._useInvalidatedEvent) {
+				this.sendEvent(new InvalidatedEvent( ['variables'] ));
+			}
 		}
 	}
 

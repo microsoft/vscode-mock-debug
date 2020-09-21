@@ -31,8 +31,11 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 				"stopOnEntry": true
 			});
 		}),
-		vscode.commands.registerCommand('extension.mock-debug.showAsHex', (variable) => {
-			vscode.window.showInformationMessage(`${variable.container.name}: ${variable.variable.name}`);
+		vscode.commands.registerCommand('extension.mock-debug.toggleFormatting', (variable) => {
+			const ds = vscode.debug.activeDebugSession;
+			if (ds) {
+				ds.customRequest('toggleFormatting');
+			}
 		})
 	);
 

@@ -37,16 +37,14 @@
     "test": "node ./out/test/runTest.js",
     "package": "vsce package",
     "publish": "vsce publish",
-
     "package-ext": "webpack --mode production --config ./build/extension.webpack.config.js",
-
     "compile-web": "webpack --devtool nosources-source-map --config ./build/web-extension.webpack.config.js",
     "watch-web": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./build/web-extension.webpack.config.js",
     "package-web": "webpack --mode production --config ./build/web-extension.webpack.config.js"
   },
   "dependencies": {
     "await-notify": "1.0.1",
-    "vscode-debugadapter": "1.42.0-pre.4"
+    "vscode-debugadapter": "^1.42.0-pre.5"
   },
   "devDependencies": {
     "@types/vscode": "^1.49.0",
@@ -59,7 +57,7 @@
     "glob": "^7.1.6",
     "mocha": "^8.0.1",
     "typescript": "^3.8.3",
-    "vscode-debugadapter-testsupport": "1.41.0",
+    "vscode-debugadapter-testsupport": "^1.42.0-pre.0",
     "vsce": "^1.79.5",
     "ts-loader": "^8.0.3",
     "webpack": "^4.44.1",
@@ -90,7 +88,7 @@
       ],
       "debug/variables/context": [
         {
-          "command": "extension.mock-debug.showAsHex",
+          "command": "extension.mock-debug.toggleFormatting",
           "when": "debugConfigurationType == 'mock' && debugProtocolVariableMenuContext == 'simple'"
         }
       ]
@@ -107,8 +105,8 @@
         "icon": "$(play)"
       },
       {
-        "command": "extension.mock-debug.showAsHex",
-        "title": "Show as Hex"
+        "command": "extension.mock-debug.toggleFormatting",
+        "title": "Toggle between decimal and hex formatting"
       }
     ],
     "breakpoints": [

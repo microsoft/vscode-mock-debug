@@ -1,3 +1,6 @@
+## 0.44.0
+* Emit "Invalidated" event if client supports it.
+* Changed context menu action "Show as Hex" to "Toggle between decimal and heximal formatting"
 
 ## 0.43.0
 * Add context menu action "Show as Hex" to integer variables in Variables view
