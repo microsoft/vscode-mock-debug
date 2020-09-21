@@ -118,7 +118,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			this._reportProgress = true;
 		}
 		if (args.supportsInvalidatedEvent) {
-			this._useInvalidatedEvent;
+			this._useInvalidatedEvent = true;
 		}
 
 		// build and return the capabilities of this debug adapter:
