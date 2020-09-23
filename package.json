@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "await-notify": "1.0.1",
-    "vscode-debugadapter": "^1.42.0"
+    "vscode-debugadapter": "^1.42.1"
   },
   "devDependencies": {
     "@types/vscode": "^1.49.0",
