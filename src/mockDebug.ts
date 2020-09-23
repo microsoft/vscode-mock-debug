@@ -546,12 +546,15 @@ export class MockDebugSession extends LoggingDebugSession {
 		}
 	}
 
-	protected customRequest(command: string) {
+	protected customRequest(command: string, response: DebugProtocol.Response, args: any) {
 		if (command === 'toggleFormatting') {
 			this._showHex = ! this._showHex;
 			if (this._useInvalidatedEvent) {
 				this.sendEvent(new InvalidatedEvent( ['variables'] ));
 			}
+			this.sendResponse(response);
+		} else {
+			super.customRequest(command, response, args);
 		}
 	}
 
