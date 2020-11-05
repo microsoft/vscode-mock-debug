@@ -88,7 +88,8 @@
       ],
       "debug/variables/context": [
         {
-          "command": "extension.mock-debug.toggleFormatting",          "when": "debugType == 'mock' && debugProtocolVariableMenuContext == 'simple'"
+          "command": "extension.mock-debug.toggleFormatting",
+          "when": "debugType == 'mock' && debugProtocolVariableMenuContext == 'simple'"
         }
       ]
     },
