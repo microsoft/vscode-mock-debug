@@ -57,19 +57,19 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 				{
 					name: "Dynamic Launch",
 					request: "launch",
-					type: "node",
+					type: "mock",
 					program: "${file}"
 				},
 				{
 					name: "Another Dynamic Launch",
 					request: "launch",
-					type: "node",
+					type: "mock",
 					program: "${file}"
 				},
 				{
 					name: "Mock Launch",
 					request: "launch",
-					type: "node",
+					type: "mock",
 					program: "${file}"
 				}
 			];
