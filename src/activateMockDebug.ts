@@ -13,23 +13,34 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('extension.mock-debug.runEditorContents', (resource: vscode.Uri) => {
-			vscode.debug.startDebugging(undefined, {
-				type: 'mock',
-				name: 'Run Editor Contents',
-				request: 'launch',
-				program: resource.toString()
-			}, {
-				noDebug: true
-			});
+			let targetResource = resource;
+			if (!targetResource && vscode.window.activeTextEditor) {
+				targetResource = vscode.window.activeTextEditor.document.uri;
+			}
+			if (targetResource) {
+				vscode.debug.startDebugging(undefined, {
+						type: 'mock',
+						name: 'Run File',
+						request: 'launch',
+						program: targetResource.fsPath
+					},
+					{ noDebug: true }
+				);
+			}
 		}),
 		vscode.commands.registerCommand('extension.mock-debug.debugEditorContents', (resource: vscode.Uri) => {
-			vscode.debug.startDebugging(undefined, {
-				type: 'mock',
-				name: 'Debug Editor Contents',
-				request: 'launch',
-				program: resource.toString(),
-				"stopOnEntry": true
-			});
+			let targetResource = resource;
+			if (!targetResource && vscode.window.activeTextEditor) {
+				targetResource = vscode.window.activeTextEditor.document.uri;
+			}
+			if (targetResource) {
+				vscode.debug.startDebugging(undefined, {
+					type: 'mock',
+					name: 'Debug File',
+					request: 'launch',
+					program: targetResource.fsPath
+				});
+			}
 		}),
 		vscode.commands.registerCommand('extension.mock-debug.toggleFormatting', (variable) => {
 			const ds = vscode.debug.activeDebugSession;
