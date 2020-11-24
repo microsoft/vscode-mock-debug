@@ -1,3 +1,6 @@
+## 0.45.0
+* Add support for exception filters (and conditions)
+
 ## 0.44.0
 * Emit "Invalidated" event if client supports it.
 * Changed context menu action "Show as Hex" to "Toggle between decimal and heximal formatting"

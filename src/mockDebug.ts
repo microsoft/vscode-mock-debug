@@ -149,6 +149,23 @@ export class MockDebugSession extends LoggingDebugSession {
 		// make VS Code provide "Step in Target" functionality
 		response.body.supportsStepInTargetsRequest = true;
 
+		// the adapter defines two exceptions filters with support for conditions.
+		response.body.supportsExceptionFilterOptions = true;
+		response.body.exceptionBreakpointFilters = [
+			{
+				filter: "filter_A",
+				label: "Filter A",
+				default: false,
+				supportsCondition: true
+			},
+			{
+				filter: "filter_B",
+				label: "Filter B",
+				default: false,
+				supportsCondition: true
+			}
+		];
+
 		this.sendResponse(response);
 
 		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
@@ -222,6 +239,15 @@ export class MockDebugSession extends LoggingDebugSession {
 			response.body = {
 				breakpoints: []
 			};
+		}
+		this.sendResponse(response);
+	}
+
+	protected async setExceptionBreakPointsRequest(response: DebugProtocol.SetExceptionBreakpointsResponse, args: DebugProtocol.SetExceptionBreakpointsArguments): Promise<void> {
+		if (args.filterOptions) {
+			// remember exception filters
+		} else if (args.filters) {
+			// remember exception filters and their conditions
 		}
 		this.sendResponse(response);
 	}
