@@ -273,13 +273,16 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		response.body = {
 			stackFrames: stk.frames.map(f => {
-				const sf = new StackFrame(f.index, f.name, this.createSource(f.file), this.convertDebuggerLineToClient(f.line));
+				const sf = new StackFrame(f.index, `${f.index}: ${f.name}`, this.createSource(f.file), this.convertDebuggerLineToClient(f.line));
 				if (typeof f.column === 'number') {
 					sf.column = this.convertDebuggerColumnToClient(f.column);
 				}
 				return sf;
 			}),
-			totalFrames: stk.count
+			//no totalFrames: 				// VS Code has to probe/guess. Should result in a max. of two requests
+			totalFrames: stk.count			// stk.count is the correct size, should result in a max. of two requests
+			//totalFrames: 1000000 			// not the correct size, should result in a max. of two requests
+			//totalFrames: endFrame + 20 	// dynamically increases the size with every requested chunk, results in paging
 		};
 		this.sendResponse(response);
 	}
