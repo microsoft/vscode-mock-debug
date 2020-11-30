@@ -61,6 +61,10 @@ export class MockRuntime extends EventEmitter {
 
 	private _noDebug = false;
 
+	private _namedException: string | undefined;
+	private _otherExceptions = false;
+
+
 	constructor(private _fileAccessor: FileAccessor) {
 		super();
 	}
@@ -258,6 +262,11 @@ export class MockRuntime extends EventEmitter {
 		return false;
 	}
 
+	public setExceptionsFilters(namedException: string | undefined, otherExceptions: boolean): void {
+		this._namedException = namedException;
+		this._otherExceptions = otherExceptions;
+	}
+
 	/*
 	 * Clear all data breakpoints.
 	 */
@@ -338,8 +347,8 @@ export class MockRuntime extends EventEmitter {
 	}
 
 	/**
-	 * Fire events if line has a breakpoint or the word 'exception' is found.
-	 * Returns true is execution needs to stop.
+	 * Fire events if line has a breakpoint or the word 'exception' or 'exception(...)' is found.
+	 * Returns true if execution needs to stop.
 	 */
 	private fireEventsForLine(ln: number, stepEvent?: string): boolean {
 
@@ -364,10 +373,27 @@ export class MockRuntime extends EventEmitter {
 			}
 		}
 
-		// if word 'exception' found in source -> throw exception
-		if (line.indexOf('exception') >= 0) {
-			this.sendEvent('stopOnException');
-			return true;
+		// if pattern 'exception(...)' found in source -> throw named exception
+		const matches2 = /exception\((.*)\)/.exec(line);
+		if (matches2 && matches2.length === 2) {
+			const exception = matches2[1].trim();
+			if (this._namedException === exception) {
+				this.sendEvent('stopOnException', exception);
+				return true;
+			} else {
+				if (this._otherExceptions) {
+					this.sendEvent('stopOnException', undefined);
+					return true;
+				}
+			}
+		} else {
+			// if word 'exception' found in source -> throw exception
+			if (line.indexOf('exception') >= 0) {
+				if (this._otherExceptions) {
+					this.sendEvent('stopOnException', undefined);
+					return true;
+				}
+			}
 		}
 
 		// is there a breakpoint?

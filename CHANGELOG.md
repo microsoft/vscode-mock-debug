@@ -1,5 +1,5 @@
-## 0.45.0
-* Add support for exception filters (and conditions)
+## 0.45.1
+* Add support for exception filters (and conditions). "Named Exception" will break on the `exception(xxx)` pattern if the exception condition is set to `xxx`. "Other Exceptions" will break on the word `exception` and the `exception(...)` patterns not matched by "Named Exception".
 
 ## 0.44.0
 * Emit "Invalidated" event if client supports it.

@@ -84,8 +84,12 @@ export class MockDebugSession extends LoggingDebugSession {
 		this._runtime.on('stopOnDataBreakpoint', () => {
 			this.sendEvent(new StoppedEvent('data breakpoint', MockDebugSession.threadID));
 		});
-		this._runtime.on('stopOnException', () => {
-			this.sendEvent(new StoppedEvent('exception', MockDebugSession.threadID));
+		this._runtime.on('stopOnException', (exception) => {
+			if (exception) {
+				this.sendEvent(new StoppedEvent(`exception(${exception})`, MockDebugSession.threadID));
+			} else {
+				this.sendEvent(new StoppedEvent('exception', MockDebugSession.threadID));
+			}
 		});
 		this._runtime.on('breakpointValidated', (bp: IMockBreakpoint) => {
 			this.sendEvent(new BreakpointEvent('changed', { verified: bp.verified, id: bp.id } as DebugProtocol.Breakpoint));
@@ -153,16 +157,16 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body.supportsExceptionFilterOptions = true;
 		response.body.exceptionBreakpointFilters = [
 			{
-				filter: "filter_A",
-				label: "Filter A",
+				filter: 'namedException',
+				label: "Named Exception",
 				default: false,
 				supportsCondition: true
 			},
 			{
-				filter: "filter_B",
-				label: "Filter B",
-				default: false,
-				supportsCondition: true
+				filter: 'otherExceptions',
+				label: "Other Exceptions",
+				default: true,
+				supportsCondition: false
 			}
 		];
 
@@ -244,11 +248,31 @@ export class MockDebugSession extends LoggingDebugSession {
 	}
 
 	protected async setExceptionBreakPointsRequest(response: DebugProtocol.SetExceptionBreakpointsResponse, args: DebugProtocol.SetExceptionBreakpointsArguments): Promise<void> {
+
+		let namedException: string | undefined = undefined;
+		let otherExceptions = false;
+
 		if (args.filterOptions) {
-			// remember exception filters
-		} else if (args.filters) {
-			// remember exception filters and their conditions
+			for (const filterOption of args.filterOptions) {
+				switch (filterOption.filterId) {
+					case 'namedException':
+						namedException = args.filterOptions[0].condition;
+						break;
+					case 'otherExceptions':
+						otherExceptions = true;
+						break;
+				}
+			}
 		}
+
+		if (args.filters) {
+			if (args.filters.indexOf('exception') >= 0) {
+				otherExceptions = true;
+			}
+		}
+
+		this._runtime.setExceptionsFilters(namedException, otherExceptions);
+
 		this.sendResponse(response);
 	}
 
