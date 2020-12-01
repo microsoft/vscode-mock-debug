@@ -280,7 +280,7 @@ export class MockRuntime extends EventEmitter {
 		if (this._sourceFile !== file) {
 			this._sourceFile = file;
 			const contents = await this._fileAccessor.readFile(file);
-			this._sourceLines = contents.split('\n');
+			this._sourceLines = contents.split(/\r?\n/);
 		}
 	}
 
