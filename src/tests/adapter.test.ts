@@ -125,7 +125,7 @@ suite('Node Debug Adapter', () => {
 
 				dc.waitForEvent('initialized').then(event => {
 					return dc.setExceptionBreakpointsRequest({
-						filters: [ 'all' ]
+						filters: [ 'otherExceptions' ]
 					});
 				}).then(response => {
 					return dc.configurationDoneRequest();

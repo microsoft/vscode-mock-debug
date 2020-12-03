@@ -266,7 +266,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		}
 
 		if (args.filters) {
-			if (args.filters.indexOf('exception') >= 0) {
+			if (args.filters.indexOf('otherExceptions') >= 0) {
 				otherExceptions = true;
 			}
 		}
