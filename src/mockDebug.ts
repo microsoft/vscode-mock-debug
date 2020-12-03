@@ -297,7 +297,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		response.body = {
 			stackFrames: stk.frames.map(f => {
-				const sf = new StackFrame(f.index, `${f.index}: ${f.name}`, this.createSource(f.file), this.convertDebuggerLineToClient(f.line));
+				const sf = new StackFrame(f.index, f.name, this.createSource(f.file), this.convertDebuggerLineToClient(f.line));
 				if (typeof f.column === 'number') {
 					sf.column = this.convertDebuggerColumnToClient(f.column);
 				}
