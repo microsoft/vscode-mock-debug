@@ -1,4 +1,7 @@
-## 0.45.1
+## 0.45.4
+* Add support for the `exceptionInfo` request.
+
+## 0.45.3
 * Add support for exception filters (and conditions). "Named Exception" will break on the `exception(xxx)` pattern if the exception condition is set to `xxx`. "Other Exceptions" will break on the word `exception` and the `exception(...)` patterns not matched by "Named Exception".
 
 ## 0.44.0

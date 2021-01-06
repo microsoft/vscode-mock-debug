@@ -131,20 +131,20 @@ export class MockDebugSession extends LoggingDebugSession {
 		// the adapter implements the configurationDoneRequest.
 		response.body.supportsConfigurationDoneRequest = true;
 
-		// make VS Code to use 'evaluate' when hovering over source
+		// make VS Code use 'evaluate' when hovering over source
 		response.body.supportsEvaluateForHovers = true;
 
-		// make VS Code to show a 'step back' button
+		// make VS Code show a 'step back' button
 		response.body.supportsStepBack = true;
 
-		// make VS Code to support data breakpoints
+		// make VS Code support data breakpoints
 		response.body.supportsDataBreakpoints = true;
 
-		// make VS Code to support completion in REPL
+		// make VS Code support completion in REPL
 		response.body.supportsCompletionsRequest = true;
 		response.body.completionTriggerCharacters = [ ".", "[" ];
 
-		// make VS Code to send cancelRequests
+		// make VS Code send cancelRequests
 		response.body.supportsCancelRequest = true;
 
 		// make VS Code send the breakpointLocations request
@@ -169,6 +169,9 @@ export class MockDebugSession extends LoggingDebugSession {
 				supportsCondition: false
 			}
 		];
+
+		// make VS Code send exceptionInfoRequests
+		response.body.supportsExceptionInfoRequest = true;
 
 		this.sendResponse(response);
 
@@ -273,6 +276,20 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		this._runtime.setExceptionsFilters(namedException, otherExceptions);
 
+		this.sendResponse(response);
+	}
+
+	protected exceptionInfoRequest(response: DebugProtocol.ExceptionInfoResponse, args: DebugProtocol.ExceptionInfoArguments) {
+		response.body = {
+			exceptionId: 'Exception ID',
+			description: 'This is a descriptive description of the exception.',
+			breakMode: 'always',
+			details: {
+				message: 'Message contained in the exception.',
+				typeName: 'Short type name of the exception object',
+				stackTrace: 'stack frame 1\nstack frame 2',
+			}
+		};
 		this.sendResponse(response);
 	}
 
