@@ -153,18 +153,21 @@ export class MockDebugSession extends LoggingDebugSession {
 		// make VS Code provide "Step in Target" functionality
 		response.body.supportsStepInTargetsRequest = true;
 
-		// the adapter defines two exceptions filters with support for conditions.
+		// the adapter defines two exceptions filters, one with support for conditions.
 		response.body.supportsExceptionFilterOptions = true;
 		response.body.exceptionBreakpointFilters = [
 			{
 				filter: 'namedException',
 				label: "Named Exception",
+				description: `Break on named exceptions. Enter the exception's name as the Condition.`,
 				default: false,
-				supportsCondition: true
+				supportsCondition: true,
+				conditionDescription: `Enter the exception's name`
 			},
 			{
 				filter: 'otherExceptions',
 				label: "Other Exceptions",
+				description: 'This is a other exception',
 				default: true,
 				supportsCondition: false
 			}

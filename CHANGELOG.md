@@ -1,3 +1,6 @@
+## 0.45.5
+* Provide help texts for exception filters via DAP's new `description` and `conditionDescription`properties.
+
 ## 0.45.4
 * Add support for the `exceptionInfo` request.
 
