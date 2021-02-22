@@ -1,11 +1,17 @@
 # VS Code Mock Debug
 
-Mock Debug allows to "debug" markdown files (like this).
+Mock Debug local_i allows to "debug" markdown files (like this).
 The text of the markdown is considered the "program to debug" and certain keywords trigger specific functionality:
 
 * if debugging stops on a line, the line becomes a stack in the CALL STACK with the words shown as frames.
   Here is a long stack trace: a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z.
 * Variables are just synthesized by Mock Debug, they do not originate from the markdown file.
+
+## Inline Values
+
+Words of the form local_i ... local_o are treated as variables for which a value is shown at the end of the line.
+Some more local_f or local_s.
+And the same again: local_i, local_o
 
 ## Breakpoints:
 

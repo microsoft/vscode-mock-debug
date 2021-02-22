@@ -96,14 +96,39 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 	}
 
 	// override VS Code's default implementation of the debug hover
-	/*
-	vscode.languages.registerEvaluatableExpressionProvider('markdown', {
+	context.subscriptions.push(vscode.languages.registerEvaluatableExpressionProvider('markdown', {
 		provideEvaluatableExpression(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.EvaluatableExpression> {
 			const wordRange = document.getWordRangeAtPosition(position);
 			return wordRange ? new vscode.EvaluatableExpression(wordRange) : undefined;
 		}
-	});
-	*/
+	}));
+
+	// override VS Code's default implementation of the "inline values" feature"
+	context.subscriptions.push(vscode.languages.registerInlineValuesProvider('markdown', {
+
+		provideInlineValues(document: vscode.TextDocument, viewport: vscode.Range, context: vscode.InlineValueContext) : vscode.ProviderResult<vscode.InlineValue[]> {
+
+			const allValues: vscode.InlineValue[] = [];
+
+			for (let l = 0; l <= context.stoppedLocation.end.line; l++) {
+				const line = document.lineAt(l);
+				var re = /local_[ifso]/g;	// match variables of the form local_i, local_f, ...
+				do {
+					var m = re.exec(line.text);
+					if (m) {
+						const varName = m[0];
+						const rng = new vscode.Range(l, m.index, l, m.index + varName.length);
+
+						//allValues.push(new vscode.InlineValueText(r, `${varName}: some value`));
+						allValues.push(new vscode.InlineValueVariableLookup(rng, varName));
+						//allValues.push(new vscode.InlineValueEvaluatableExpression(r, varName));
+					}
+				} while (m);
+			}
+
+			return allValues;
+		}
+	}));
 }
 
 class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
