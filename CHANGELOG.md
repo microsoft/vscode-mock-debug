@@ -1,5 +1,5 @@
 ## 0.45.6
-* Add support for a custom inline value provider.
+* Add support for a custom inline value provider that matches variables in a case-insensitive way.
 
 ## 0.45.5
 * Provide help texts for exception filters via DAP's new `description` and `conditionDescription`properties.

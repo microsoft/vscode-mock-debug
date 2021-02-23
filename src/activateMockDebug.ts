@@ -112,16 +112,16 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 
 			for (let l = 0; l <= context.stoppedLocation.end.line; l++) {
 				const line = document.lineAt(l);
-				var re = /local_[ifso]/g;	// match variables of the form local_i, local_f, ...
+				var re = /local_[ifso]/ig;	// match variables of the form local_i, local_f, Local_i, LOCAL_S...
 				do {
 					var m = re.exec(line.text);
 					if (m) {
 						const varName = m[0];
 						const rng = new vscode.Range(l, m.index, l, m.index + varName.length);
 
-						//allValues.push(new vscode.InlineValueText(r, `${varName}: some value`));
-						allValues.push(new vscode.InlineValueVariableLookup(rng, varName));
-						//allValues.push(new vscode.InlineValueEvaluatableExpression(r, varName));
+						//allValues.push(new vscode.InlineValueText(rng, `${varName}: some value`));
+						allValues.push(new vscode.InlineValueVariableLookup(rng, varName, false));
+						//allValues.push(new vscode.InlineValueEvaluatableExpression(rng, varName));
 					}
 				} while (m);
 			}

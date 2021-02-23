@@ -12,6 +12,7 @@ The text of the markdown is considered the "program to debug" and certain keywor
 Words of the form local_i ... local_o are treated as variables for which a value is shown at the end of the line.
 Some more local_f or local_s.
 And the same again: local_i, local_o
+And these with different casing: Local_I, LOCAL_S
 
 ## Breakpoints:
 
