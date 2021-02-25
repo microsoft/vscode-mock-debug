@@ -3739,25 +3739,25 @@ vsce@^1.81.1:
     yauzl "^2.3.1"
     yazl "^2.2.2"
 
-vscode-debugadapter-testsupport@^1.45.0-pre.0:
-  version "1.45.0-pre.0"
-  resolved "https://registry.yarnpkg.com/vscode-debugadapter-testsupport/-/vscode-debugadapter-testsupport-1.45.0-pre.0.tgz#6dde256154680be6cd7a7fd0a431180772777590"
-  integrity sha512-t6gB7TVhNutS68whjT9sseY0rRRwBt1vAXyRlbI4Y7fJx71UclBKaki5KNb8jQemxHLL8a8Kh0SZJ/jLnLZISw==
+vscode-debugadapter-testsupport@^1.45.0:
+  version "1.45.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugadapter-testsupport/-/vscode-debugadapter-testsupport-1.45.0.tgz#3cb619fb7ae08ca0bfa8830a2247ece48c312bd8"
+  integrity sha512-/5q/F2K1mNLfJWxXStG9pO86mgOeK73PoMJpOBZaniToplrzM7LgFEdXUPlzNH07//XZwzRsCFn7Eq3brqYk6Q==
   dependencies:
-    vscode-debugprotocol "^1.45.0-pre.0"
+    vscode-debugprotocol "^1.45.0"
 
-vscode-debugadapter@^1.45.0-pre.0:
-  version "1.45.0-pre.0"
-  resolved "https://registry.yarnpkg.com/vscode-debugadapter/-/vscode-debugadapter-1.45.0-pre.0.tgz#5e3518ecb981452a4c249a8041713a536f9e6175"
-  integrity sha512-vfOAUcfz2vu+xaTJ75UBylJqKU1hOKKdzpIrXnkTQaEX99JAwymBcfvzl7lQQsPsRS/VUwHvEzAiVo/Wyg8JNw==
+vscode-debugadapter@^1.45.0:
+  version "1.45.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugadapter/-/vscode-debugadapter-1.45.0.tgz#42721766190765f1a72030c31fc4c32d74c00419"
+  integrity sha512-cYb4NnKyFpK+VoFA5hAimzRyNFwi2/MdvoFeV6B90n6/twO+UrxWZLwGSCNv+s0UUDiFkxVM4msxYd1DCfjVUQ==
   dependencies:
     mkdirp "^0.5.5"
-    vscode-debugprotocol "1.45.0-pre.0"
+    vscode-debugprotocol "1.45.0"
 
-vscode-debugprotocol@1.45.0-pre.0, vscode-debugprotocol@^1.45.0-pre.0:
-  version "1.45.0-pre.0"
-  resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.45.0-pre.0.tgz#7ea4c6e84d966e96a8398241e46bdf98e0dacfde"
-  integrity sha512-q0ivFfnjFQyL4Qyxp1K8gSdTpfcvlCxmys5adLydBef1XvDKZNONAKalCZZCyaG/vtOlbV1ma6hS5eALNaLd8w==
+vscode-debugprotocol@1.45.0, vscode-debugprotocol@^1.45.0:
+  version "1.45.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.45.0.tgz#8419583fa3ad7f25350b98bd994485027cf52e2d"
+  integrity sha512-xU6XtdKJ0waWIt79Zt4WVyIQ3oDkhilku9Shbv7Vc4KXEr/npsf8dhinyIZXSIlH2lzJiE3imp1xbYpyRTIrhg==
 
 watchpack-chokidar2@^2.0.0:
   version "2.0.0"
