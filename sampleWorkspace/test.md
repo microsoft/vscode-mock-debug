@@ -23,6 +23,27 @@ If a Mock Debug session is active, breakpoints are "validated" according these r
 * if a line starts with `-` we don't allow to set a breakpoint but move the breakpoint up
 * a breakpoint on a line containing the word `lazy` is not immediately validated, but only after hitting it once.
 
+## Data Breakpoints
+
+Data Breakpoints can be set in the VARIABLES view of the editor (while debugging) if the Debug Session supports these.
+Breakpoint should apply on next line if access type is "Read" (Break When Value Is Read)
+* local_i_read 
+* local_f_read 
+* local_s_read 
+* local_o_read
+
+Breakpoint should apply on next line if access type is "Write" (Break When Value Changes)
+* local_i_write 
+* local_f_write 
+* local_s_write 
+* local_o_write
+
+Breakpoint should apply on next line if access type is "ReadWrite" (Break When Value Is Accessed)
+* local_i_readWrite 
+* local_f_readWrite 
+* local_s_readWrite 
+* local_o_readWrite
+
 ## Exceptions:
 
 If a line contains the word `exception` or the pattern `exception(name)` an exception is thrown.
