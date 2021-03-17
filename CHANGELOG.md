@@ -1,3 +1,6 @@
+## 0.45.7
+* Add support for data breakpoint access types (a big _Thank You_ to @yannickowow for the PR)
+
 ## 0.45.6
 * Add support for a custom inline value provider that matches variables in a case-insensitive way.
 * Group "run" and "debug" editor commands in the new "run" submenu
