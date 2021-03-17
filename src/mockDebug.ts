@@ -550,7 +550,12 @@ export class MockDebugSession extends LoggingDebugSession {
 			if (id === "global") {
 				response.body.dataId = args.name;
 				response.body.description = args.name;
-				response.body.accessTypes = [ "read" ];
+				response.body.accessTypes = [ "write" ];
+				response.body.canPersist = true;
+			} else {
+				response.body.dataId = args.name;
+				response.body.description = args.name;
+				response.body.accessTypes = ["read", "write", "readWrite"];
 				response.body.canPersist = true;
 			}
 		}
@@ -569,7 +574,8 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		for (const dbp of args.breakpoints) {
 			// assume that id is the "address" to break on
-			const ok = this._runtime.setDataBreakpoint(dbp.dataId);
+			const dataId = dbp.dataId + `_${dbp.accessType ? dbp.accessType : 'write'}`
+			const ok = this._runtime.setDataBreakpoint(dataId);
 			response.body.breakpoints.push({
 				verified: ok
 			});
