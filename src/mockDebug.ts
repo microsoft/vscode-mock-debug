@@ -396,6 +396,12 @@ export class MockDebugSession extends LoggingDebugSession {
 					variablesReference: 0
 				});
 				variables.push({
+					name: id + "_f",
+					type: "float",
+					value: "6.28",
+					variablesReference: 0
+				});
+				variables.push({
 					name: id + "_s",
 					type: "string",
 					value: "hello world",
