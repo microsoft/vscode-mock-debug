@@ -380,6 +380,7 @@ export class MockDebugSession extends LoggingDebugSession {
 					name: id + "_i",
 					type: "integer",
 					value: this._showHex ? '0x' + i.toString(16) : i.toString(10),
+					// eslint-disable-next-line @typescript-eslint/naming-convention
 					__vscodeVariableMenuContext: "simple",
 					variablesReference: 0
 				} as DebugProtocol.Variable);
@@ -586,7 +587,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		for (const dbp of args.breakpoints) {
 			// assume that id is the "address" to break on
-			const dataId = dbp.dataId + `_${dbp.accessType ? dbp.accessType : 'write'}`
+			const dataId = dbp.dataId + `_${dbp.accessType ? dbp.accessType : 'write'}`;
 			const ok = this._runtime.setDataBreakpoint(dataId);
 			response.body.breakpoints.push({
 				verified: ok
