@@ -110,7 +110,7 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 
 			const allValues: vscode.InlineValue[] = [];
 
-			for (let l = 0; l <= context.stoppedLocation.end.line; l++) {
+			for (let l = viewport.start.line; l <= context.stoppedLocation.end.line; l++) {
 				const line = document.lineAt(l);
 				var regExp = /local_[ifso]/ig;	// match variables of the form local_i, local_f, Local_i, LOCAL_S...
 				do {
@@ -120,13 +120,13 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 						const varRange = new vscode.Range(l, m.index, l, m.index + varName.length);
 
 						// some literal text
-						//allValues.push(new vscode.InlineValueText(rng, `${varName}: some value`));
+						//allValues.push(new vscode.InlineValueText(varRange, `${varName}: ${viewport.start.line}`));
 
 						// value found via variable lookup
 						allValues.push(new vscode.InlineValueVariableLookup(varRange, varName, false));
 
 						// value determined via expression evaluation
-						//allValues.push(new vscode.InlineValueEvaluatableExpression(rng, varName));
+						//allValues.push(new vscode.InlineValueEvaluatableExpression(varRange, varName));
 					}
 				} while (m);
 			}
