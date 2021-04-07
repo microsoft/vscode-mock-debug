@@ -85,15 +85,15 @@
         }
       ],
       "commandPalette": [
-				{
-					"command": "extension.mock-debug.debugEditorContents",
-					"when": "resourceLangId == markdown"
-				},
-				{
-					"command": "extension.mock-debug.runEditorContents",
-					"when": "resourceLangId == markdown"
-				}
-			],
+        {
+          "command": "extension.mock-debug.debugEditorContents",
+          "when": "resourceLangId == markdown"
+        },
+        {
+          "command": "extension.mock-debug.runEditorContents",
+          "when": "resourceLangId == markdown"
+        }
+      ],
       "debug/variables/context": [
         {
           "command": "extension.mock-debug.toggleFormatting",
@@ -106,14 +106,14 @@
         "command": "extension.mock-debug.debugEditorContents",
         "title": "Debug File",
         "category": "Mock Debug",
-				"enablement": "!inDebugMode",
+        "enablement": "!inDebugMode",
         "icon": "$(debug-alt)"
       },
       {
         "command": "extension.mock-debug.runEditorContents",
         "title": "Run File",
         "category": "Mock Debug",
-				"enablement": "!inDebugMode",
+        "enablement": "!inDebugMode",
         "icon": "$(play)"
       },
       {
