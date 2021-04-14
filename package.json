@@ -72,6 +72,9 @@
     "onCommand:extension.mock-debug.runEditorContents",
     "onCommand:extension.mock-debug.debugEditorContents"
   ],
+  "workspaceTrust": {
+    "request": "never"
+  },
   "contributes": {
     "menus": {
       "editor/title/run": [
