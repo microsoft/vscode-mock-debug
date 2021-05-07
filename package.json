@@ -132,6 +132,7 @@
     "debuggers": [
       {
         "type": "mock",
+        "languages": ["markdown"],
         "label": "Mock Debug",
         "program": "./out/debugAdapter.js",
         "runtime": "node",
