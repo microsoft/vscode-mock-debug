@@ -1,3 +1,6 @@
+## 0.45.8
+* Register Mock Debug as default debugger for markdown files
+
 ## 0.45.7
 * Add support for data breakpoint access types (a big _Thank You_ to @yannickowow for the PR)
 
