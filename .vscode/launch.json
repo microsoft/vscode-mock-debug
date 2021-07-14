@@ -21,7 +21,8 @@
 			"request": "launch",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"${workspaceFolder}/sampleWebWorkerWorkspace"
+				"--extensionDevelopmentKind=web",
+				"${workspaceFolder}/sampleWorkspace"
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/web/**/*.js"
