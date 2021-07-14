@@ -11,12 +11,8 @@ import {
 } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { basename } from 'path';
-import { MockRuntime, IMockBreakpoint, FileAccessor } from './mockRuntime';
+import { MockRuntime, IRuntimeBreakpoint, FileAccessor, IRuntimeVariable, timeout } from './mockRuntime';
 import { Subject } from 'await-notify';
-
-function timeout(ms: number) {
-	return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 /**
  * This interface describes the mock-debug specific launch attributes
@@ -43,12 +39,11 @@ export class MockDebugSession extends LoggingDebugSession {
 	// a Mock runtime (or debugger)
 	private _runtime: MockRuntime;
 
-	private _variableHandles = new Handles<string>();
+	private _variableHandles = new Handles<'locals' | 'globals' | IRuntimeVariable>();
 
 	private _configurationDone = new Subject();
 
 	private _cancelationTokens = new Map<number, boolean>();
-	private _isLongrunning = new Map<number, boolean>();
 
 	private _reportProgress = false;
 	private _progressId = 10000;
@@ -91,7 +86,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				this.sendEvent(new StoppedEvent('exception', MockDebugSession.threadID));
 			}
 		});
-		this._runtime.on('breakpointValidated', (bp: IMockBreakpoint) => {
+		this._runtime.on('breakpointValidated', (bp: IRuntimeBreakpoint) => {
 			this.sendEvent(new BreakpointEvent('changed', { verified: bp.verified, id: bp.id } as DebugProtocol.Breakpoint));
 		});
 		this._runtime.on('output', (text, filePath, line, column) => {
@@ -128,7 +123,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		// build and return the capabilities of this debug adapter:
 		response.body = response.body || {};
 
-		// the adapter implements the configurationDoneRequest.
+		// the adapter implements the configurationDone request.
 		response.body.supportsConfigurationDoneRequest = true;
 
 		// make VS Code use 'evaluate' when hovering over source
@@ -144,7 +139,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body.supportsCompletionsRequest = true;
 		response.body.completionTriggerCharacters = [ ".", "[" ];
 
-		// make VS Code send cancelRequests
+		// make VS Code send cancel request
 		response.body.supportsCancelRequest = true;
 
 		// make VS Code send the breakpointLocations request
@@ -173,8 +168,14 @@ export class MockDebugSession extends LoggingDebugSession {
 			}
 		];
 
-		// make VS Code send exceptionInfoRequests
+		// make VS Code send exceptionInfo request
 		response.body.supportsExceptionInfoRequest = true;
+
+		// make VS Code send setVariable request
+		response.body.supportsSetVariable = true;
+
+		// make VS Code send setExpression request
+		//response.body.supportsSetExpression = true;
 
 		this.sendResponse(response);
 
@@ -335,102 +336,44 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		response.body = {
 			scopes: [
-				new Scope("Local", this._variableHandles.create("local"), false),
-				new Scope("Global", this._variableHandles.create("global"), true)
+				new Scope("Locals", this._variableHandles.create('locals'), false),
+				new Scope("Globals", this._variableHandles.create('globals'), true)
 			]
 		};
 		this.sendResponse(response);
 	}
 
-	protected async variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request) {
+	protected async variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request): Promise<void> {
 
-		const variables: DebugProtocol.Variable[] = [];
-
-		if (this._isLongrunning.get(args.variablesReference)) {
-			// long running
-
+		let vs: IRuntimeVariable[] = [];
+		
+		const v = this._variableHandles.get(args.variablesReference);
+		if (v === 'locals') {
+			vs = this._runtime.getLocalVariables();
+		} else if (v === 'globals') {
 			if (request) {
 				this._cancelationTokens.set(request.seq, false);
-			}
-
-			for (let i = 0; i < 100; i++) {
-				await timeout(1000);
-				variables.push({
-					name: `i_${i}`,
-					type: "integer",
-					value: `${i}`,
-					variablesReference: 0
-				});
-				if (request && this._cancelationTokens.get(request.seq)) {
-					break;
-				}
-			}
-
-			if (request) {
+				vs = await this._runtime.getGlobalVariables(() => !!this._cancelationTokens.get(request.seq));
 				this._cancelationTokens.delete(request.seq);
+			} else {
+				vs = await this._runtime.getGlobalVariables();
 			}
-
-		} else {
-
-			const id = this._variableHandles.get(args.variablesReference);
-
-			if (id) {
-				const i = 12345678;
-				variables.push({
-					name: id + "_i",
-					type: "integer",
-					value: this._showHex ? '0x' + i.toString(16) : i.toString(10),
-					// eslint-disable-next-line @typescript-eslint/naming-convention
-					__vscodeVariableMenuContext: "simple",
-					variablesReference: 0
-				} as DebugProtocol.Variable);
-				variables.push({
-					name: id + "_f",
-					type: "float",
-					value: "3.14",
-					variablesReference: 0
-				});
-				variables.push({
-					name: id + "_f",
-					type: "float",
-					value: "6.28",
-					variablesReference: 0
-				});
-				variables.push({
-					name: id + "_f",
-					type: "float",
-					value: "6.28",
-					variablesReference: 0
-				});
-				variables.push({
-					name: id + "_s",
-					type: "string",
-					value: "hello world",
-					variablesReference: 0
-				});
-				variables.push({
-					name: id + "_o",
-					type: "object",
-					value: "Object",
-					variablesReference: this._variableHandles.create(id + "_o")
-				});
-
-				// cancellation support for long running requests
-				const nm = id + "_long_running";
-				const ref = this._variableHandles.create(id + "_lr");
-				variables.push({
-					name: nm,
-					type: "object",
-					value: "Object",
-					variablesReference: ref
-				});
-				this._isLongrunning.set(ref, true);
-			}
+		} else if (v && Array.isArray(v.value)) {
+			vs = v.value;
 		}
 
 		response.body = {
-			variables: variables
+			variables: vs.map(v => this.convert(v))
 		};
+		this.sendResponse(response);
+	}
+
+	protected setVariable(response: DebugProtocol.SetVariableResponse, args: DebugProtocol.SetVariableArguments): void {
+
+		const v = this._variableHandles.get(args.variablesReference);
+		if (v) {
+			this._runtime.setLocalVariable(args.name, args.value);
+		}
 		this.sendResponse(response);
 	}
 
@@ -478,43 +421,52 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		let reply: string | undefined = undefined;
 
-		if (args.context === 'repl') {
-			// 'evaluate' supports to create and delete breakpoints from the 'repl':
-			const matches = /new +([0-9]+)/.exec(args.expression);
-			if (matches && matches.length === 2) {
-				const mbp = await this._runtime.setBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));
-				const bp = new Breakpoint(mbp.verified, this.convertDebuggerLineToClient(mbp.line), undefined, this.createSource(this._runtime.sourceFile)) as DebugProtocol.Breakpoint;
-				bp.id= mbp.id;
-				this.sendEvent(new BreakpointEvent('new', bp));
-				reply = `breakpoint created`;
-			} else {
-				const matches = /del +([0-9]+)/.exec(args.expression);
+		switch (args.context) {
+			case 'repl':
+				// 'evaluate' supports to create and delete breakpoints from the 'repl':
+				const matches = /new +([0-9]+)/.exec(args.expression);
 				if (matches && matches.length === 2) {
-					const mbp = this._runtime.clearBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));
-					if (mbp) {
-						const bp = new Breakpoint(false) as DebugProtocol.Breakpoint;
-						bp.id= mbp.id;
-						this.sendEvent(new BreakpointEvent('removed', bp));
-						reply = `breakpoint deleted`;
-					}
+					const mbp = await this._runtime.setBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));
+					const bp = new Breakpoint(mbp.verified, this.convertDebuggerLineToClient(mbp.line), undefined, this.createSource(this._runtime.sourceFile)) as DebugProtocol.Breakpoint;
+					bp.id= mbp.id;
+					this.sendEvent(new BreakpointEvent('new', bp));
+					reply = `breakpoint created`;
 				} else {
-					const matches = /progress/.exec(args.expression);
-					if (matches && matches.length === 1) {
-						if (this._reportProgress) {
-							reply = `progress started`;
-							this.progressSequence();
-						} else {
-							reply = `frontend doesn't support progress (capability 'supportsProgressReporting' not set)`;
+					const matches = /del +([0-9]+)/.exec(args.expression);
+					if (matches && matches.length === 2) {
+						const mbp = this._runtime.clearBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));
+						if (mbp) {
+							const bp = new Breakpoint(false) as DebugProtocol.Breakpoint;
+							bp.id= mbp.id;
+							this.sendEvent(new BreakpointEvent('removed', bp));
+							reply = `breakpoint deleted`;
+						}
+					} else {
+						const matches = /progress/.exec(args.expression);
+						if (matches && matches.length === 1) {
+							if (this._reportProgress) {
+								reply = `progress started`;
+								this.progressSequence();
+							} else {
+								reply = `frontend doesn't support progress (capability 'supportsProgressReporting' not set)`;
+							}
 						}
 					}
 				}
-			}
+				// fall through
+			default:
+				reply = this._runtime.evaluate(args.expression);
+				break;
 		}
 
 		response.body = {
 			result: reply ? reply : `evaluate(context: '${args.context}', '${args.expression}')`,
 			variablesReference: 0
 		};
+		this.sendResponse(response);
+	}
+
+	protected setExpression(response: DebugProtocol.SetExpressionResponse, args: DebugProtocol.SetExpressionArguments): void {
 		this.sendResponse(response);
 	}
 
@@ -559,8 +511,8 @@ export class MockDebugSession extends LoggingDebugSession {
         };
 
 		if (args.variablesReference && args.name) {
-			const id = this._variableHandles.get(args.variablesReference);
-			if (id === "global") {
+			const v = this._variableHandles.get(args.variablesReference);
+			if (v === 'globals') {
 				response.body.dataId = args.name;
 				response.body.description = args.name;
 				response.body.accessTypes = [ "write" ];
@@ -586,9 +538,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		};
 
 		for (const dbp of args.breakpoints) {
-			// assume that id is the "address" to break on
-			const dataId = dbp.dataId + `_${dbp.accessType ? dbp.accessType : 'write'}`;
-			const ok = this._runtime.setDataBreakpoint(dataId);
+			const ok = this._runtime.setDataBreakpoint(dbp.dataId, dbp.accessType || 'write');
 			response.body.breakpoints.push({
 				verified: ok
 			});
@@ -651,6 +601,45 @@ export class MockDebugSession extends LoggingDebugSession {
 	}
 
 	//---- helpers
+
+	private convert(v: IRuntimeVariable): DebugProtocol.Variable {
+
+		let dapVariable: DebugProtocol.Variable = {
+			name: v.name,
+			value: '???',
+			type: typeof v.value,
+			variablesReference: 0
+		};
+
+		if (Array.isArray(v.value)) {
+			dapVariable.value = 'Object';
+			dapVariable.variablesReference = this._variableHandles.create(v);
+		} else {
+			switch (typeof v.value) {
+				case 'number':
+					if (Math.round(v.value) === v.value) {
+						dapVariable.value = this._showHex ? '0x' + v.value.toString(16) : v.value.toString(10);
+						(<any>dapVariable).__vscodeVariableMenuContext = 'simple';	// enable context menu contribution
+						dapVariable.type = 'integer';
+					} else {
+						dapVariable.value = v.value.toString();
+						dapVariable.type = 'float';
+					}
+					break;
+				case 'string':
+					dapVariable.value = `"${v.value}"`;
+					break;
+				case 'boolean':
+					dapVariable.value = v.value ? 'true' : 'false';
+					break;
+				default:
+					dapVariable.value = typeof v.value;
+					break;		
+			}
+		}
+
+		return dapVariable;
+	}
 
 	private createSource(filePath: string): Source {
 		return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, 'mock-adapter-data');

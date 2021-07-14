@@ -38,7 +38,8 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 					type: 'mock',
 					name: 'Debug File',
 					request: 'launch',
-					program: targetResource.fsPath
+					program: targetResource.fsPath,
+					stopOnEntry: true
 				});
 			}
 		}),
@@ -96,10 +97,22 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 	}
 
 	// override VS Code's default implementation of the debug hover
+	// here we match only Mock "variables", that are words starting with an '$' 
 	context.subscriptions.push(vscode.languages.registerEvaluatableExpressionProvider('markdown', {
 		provideEvaluatableExpression(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.EvaluatableExpression> {
-			const wordRange = document.getWordRangeAtPosition(position);
-			return wordRange ? new vscode.EvaluatableExpression(wordRange) : undefined;
+
+			const VARIABLE_REGEXP = /\$[a-z][a-z0-9]*/ig;
+			const line = document.lineAt(position.line).text;
+			
+			let m: RegExpExecArray | null;
+			while (m = VARIABLE_REGEXP.exec(line)) {
+				const varRange = new vscode.Range(position.line, m.index, position.line, m.index + m[0].length);
+
+				if (varRange.contains(position)) {
+					return new vscode.EvaluatableExpression(varRange);
+				}
+			}
+			return undefined;
 		}
 	}));
 
@@ -112,11 +125,11 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 
 			for (let l = viewport.start.line; l <= context.stoppedLocation.end.line; l++) {
 				const line = document.lineAt(l);
-				var regExp = /local_[ifso]/ig;	// match variables of the form local_i, local_f, Local_i, LOCAL_S...
+				var regExp = /\$([a-z][a-z0-9]*)/ig;	// variables are words starting with '$'
 				do {
 					var m = regExp.exec(line.text);
 					if (m) {
-						const varName = m[0];
+						const varName = m[1];
 						const varRange = new vscode.Range(l, m.index, l, m.index + varName.length);
 
 						// some literal text

@@ -7,8 +7,8 @@
 		{
 			"type": "mock",
 			"request": "launch",
-			"name": "Debug test.md",
-			"program": "${workspaceFolder}/test.md",
+			"name": "Debug readme.md",
+			"program": "${workspaceFolder}/readme.md",
 			"stopOnEntry": true,
 			"trace": false
 		}

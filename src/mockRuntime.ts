@@ -8,18 +8,18 @@ export interface FileAccessor {
 	readFile(path: string): Promise<string>;
 }
 
-export interface IMockBreakpoint {
+export interface IRuntimeBreakpoint {
 	id: number;
 	line: number;
 	verified: boolean;
 }
 
-interface IStepInTargets {
+interface IRuntimeStepInTargets {
 	id: number;
 	label: string;
 }
 
-interface IStackFrame {
+interface IRuntimeStackFrame {
 	index: number;
 	name: string;
 	file: string;
@@ -27,9 +27,18 @@ interface IStackFrame {
 	column?: number;
 }
 
-interface IStack {
+interface IRuntimeStack {
 	count: number;
-	frames: IStackFrame[];
+	frames: IRuntimeStackFrame[];
+}
+
+export interface IRuntimeVariable {
+	name: string;
+	value: number | boolean | string | IRuntimeVariable[];
+}
+
+export function timeout(ms: number) {
+	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
@@ -43,6 +52,8 @@ export class MockRuntime extends EventEmitter {
 		return this._sourceFile;
 	}
 
+	private _variables = new Map<string, IRuntimeVariable>();
+
 	// the contents (= lines) of the one and only file
 	private _sourceLines: string[] = [];
 
@@ -51,13 +62,13 @@ export class MockRuntime extends EventEmitter {
 	private _currentColumn: number | undefined;
 
 	// maps from sourceFile to array of Mock breakpoints
-	private _breakPoints = new Map<string, IMockBreakpoint[]>();
+	private _breakPoints = new Map<string, IRuntimeBreakpoint[]>();
 
 	// since we want to send breakpoint events, we will assign an id to every event
 	// so that the frontend can match events with breakpoints.
 	private _breakpointId = 1;
 
-	private _breakAddresses = new Set<string>();
+	private _breakAddresses = new Map<string, string>();
 
 	private _noDebug = false;
 
@@ -136,7 +147,7 @@ export class MockRuntime extends EventEmitter {
 		this.sendEvent('stopOnStep');
 	}
 
-	public getStepInTargets(frameId: number): IStepInTargets[] {
+	public getStepInTargets(frameId: number): IRuntimeStepInTargets[] {
 
 		const line = this._sourceLines[this._currentLine].trim();
 
@@ -165,19 +176,27 @@ export class MockRuntime extends EventEmitter {
 	/**
 	 * Returns a fake 'stacktrace' where every 'stackframe' is a word from the current line.
 	 */
-	public stack(startFrame: number, endFrame: number): IStack {
+	public stack(startFrame: number, endFrame: number): IRuntimeStack {
 
-		const words = this._sourceLines[this._currentLine].trim().split(/\s+/);
+		// break line into words: each word becomes a stack frame
+		const WORD_REGEXP = /[a-z]+/ig;
+		const words: { name: string, index?: number }[] = [];
+		let match: RegExpExecArray | null;
+		const line = this._sourceLines[this._currentLine].trim();
+		while (match = WORD_REGEXP.exec(line)) {
+			words.push({ name: match[0], index: match.index });
+		}
+		words.push({ name: 'BOTTOM' });	// add a sentinel so that the stack is never empty...
 
-		const frames = new Array<IStackFrame>();
+		const frames = new Array<IRuntimeStackFrame>();
 		// every word of the current line becomes a stack frame.
 		for (let i = startFrame; i < Math.min(endFrame, words.length); i++) {
-			const name = words[i];	// use a word of the line as the stackframe name
-			const stackFrame: IStackFrame = {
+			const stackFrame: IRuntimeStackFrame = {
 				index: i,
-				name: `${name}(${i})`,
+				name: `${words[i].name}(${i})`,	// use a word of the line as the stackframe name
 				file: this._sourceFile,
-				line: this._currentLine
+				line: this._currentLine,
+				//column: words[i].index
 			};
 			if (typeof this._currentColumn === 'number') {
 				stackFrame.column = this._currentColumn;
@@ -213,12 +232,12 @@ export class MockRuntime extends EventEmitter {
 	/*
 	 * Set breakpoint in file with given line.
 	 */
-	public async setBreakPoint(path: string, line: number): Promise<IMockBreakpoint> {
+	public async setBreakPoint(path: string, line: number): Promise<IRuntimeBreakpoint> {
 
-		const bp: IMockBreakpoint = { verified: false, line, id: this._breakpointId++ };
+		const bp: IRuntimeBreakpoint = { verified: false, line, id: this._breakpointId++ };
 		let bps = this._breakPoints.get(path);
 		if (!bps) {
-			bps = new Array<IMockBreakpoint>();
+			bps = new Array<IRuntimeBreakpoint>();
 			this._breakPoints.set(path, bps);
 		}
 		bps.push(bp);
@@ -231,7 +250,7 @@ export class MockRuntime extends EventEmitter {
 	/*
 	 * Clear breakpoint in file with given line.
 	 */
-	public clearBreakPoint(path: string, line: number): IMockBreakpoint | undefined {
+	public clearBreakPoint(path: string, line: number): IRuntimeBreakpoint | undefined {
 		const bps = this._breakPoints.get(path);
 		if (bps) {
 			const index = bps.findIndex(bp => bp.line === line);
@@ -254,12 +273,19 @@ export class MockRuntime extends EventEmitter {
 	/*
 	 * Set data breakpoint.
 	 */
-	public setDataBreakpoint(address: string): boolean {
-		if (address) {
-			this._breakAddresses.add(address);
-			return true;
+	public setDataBreakpoint(address: string, accessType: 'read' | 'write' | 'readWrite'): boolean {
+
+		const x = accessType === 'readWrite' ? 'read write' : accessType;
+
+		const t = this._breakAddresses.get(address);
+		if (t) {
+			if (t !== x) {
+				this._breakAddresses.set(address, 'read write');
+			}
+		} else {
+			this._breakAddresses.set(address, x);
 		}
-		return false;
+		return true;
 	}
 
 	public setExceptionsFilters(namedException: string | undefined, otherExceptions: boolean): void {
@@ -272,6 +298,45 @@ export class MockRuntime extends EventEmitter {
 	 */
 	public clearAllDataBreakpoints(): void {
 		this._breakAddresses.clear();
+	}
+
+	public async getGlobalVariables(cancellationToken?: () => boolean ): Promise<IRuntimeVariable[]> {
+
+		let a: IRuntimeVariable[] = [];
+
+		for (let i = 0; i < 10; i++) {
+			a.push({
+				name: `global_${i}`,
+				value: i
+			});
+			if (cancellationToken && cancellationToken()) {
+				break;
+			}
+			await timeout(1000);
+		}
+
+		return a;
+	}
+
+	public getLocalVariables(): IRuntimeVariable[] {
+		return Array.from(this._variables, ([name, value]) => value);
+	}
+
+	public setLocalVariable(name: string, value: string) {
+		const v = this._variables.get(name);
+		if (v) {
+			v.value = value;
+		}
+	}
+
+	public evaluate(expression: string): string | undefined {
+		if (expression[0] === '$') {
+			const v = this._variables.get(expression.substr(1));
+			if (v) {
+				return v.value.toString();
+			}
+		}
+		return undefined;
 	}
 
 	// private methods
@@ -358,19 +423,65 @@ export class MockRuntime extends EventEmitter {
 
 		const line = this._sourceLines[ln].trim();
 
+		// find variable accesses
+		let reg0 = /\$([a-z][a-z0-9]*)(=(false|true|[0-9]+(\.[0-9]+)?|\".*\"|\{.*\}))?/ig;
+		let matches0: RegExpExecArray | null;
+		while (matches0 = reg0.exec(line)) {
+			if (matches0.length === 5) {
+				
+				let access: string | undefined;
+
+				const name = matches0[1];
+				const value = matches0[3];
+
+				let v: IRuntimeVariable = { name, value };
+
+				if (value && value.length > 0) {
+					if (value === 'true') {
+						v.value = true;
+					} else if (value === 'false') {
+						v.value = false;
+					} else if (value[0] === '"') {
+						v.value = value.substr(1, value.length-2);
+					} else if (value[0] === '{') {
+						v.value = [ {
+							name: 'fBool',
+							value: true
+						}, {
+							name: 'fInteger',
+							value: 123
+						}, {
+							name: 'fString',
+							value: 'hello'
+						} ];
+					} else {
+						v.value = parseFloat(value);
+					}
+
+					if (this._variables.has(name)) {
+						// the first write access to a variable is the "declaration" and not a "write access"
+						access = 'write';
+					}
+					this._variables.set(name, v);
+				} else {
+					if (this._variables.has(name)) {
+						// variable must exist in order to trigger a read access 
+						access = 'read';
+					}
+				}
+
+				const accessType = this._breakAddresses.get(name);
+				if (access && accessType && accessType.indexOf(access) >= 0) {
+					this.sendEvent('stopOnDataBreakpoint', access);
+					return true;
+				}
+			}
+		}
+
 		// if 'log(...)' found in source -> send argument to debug console
 		const matches = /log\((.*)\)/.exec(line);
 		if (matches && matches.length === 2) {
 			this.sendEvent('output', matches[1], this._sourceFile, ln, matches.index);
-		}
-
-		// if a word in a line matches a data breakpoint, fire a 'dataBreakpoint' event
-		const words = line.split(" ");
-		for (const word of words) {
-			if (this._breakAddresses.has(word)) {
-				this.sendEvent('stopOnDataBreakpoint');
-				return true;
-			}
 		}
 
 		// if pattern 'exception(...)' found in source -> throw named exception
