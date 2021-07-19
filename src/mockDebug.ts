@@ -43,7 +43,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 	private _configurationDone = new Subject();
 
-	private _cancelationTokens = new Map<number, boolean>();
+	private _cancellationTokens = new Map<number, boolean>();
 
 	private _reportProgress = false;
 	private _progressId = 10000;
@@ -78,6 +78,9 @@ export class MockDebugSession extends LoggingDebugSession {
 		});
 		this._runtime.on('stopOnDataBreakpoint', () => {
 			this.sendEvent(new StoppedEvent('data breakpoint', MockDebugSession.threadID));
+		});
+		this._runtime.on('stopOnInstructionBreakpoint', () => {
+			this.sendEvent(new StoppedEvent('instruction breakpoint', MockDebugSession.threadID));
 		});
 		this._runtime.on('stopOnException', (exception) => {
 			if (exception) {
@@ -176,6 +179,11 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// make VS Code send setExpression request
 		//response.body.supportsSetExpression = true;
+
+		// make VS Code send disassemble request
+		response.body.supportsDisassembleRequest = true;
+		response.body.supportsSteppingGranularity = true;
+		response.body.supportsInstructionBreakpoints = true;
 
 		this.sendResponse(response);
 
@@ -317,11 +325,15 @@ export class MockDebugSession extends LoggingDebugSession {
 		const stk = this._runtime.stack(startFrame, endFrame);
 
 		response.body = {
-			stackFrames: stk.frames.map(f => {
+			stackFrames: stk.frames.map((f, ix) => {
 				const sf = new StackFrame(f.index, f.name, this.createSource(f.file), this.convertDebuggerLineToClient(f.line));
 				if (typeof f.column === 'number') {
 					sf.column = this.convertDebuggerColumnToClient(f.column);
 				}
+				if (typeof f.instruction === 'number') {
+					(sf as DebugProtocol.StackFrame).instructionPointerReference = '0x' + f.instruction.toString(16);
+				}
+
 				return sf;
 			}),
 			//no totalFrames: 				// VS Code has to probe/guess. Should result in a max. of two requests
@@ -352,9 +364,9 @@ export class MockDebugSession extends LoggingDebugSession {
 			vs = this._runtime.getLocalVariables();
 		} else if (v === 'globals') {
 			if (request) {
-				this._cancelationTokens.set(request.seq, false);
-				vs = await this._runtime.getGlobalVariables(() => !!this._cancelationTokens.get(request.seq));
-				this._cancelationTokens.delete(request.seq);
+				this._cancellationTokens.set(request.seq, false);
+				vs = await this._runtime.getGlobalVariables(() => !!this._cancellationTokens.get(request.seq));
+				this._cancellationTokens.delete(request.seq);
 			} else {
 				vs = await this._runtime.getGlobalVariables();
 			}
@@ -369,7 +381,6 @@ export class MockDebugSession extends LoggingDebugSession {
 	}
 
 	protected setVariable(response: DebugProtocol.SetVariableResponse, args: DebugProtocol.SetVariableArguments): void {
-
 		const v = this._variableHandles.get(args.variablesReference);
 		if (v) {
 			this._runtime.setLocalVariable(args.name, args.value);
@@ -388,12 +399,12 @@ export class MockDebugSession extends LoggingDebugSession {
  	}
 
 	protected nextRequest(response: DebugProtocol.NextResponse, args: DebugProtocol.NextArguments): void {
-		this._runtime.step();
+		this._runtime.step(args.granularity === 'instruction', false);
 		this.sendResponse(response);
 	}
 
 	protected stepBackRequest(response: DebugProtocol.StepBackResponse, args: DebugProtocol.StepBackArguments): void {
-		this._runtime.step(true);
+		this._runtime.step(args.granularity === 'instruction', true);
 		this.sendResponse(response);
 	}
 
@@ -581,11 +592,52 @@ export class MockDebugSession extends LoggingDebugSession {
 
 	protected cancelRequest(response: DebugProtocol.CancelResponse, args: DebugProtocol.CancelArguments) {
 		if (args.requestId) {
-			this._cancelationTokens.set(args.requestId, true);
+			this._cancellationTokens.set(args.requestId, true);
 		}
 		if (args.progressId) {
 			this._cancelledProgressId= args.progressId;
 		}
+	}
+
+	protected disassembleRequest(response: DebugProtocol.DisassembleResponse, args: DebugProtocol.DisassembleArguments) {
+
+		const baseAddress = parseInt(args.memoryReference);
+		const offset = args.instructionOffset || 0;
+		const count = args.instructionCount;
+
+		const isHex = args.memoryReference.startsWith('0x');
+		const pad = isHex ? args.memoryReference.length-2 : args.memoryReference.length;
+
+		const instructions = this._runtime.disassembleRequest(baseAddress, offset, count).map(instruction => {
+			const address = instruction.address.toString(isHex ? 16 : 10).padStart(pad, '0');
+			return {
+				address: isHex ? `0x${address}` : `${address}`,
+				instruction: instruction.instruction
+			};
+		});
+
+		response.body = {
+			instructions: instructions
+		}
+		this.sendResponse(response);
+	}
+
+	protected setInstructionBreakpoints(response: DebugProtocol.SetInstructionBreakpointsResponse, args: DebugProtocol.SetInstructionBreakpointsArguments) {
+
+		args.breakpoints.forEach(x => {
+			console.log(x)
+			//x.instructionReference
+			//x.offset
+		});
+		
+		response.body = {
+			breakpoints: args.breakpoints.map(x => {
+				return <DebugProtocol.Breakpoint>{
+					verified: true
+				}
+			})
+		};
+		this.sendResponse(response);
 	}
 
 	protected customRequest(command: string, response: DebugProtocol.Response, args: any) {

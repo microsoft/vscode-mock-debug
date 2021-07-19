@@ -25,11 +25,17 @@ interface IRuntimeStackFrame {
 	file: string;
 	line: number;
 	column?: number;
+	instruction?: number;
 }
 
 interface IRuntimeStack {
 	count: number;
 	frames: IRuntimeStackFrame[];
+}
+
+interface RuntimeDisassembledInstruction {
+	address: number;
+	instruction: string;
 }
 
 export interface IRuntimeVariable {
@@ -60,6 +66,9 @@ export class MockRuntime extends EventEmitter {
 	// This is the next line that will be 'executed'
 	private _currentLine = 0;
 	private _currentColumn: number | undefined;
+
+	// This is the next instruction that will be 'executed'
+	public _instruction: number | undefined;
 
 	// maps from sourceFile to array of Mock breakpoints
 	private _breakPoints = new Map<string, IRuntimeBreakpoint[]>();
@@ -94,7 +103,7 @@ export class MockRuntime extends EventEmitter {
 
 		if (stopOnEntry) {
 			// we step once
-			this.step(false, 'stopOnEntry');
+			this.step(false, false, 'stopOnEntry');
 		} else {
 			// we just start to run until we hit a breakpoint or an exception
 			this.continue();
@@ -111,7 +120,22 @@ export class MockRuntime extends EventEmitter {
 	/**
 	 * Step to the next/previous non empty line.
 	 */
-	public step(reverse = false, event = 'stopOnStep') {
+	public step(instruction: boolean, reverse: boolean, event = 'stopOnStep') {
+
+		if (typeof this._instruction === 'number' ) {
+			if (!instruction) {
+				this._instruction = undefined;		// reset to normal mode
+			} else {
+				if (reverse) {
+					this._instruction--;
+				} else {
+					this._instruction++;
+				}
+				this.sendEvent(event);
+				return;
+			}
+		}
+		
 		this.run(reverse, event);
 	}
 
@@ -191,9 +215,10 @@ export class MockRuntime extends EventEmitter {
 		const frames = new Array<IRuntimeStackFrame>();
 		// every word of the current line becomes a stack frame.
 		for (let i = startFrame; i < Math.min(endFrame, words.length); i++) {
+			const name = words[i].name;
 			const stackFrame: IRuntimeStackFrame = {
 				index: i,
-				name: `${words[i].name}(${i})`,	// use a word of the line as the stackframe name
+				name: `${name}(${i})`,	// use a word of the line as the stackframe name
 				file: this._sourceFile,
 				line: this._currentLine,
 				//column: words[i].index
@@ -203,6 +228,16 @@ export class MockRuntime extends EventEmitter {
 			}
 			frames.push(stackFrame);
 		}
+
+		if (line.indexOf('disassembly') >= 0) {
+			if (typeof this._instruction === 'number') {
+				frames[0].name = `${words[0].name}(${'0x' + this._instruction.toString(16)})`;
+				frames[0].instruction = this._instruction;
+			} else {
+				frames[0].instruction = 0x10000000;
+			}
+		}
+
 		return {
 			frames: frames,
 			count: words.length
@@ -337,6 +372,24 @@ export class MockRuntime extends EventEmitter {
 			}
 		}
 		return undefined;
+	}
+
+	public disassembleRequest(memoryReference: number, offset: number, instructionCount: number): RuntimeDisassembledInstruction[] {
+
+		const instructions: RuntimeDisassembledInstruction[] = [];
+
+		this._instruction = memoryReference;
+
+		const ref =  this._instruction + offset;
+
+		for (let i = 0; i < instructionCount; i++) {
+			instructions.push({
+				address: ref+i,
+				instruction: 'mov r1, r2'
+			});
+		}
+
+		return instructions;
 	}
 
 	// private methods

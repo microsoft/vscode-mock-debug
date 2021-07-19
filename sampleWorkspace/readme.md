@@ -47,6 +47,10 @@ Examples:
 - Read Access: $i
 - Write Access: $i=999
 
+## Disassembly View
+
+A stackframe with the name 'disassembly' can be opened in the Disassembly view where "instruction stepping" is now supported.
+
 ## Exceptions:
 
 If a line contains the word `exception` or the pattern `exception(name)` an exception is thrown.
