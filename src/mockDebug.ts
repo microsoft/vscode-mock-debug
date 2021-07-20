@@ -50,8 +50,10 @@ export class MockDebugSession extends LoggingDebugSession {
 	private _cancelledProgressId: string | undefined = undefined;
 	private _isProgressCancellable = true;
 
-	private _showHex = false;
+	private _valuesInHex = false;
 	private _useInvalidatedEvent = false;
+
+	private _addressesInHex = true;
 
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
@@ -326,12 +328,14 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		response.body = {
 			stackFrames: stk.frames.map((f, ix) => {
-				const sf = new StackFrame(f.index, f.name, this.createSource(f.file), this.convertDebuggerLineToClient(f.line));
+				const sf: DebugProtocol.StackFrame = new StackFrame(f.index, f.name, this.createSource(f.file), this.convertDebuggerLineToClient(f.line));
 				if (typeof f.column === 'number') {
 					sf.column = this.convertDebuggerColumnToClient(f.column);
 				}
 				if (typeof f.instruction === 'number') {
-					(sf as DebugProtocol.StackFrame).instructionPointerReference = '0x' + f.instruction.toString(16);
+					const address = this.formatAddress(f.instruction);
+					sf.name = `${f.name} ${address}`; 
+					sf.instructionPointerReference = address;
 				}
 
 				return sf;
@@ -389,7 +393,7 @@ export class MockDebugSession extends LoggingDebugSession {
 	}
 
 	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {
-		this._runtime.continue();
+		this._runtime.continue(false);
 		this.sendResponse(response);
 	}
 
@@ -608,7 +612,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		const isHex = args.memoryReference.startsWith('0x');
 		const pad = isHex ? args.memoryReference.length-2 : args.memoryReference.length;
 
-		const instructions = this._runtime.disassembleRequest(baseAddress, offset, count).map(instruction => {
+		const instructions = this._runtime.disassemble(baseAddress, offset, count).map(instruction => {
 			const address = instruction.address.toString(isHex ? 16 : 10).padStart(pad, '0');
 			return {
 				address: isHex ? `0x${address}` : `${address}`,
@@ -622,27 +626,29 @@ export class MockDebugSession extends LoggingDebugSession {
 		this.sendResponse(response);
 	}
 
-	protected setInstructionBreakpoints(response: DebugProtocol.SetInstructionBreakpointsResponse, args: DebugProtocol.SetInstructionBreakpointsArguments) {
+	protected setInstructionBreakpointsRequest(response: DebugProtocol.SetInstructionBreakpointsResponse, args: DebugProtocol.SetInstructionBreakpointsArguments) {
 
-		args.breakpoints.forEach(x => {
-			console.log(x)
-			//x.instructionReference
-			//x.offset
+		// clear all instruction breakpoints
+		this._runtime.clearInstructionBreakpoints();
+
+		// set instruction breakpoints
+		const breakpoints = args.breakpoints.map(ibp => {
+			const address = parseInt(ibp.instructionReference);
+			const offset = ibp.offset || 0;
+			return <DebugProtocol.Breakpoint>{
+				verified: this._runtime.setInstructionBreakpoint(address + offset)
+			}
 		});
-		
+
 		response.body = {
-			breakpoints: args.breakpoints.map(x => {
-				return <DebugProtocol.Breakpoint>{
-					verified: true
-				}
-			})
+			breakpoints: breakpoints
 		};
 		this.sendResponse(response);
 	}
 
 	protected customRequest(command: string, response: DebugProtocol.Response, args: any) {
 		if (command === 'toggleFormatting') {
-			this._showHex = ! this._showHex;
+			this._valuesInHex = ! this._valuesInHex;
 			if (this._useInvalidatedEvent) {
 				this.sendEvent(new InvalidatedEvent( ['variables'] ));
 			}
@@ -653,6 +659,7 @@ export class MockDebugSession extends LoggingDebugSession {
 	}
 
 	//---- helpers
+
 
 	private convert(v: IRuntimeVariable): DebugProtocol.Variable {
 
@@ -670,7 +677,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			switch (typeof v.value) {
 				case 'number':
 					if (Math.round(v.value) === v.value) {
-						dapVariable.value = this._showHex ? '0x' + v.value.toString(16) : v.value.toString(10);
+						dapVariable.value = this.formatNumber(v.value);
 						(<any>dapVariable).__vscodeVariableMenuContext = 'simple';	// enable context menu contribution
 						dapVariable.type = 'integer';
 					} else {
@@ -693,7 +700,16 @@ export class MockDebugSession extends LoggingDebugSession {
 		return dapVariable;
 	}
 
+	private formatAddress(x: number, pad = 8) {
+		return this._addressesInHex ? '0x' + x.toString(16).padStart(8, '0') : x.toString(10)
+	}
+
+	private formatNumber(x: number) {
+		return this._valuesInHex ? '0x' + x.toString(16) : x.toString(10)
+	}
+
 	private createSource(filePath: string): Source {
 		return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, 'mock-adapter-data');
 	}
 }
+

@@ -49,7 +49,8 @@ Examples:
 
 ## Disassembly View
 
-A stackframe with the name 'disassembly' can be opened in the Disassembly view where "instruction stepping" is now supported.
+If a markdown line contains the word 'disassembly', the context menu's "Open Disassembly View" command is enabled and the view shows (fake)
+assembly instructions and "instruction stepping" and "instruction breakpoints" are supported.
 
 ## Exceptions:
 

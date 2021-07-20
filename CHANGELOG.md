@@ -1,6 +1,6 @@
 ## 0.46.0
 * Rewrite Variables; see Readme.md in sampleWorkspace 
-* Add support for Disassembly View
+* Add support for Disassembly View, Instruction Stepping, and Instruction Breakpoints.
 
 ## 0.45.8
 * Register Mock Debug as default debugger for markdown files
