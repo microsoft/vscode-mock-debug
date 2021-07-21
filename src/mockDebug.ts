@@ -612,7 +612,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		const isHex = args.memoryReference.startsWith('0x');
 		const pad = isHex ? args.memoryReference.length-2 : args.memoryReference.length;
 
-		const instructions = this._runtime.disassemble(baseAddress, offset, count).map(instruction => {
+		const instructions = this._runtime.disassemble(baseAddress+offset, count).map(instruction => {
 			const address = instruction.address.toString(isHex ? 16 : 10).padStart(pad, '0');
 			return {
 				address: isHex ? `0x${address}` : `${address}`,

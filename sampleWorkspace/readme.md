@@ -49,17 +49,16 @@ Examples:
 
 ## Disassembly View
 
-If a markdown line contains the word 'disassembly', the context menu's "Open Disassembly View" command is enabled and the view shows (fake)
-assembly instructions and "instruction stepping" and "instruction breakpoints" are supported.
+If a markdown line contains the word 'disassembly', the context menu's "Open Disassembly View" command is enabled and the Disassembly view shows (fake) assembly instructions and "instruction stepping" and "instruction breakpoints" are supported.
 
-## Exceptions:
+## Exceptions
 
 If a line contains the word `exception` or the pattern `exception(name)` an exception is thrown.
 To make the debugger stop when an exception is thrown, two "exception options" exist in the BREAKPOINTS view:
 - **Named Exception**: if enabled and configured with a condition (e.g. `xxx`) the debugger will break on the `exception(xxx)` pattern.
 - **Other Exceptions**: if enabled the debugger will break on the word `exception` and the `exception(...)` pattern.
 
-## Output logging:
+## Output logging
 
 * a line with the pattern `log(xxx)` logs `xxx` to the debug console. If "xxx" is `start` or `end`, a "log group" is started or ended.
 
@@ -83,3 +82,5 @@ log(another line of text level 2)
 log(end)
 log(another line of text)
 log(end)
+
+## The End
