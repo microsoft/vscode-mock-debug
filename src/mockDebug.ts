@@ -211,11 +211,13 @@ export class MockDebugSession extends LoggingDebugSession {
 		// make sure to 'Stop' the buffered logging if 'trace' is not set
 		logger.setup(args.trace ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
 
+		this._runtime.debug = !args.noDebug;
+
 		// wait until configuration has finished (and configurationDoneRequest has been called)
 		await this._configurationDone.wait(1000);
 
 		// start the program in the runtime
-		await this._runtime.start(args.program, !!args.stopOnEntry, !!args.noDebug);
+		await this._runtime.start(args.program, !!args.stopOnEntry);
 
 		this.sendResponse(response);
 	}
@@ -622,7 +624,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		response.body = {
 			instructions: instructions
-		}
+		};
 		this.sendResponse(response);
 	}
 
@@ -637,7 +639,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			const offset = ibp.offset || 0;
 			return <DebugProtocol.Breakpoint>{
 				verified: this._runtime.setInstructionBreakpoint(address + offset)
-			}
+			};
 		});
 
 		response.body = {
@@ -701,11 +703,11 @@ export class MockDebugSession extends LoggingDebugSession {
 	}
 
 	private formatAddress(x: number, pad = 8) {
-		return this._addressesInHex ? '0x' + x.toString(16).padStart(8, '0') : x.toString(10)
+		return this._addressesInHex ? '0x' + x.toString(16).padStart(8, '0') : x.toString(10);
 	}
 
 	private formatNumber(x: number) {
-		return this._valuesInHex ? '0x' + x.toString(16) : x.toString(10)
+		return this._valuesInHex ? '0x' + x.toString(16) : x.toString(10);
 	}
 
 	private createSource(filePath: string): Source {

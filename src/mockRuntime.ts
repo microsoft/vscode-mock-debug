@@ -97,7 +97,7 @@ export class MockRuntime extends EventEmitter {
 
 	private _breakAddresses = new Map<string, string>();
 
-	private _noDebug = false;
+	public debug;
 
 	private _namedException: string | undefined;
 	private _otherExceptions = false;
@@ -110,15 +110,13 @@ export class MockRuntime extends EventEmitter {
 	/**
 	 * Start executing the given program.
 	 */
-	public async start(program: string, stopOnEntry: boolean, noDebug: boolean): Promise<void> {
-
-		this._noDebug = noDebug;
+	public async start(program: string, stopOnEntry: boolean): Promise<void> {
 
 		await this.loadSource(program);
 
 		await this.verifyBreakpoints(this._sourceFile);
 
-		if (stopOnEntry) {
+		if (this.debug && stopOnEntry) {
 			this.findNextStatement(false, 'stopOnEntry');
 		} else {
 			// we just start to run until we hit a breakpoint or an exception
@@ -454,26 +452,26 @@ export class MockRuntime extends EventEmitter {
 
 		for (let ln = this._currentLine; reverse ? ln >= 0 : ln < this._sourceLines.length; reverse ? ln-- : ln++) {
 
-			// check breakpoints
-
-			// is there a source breakpoint?
-			const breakpoints = this._breakPoints.get(this._sourceFile);
-			if (breakpoints) {
-				const bps = breakpoints.filter(bp => bp.line === ln);
-				if (bps.length > 0) {
-
-					// send 'stopped' event
-					this.sendEvent('stopOnBreakpoint');
-
-					// the following shows the use of 'breakpoint' events to update properties of a breakpoint in the UI
-					// if breakpoint is not yet verified, verify it now and send a 'breakpoint' update event
-					if (!bps[0].verified) {
-						bps[0].verified = true;
-						this.sendEvent('breakpointValidated', bps[0]);
+			if (this.debug) {
+				// is there a source breakpoint?
+				const breakpoints = this._breakPoints.get(this._sourceFile);
+				if (breakpoints) {
+					const bps = breakpoints.filter(bp => bp.line === ln);
+					if (bps.length > 0) {
+	
+						// send 'stopped' event
+						this.sendEvent('stopOnBreakpoint');
+	
+						// the following shows the use of 'breakpoint' events to update properties of a breakpoint in the UI
+						// if breakpoint is not yet verified, verify it now and send a 'breakpoint' update event
+						if (!bps[0].verified) {
+							bps[0].verified = true;
+							this.sendEvent('breakpointValidated', bps[0]);
+						}
+	
+						this._currentLine = ln;
+						return true;
 					}
-
-					this._currentLine = ln;
-					return true;
 				}
 			}
 
@@ -496,7 +494,7 @@ export class MockRuntime extends EventEmitter {
 	 */
 	private executeLine(ln: number, reverse: boolean): boolean {
 
-		if (this._noDebug) {
+		if (!this.debug) {
 			return false;
 		}
 
@@ -601,38 +599,36 @@ export class MockRuntime extends EventEmitter {
 
 	private async verifyBreakpoints(path: string): Promise<void> {
 
-		if (this._noDebug) {
-			return;
-		}
-
-		const bps = this._breakPoints.get(path);
-		if (bps) {
-			await this.loadSource(path);
-			bps.forEach(bp => {
-				if (!bp.verified && bp.line < this._sourceLines.length) {
-					const srcLine = this.getLine(bp.line);
-
-					// if a line is empty or starts with '+' we don't allow to set a breakpoint but move the breakpoint down
-					if (srcLine.length === 0 || srcLine.indexOf('+') === 0) {
-						bp.line++;
+		if (this.debug) {
+			const bps = this._breakPoints.get(path);
+			if (bps) {
+				await this.loadSource(path);
+				bps.forEach(bp => {
+					if (!bp.verified && bp.line < this._sourceLines.length) {
+						const srcLine = this.getLine(bp.line);
+						
+						// if a line is empty or starts with '+' we don't allow to set a breakpoint but move the breakpoint down
+						if (srcLine.length === 0 || srcLine.indexOf('+') === 0) {
+							bp.line++;
+						}
+						// if a line starts with '-' we don't allow to set a breakpoint but move the breakpoint up
+						if (srcLine.indexOf('-') === 0) {
+							bp.line--;
+						}
+						// don't set 'verified' to true if the line contains the word 'lazy'
+						// in this case the breakpoint will be verified 'lazy' after hitting it once.
+						if (srcLine.indexOf('lazy') < 0) {
+							bp.verified = true;
+							this.sendEvent('breakpointValidated', bp);
+						}
 					}
-					// if a line starts with '-' we don't allow to set a breakpoint but move the breakpoint up
-					if (srcLine.indexOf('-') === 0) {
-						bp.line--;
-					}
-					// don't set 'verified' to true if the line contains the word 'lazy'
-					// in this case the breakpoint will be verified 'lazy' after hitting it once.
-					if (srcLine.indexOf('lazy') < 0) {
-						bp.verified = true;
-						this.sendEvent('breakpointValidated', bp);
-					}
-				}
-			});
+				});
+			}
 		}
 	}
-
-	private sendEvent(event: string, ... args: any[]) {
-		setImmediate(_ => {
+		
+	private sendEvent(event: string, ... args: any[]): void {
+		setImmediate(() => {
 			this.emit(event, ...args);
 		});
 	}
