@@ -1,18 +1,17 @@
 # VS Code Mock Debug
 
-Mock Debug allows to "debug" markdown files (like this). (language is not "Turing Complete" :-)
-The text of the markdown is considered the "program to debug" and certain keywords trigger specific functionality.
-(Yes, this language is not "Turing Complete" :-)
+Mock Debug allows to "debug" markdown files (like this).
+The text of the markdown is considered the "program to debug" and certain keywords trigger specific functionality (Yes, this language is not "Turing Complete" :-)
 
 ## Running or Debugging
 
-With the "Run/Debug" split button in the editor header you can easily "run" or "debug" a Markdown file without having toconfigure a debug configuration.
-Running a Markdown file has no effect. Debugging a Markdown file starts the debugger and stops on the first line.
+With the "Run/Debug" split button in the editor header you can easily "run" or "debug" a Markdown file without having to configure a debug configuration.
+"Running" a Markdown file has no visible effect. "Debugging" a Markdown file starts the debugger and stops on the first line.
   
 ## Stacks
 
 If debugging stops on a line, the line becomes a stack in the CALL STACK with the individual words shown as frames.
-The following line results in a long stack trace and show the paging feature:
+The following line results in a long stack trace and shows the paging feature:
 a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z
 
 ## Variables
