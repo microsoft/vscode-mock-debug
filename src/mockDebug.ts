@@ -11,7 +11,7 @@ import {
 } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { basename } from 'path';
-import { MockRuntime, IRuntimeBreakpoint, FileAccessor, IRuntimeVariable, timeout } from './mockRuntime';
+import { MockRuntime, IRuntimeBreakpoint, FileAccessor, IRuntimeVariable, timeout, IRuntimeVariableType } from './mockRuntime';
 import { Subject } from 'await-notify';
 
 /**
@@ -177,10 +177,10 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body.supportsExceptionInfoRequest = true;
 
 		// make VS Code send setVariable request
-		response.body.supportsSetVariable = true;
+		response.body.supportsSetVariable = false;
 
 		// make VS Code send setExpression request
-		//response.body.supportsSetExpression = true;
+		response.body.supportsSetExpression = true;
 
 		// make VS Code send disassemble request
 		response.body.supportsDisassembleRequest = true;
@@ -381,15 +381,19 @@ export class MockDebugSession extends LoggingDebugSession {
 		}
 
 		response.body = {
-			variables: vs.map(v => this.convert(v))
+			variables: vs.map(v => this.convertFromRuntime(v))
 		};
 		this.sendResponse(response);
 	}
 
-	protected setVariable(response: DebugProtocol.SetVariableResponse, args: DebugProtocol.SetVariableArguments): void {
-		const v = this._variableHandles.get(args.variablesReference);
-		if (v) {
-			this._runtime.setLocalVariable(args.name, args.value);
+	protected setVariableRequest(response: DebugProtocol.SetVariableResponse, args: DebugProtocol.SetVariableArguments): void {
+		const scope = this._variableHandles.get(args.variablesReference);
+		if (scope === 'locals') {
+			const rv = this._runtime.getLocalVariable(args.name);
+			if (rv) {
+				rv.value = this.convertToRuntime(args.value);
+				response.body = this.convertFromRuntime(rv);
+			}
 		}
 		this.sendResponse(response);
 	}
@@ -436,10 +440,12 @@ export class MockDebugSession extends LoggingDebugSession {
 
 	protected async evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): Promise<void> {
 
-		let reply: string | undefined = undefined;
+		let reply: string | undefined;
+		let rv: IRuntimeVariable | undefined;
 
 		switch (args.context) {
 			case 'repl':
+				// handle some REPL commands:
 				// 'evaluate' supports to create and delete breakpoints from the 'repl':
 				const matches = /new +([0-9]+)/.exec(args.expression);
 				if (matches && matches.length === 2) {
@@ -471,19 +477,45 @@ export class MockDebugSession extends LoggingDebugSession {
 					}
 				}
 				// fall through
+
 			default:
-				reply = this._runtime.evaluate(args.expression);
+				if (args.expression.startsWith('$')) {
+					rv = this._runtime.getLocalVariable(args.expression.substr(1));
+				} else {
+					rv = {
+						name: 'eval',
+						value: this.convertToRuntime(args.expression)
+					};
+				}
 				break;
 		}
 
-		response.body = {
-			result: reply ? reply : `evaluate(context: '${args.context}', '${args.expression}')`,
-			variablesReference: 0
-		};
+		if (rv) {
+			const v = this.convertFromRuntime(rv);
+			response.body = {
+				result: v.value,
+				type: v.type,
+				variablesReference: v.variablesReference
+			};
+		} else {
+			response.body = {
+				result: reply ? reply : `evaluate(context: '${args.context}', '${args.expression}')`,
+				variablesReference: 0
+			};
+		}
+
 		this.sendResponse(response);
 	}
 
-	protected setExpression(response: DebugProtocol.SetExpressionResponse, args: DebugProtocol.SetExpressionArguments): void {
+	protected setExpressionRequest(response: DebugProtocol.SetExpressionResponse, args: DebugProtocol.SetExpressionArguments): void {
+
+		if (args.expression.startsWith('$')) {
+			const rv = this._runtime.getLocalVariable(args.expression.substr(1));
+			if (rv) {
+				rv.value = this.convertToRuntime(args.value);
+				response.body = this.convertFromRuntime(rv);
+			}
+		} 
 		this.sendResponse(response);
 	}
 
@@ -662,14 +694,34 @@ export class MockDebugSession extends LoggingDebugSession {
 
 	//---- helpers
 
+	private convertToRuntime(value: string): IRuntimeVariableType {
 
-	private convert(v: IRuntimeVariable): DebugProtocol.Variable {
+		value= value.trim();
+
+		if (value === 'true') {
+			return true;
+		}
+		if (value === 'false') {
+			return false;
+		}
+		if (value[0] === '\'' || value[0] === '"') {
+			return value.substr(1, value.length-2);
+		}
+		const n = parseFloat(value);
+		if (!isNaN(n)) {
+			return n;
+		}
+		return value;
+	}
+
+	private convertFromRuntime(v: IRuntimeVariable): DebugProtocol.Variable {
 
 		let dapVariable: DebugProtocol.Variable = {
 			name: v.name,
 			value: '???',
 			type: typeof v.value,
-			variablesReference: 0
+			variablesReference: 0,
+			evaluateName: '$' + v.name
 		};
 
 		if (Array.isArray(v.value)) {

@@ -38,9 +38,11 @@ interface RuntimeDisassembledInstruction {
 	instruction: string;
 }
 
+export type IRuntimeVariableType = number | boolean | string | IRuntimeVariable[];
+
 export interface IRuntimeVariable {
 	name: string;
-	value: number | boolean | string | IRuntimeVariable[];
+	value: IRuntimeVariableType;
 }
 
 interface Word {
@@ -374,21 +376,8 @@ export class MockRuntime extends EventEmitter {
 		return Array.from(this._variables, ([name, value]) => value);
 	}
 
-	public setLocalVariable(name: string, value: string) {
-		const v = this._variables.get(name);
-		if (v) {
-			v.value = value;
-		}
-	}
-
-	public evaluate(expression: string): string | undefined {
-		if (expression[0] === '$') {
-			const v = this._variables.get(expression.substr(1));
-			if (v) {
-				return v.value.toString();
-			}
-		}
-		return undefined;
+	public getLocalVariable(name: string): IRuntimeVariable | undefined {
+		return this._variables.get(name);
 	}
 
 	/**

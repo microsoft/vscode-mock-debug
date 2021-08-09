@@ -1,3 +1,6 @@
+## 0.46.2
+* Implement `setExpression` request. This enables a "Set Value" context menu action on watches.
+
 ## 0.46.1
 * Improved overall stepping behavior: mock debug now behaves like a real debugger: it breaks on a line before executing the line. Previously it was breaking while executing the line.
 
