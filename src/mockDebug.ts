@@ -514,9 +514,23 @@ export class MockDebugSession extends LoggingDebugSession {
 			if (rv) {
 				rv.value = this.convertToRuntime(args.value);
 				response.body = this.convertFromRuntime(rv);
+				this.sendResponse(response);
+			} else {
+				this.sendErrorResponse(response, {
+					id: 1001,
+					format: `variable '{lexpr}' not found`,
+					variables: { lexpr: args.expression },
+					showUser: true
+				});	
 			}
-		} 
-		this.sendResponse(response);
+		} else {
+			this.sendErrorResponse(response, {
+				id: 1002,
+				format: `'{lexpr}' not an assignable expression`,
+				variables: { lexpr: args.expression },
+				showUser: true
+			});
+		}
 	}
 
 	private async progressSequence() {
