@@ -1,7 +1,7 @@
 {
   "name": "mock-debug",
   "displayName": "Mock Debug",
-  "version": "0.46.3",
+  "version": "0.46.4",
   "publisher": "andreweinand",
   "description": "Starter extension for developing debug adapters for VS Code.",
   "author": {
@@ -156,6 +156,20 @@
                 "type": "boolean",
                 "description": "Enable logging of the Debug Adapter Protocol.",
                 "default": true
+              },
+              "compileError": {
+                "type": "string",
+                "description": "Simulates a compile error in 'launch' request.",
+								"enum": [
+									"default",
+									"show",
+									"hide"
+								],
+								"enumDescriptions": [
+                  "default: show fake compile error to user",
+									"show fake compile error to user",
+									"do not show fake compile error to user"
+								]
               }
             }
           }

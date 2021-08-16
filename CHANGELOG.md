@@ -1,6 +1,7 @@
 
 ## 0.46.4
 * Generate errors for illegal arguments to `setExpression` request.
+* Specify 'compileError' in launch config to simulate a compile/build error in the "launch" request.
 
 ## 0.46.2
 * Implement `setExpression` request. This enables a "Set Value" context menu action on watches.

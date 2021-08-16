@@ -29,6 +29,8 @@ interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	trace?: boolean;
 	/** run without debugging */
 	noDebug?: boolean;
+	/** if specified, results in a simulated compile error in launch. */
+	compileError?: 'default' | 'show' | 'hide';
 }
 
 export class MockDebugSession extends LoggingDebugSession {
@@ -219,7 +221,18 @@ export class MockDebugSession extends LoggingDebugSession {
 		// start the program in the runtime
 		await this._runtime.start(args.program, !!args.stopOnEntry);
 
-		this.sendResponse(response);
+		if (args.compileError) {
+			// simulate a compile/build error in "launch" request:
+			// the error should not result in a modal dialog since 'showUser' is set to false.
+			// A missing 'showUser' should result in a modal dialog.
+			this.sendErrorResponse(response, {
+				id: 1001,
+				format: `compile error: some fake error.`,
+				showUser: args.compileError === 'show' ? true : (args.compileError === 'hide' ? false : undefined)
+			});
+		} else {
+			this.sendResponse(response);
+		}
 	}
 
 	protected async setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): Promise<void> {
@@ -517,7 +530,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				this.sendResponse(response);
 			} else {
 				this.sendErrorResponse(response, {
-					id: 1001,
+					id: 1002,
 					format: `variable '{lexpr}' not found`,
 					variables: { lexpr: args.expression },
 					showUser: true
@@ -525,7 +538,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			}
 		} else {
 			this.sendErrorResponse(response, {
-				id: 1002,
+				id: 1003,
 				format: `'{lexpr}' not an assignable expression`,
 				variables: { lexpr: args.expression },
 				showUser: true
