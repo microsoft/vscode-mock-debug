@@ -44,24 +44,24 @@
   },
   "dependencies": {
     "await-notify": "1.0.1",
-    "vscode-debugadapter": "^1.48.0-pre.0"
+    "vscode-debugadapter": "^1.49.0-pre.0"
   },
   "devDependencies": {
-    "@types/vscode": "^1.55.0",
-    "@types/glob": "^7.1.3",
-    "@types/mocha": "^8.2.2",
+    "@types/vscode": "^1.59.0",
+    "@types/glob": "^7.1.4",
+    "@types/mocha": "^9.0.0",
     "@types/node": "^14.14.37",
-    "eslint": "^7.23.0",
-    "@typescript-eslint/eslint-plugin": "^4.21.0",
-    "@typescript-eslint/parser": "^4.21.0",
-    "glob": "^7.1.6",
-    "mocha": "^8.3.2",
-    "typescript": "^4.2.3",
-    "vscode-debugadapter-testsupport": "^1.48.0-pre.0",
+    "eslint": "^7.32.0",
+    "@typescript-eslint/eslint-plugin": "^4.29.2",
+    "@typescript-eslint/parser": "^4.29.2",
+    "glob": "^7.1.7",
+    "mocha": "^9.0.3",
+    "typescript": "^4.3.5",
+    "vscode-debugadapter-testsupport": "^1.49.0-pre.0",
     "vsce": "^1.96.1",
-    "ts-loader": "^8.1.0",
-    "webpack": "^4.46.0",
-    "webpack-cli": "^3.3.12"
+    "ts-loader": "^9.2.5",
+    "webpack": "^5.50.0",
+    "webpack-cli": "^4.8.0"
   },
   "main": "./dist/ext/extension.js",
   "browser": "./dist/web/extension.js",
