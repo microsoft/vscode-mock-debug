@@ -65,63 +65,65 @@ export class MockRuntime extends EventEmitter {
 		return this._sourceFile;
 	}
 
-	private _variables = new Map<string, IRuntimeVariable>();
+	private variables = new Map<string, IRuntimeVariable>();
 
 	// the contents (= lines) of the one and only file
-	private _sourceLines: string[] = [];
-	private _instructions: Word[] = [];
-	private _starts: number[] = [];
-	private _ends: number[] = [];
+	private sourceLines: string[] = [];
+	private instructions: Word[] = [];
+	private starts: number[] = [];
+	private ends: number[] = [];
 
 	// This is the next line that will be 'executed'
-	private __currentLine = 0;
-	private get _currentLine() {
-		return this.__currentLine;
+	private _currentLine = 0;
+	private get currentLine() {
+		return this._currentLine;
 	}
-	private set _currentLine(x) {
-		this.__currentLine = x;
-		this._instruction = this._starts[x];
+	private set currentLine(x) {
+		this._currentLine = x;
+		this.instruction = this.starts[x];
 	}
-	private _currentColumn: number | undefined;
+	private currentColumn: number | undefined;
 
 	// This is the next instruction that will be 'executed'
-	public _instruction= 0;
+	public instruction= 0;
 
 	// maps from sourceFile to array of IRuntimeBreakpoint
-	private _breakPoints = new Map<string, IRuntimeBreakpoint[]>();
+	private breakPoints = new Map<string, IRuntimeBreakpoint[]>();
 
 	// all instruction breakpoint addresses
-	private _instructionBreakpoints = new Set<number>();
+	private instructionBreakpoints = new Set<number>();
 
 	// since we want to send breakpoint events, we will assign an id to every event
 	// so that the frontend can match events with breakpoints.
-	private _breakpointId = 1;
+	private breakpointId = 1;
 
-	private _breakAddresses = new Map<string, string>();
+	private breakAddresses = new Map<string, string>();
 
-	public debug;
-
-	private _namedException: string | undefined;
-	private _otherExceptions = false;
+	private namedException: string | undefined;
+	private otherExceptions = false;
 
 
-	constructor(private _fileAccessor: FileAccessor) {
+	constructor(private fileAccessor: FileAccessor) {
 		super();
 	}
 
 	/**
 	 * Start executing the given program.
 	 */
-	public async start(program: string, stopOnEntry: boolean): Promise<void> {
+	public async start(program: string, stopOnEntry: boolean, debug: boolean): Promise<void> {
 
 		await this.loadSource(program);
 
-		await this.verifyBreakpoints(this._sourceFile);
+		if (debug) {
+			await this.verifyBreakpoints(this._sourceFile);
 
-		if (this.debug && stopOnEntry) {
-			this.findNextStatement(false, 'stopOnEntry');
+			if (stopOnEntry) {
+				this.findNextStatement(false, 'stopOnEntry');
+			} else {
+				// we just start to run until we hit a breakpoint, an exception, or the end
+				this.continue(false);
+			}
 		} else {
-			// we just start to run until we hit a breakpoint or an exception
 			this.continue(false);
 		}
 	}
@@ -131,7 +133,7 @@ export class MockRuntime extends EventEmitter {
 	 */
 	public continue(reverse: boolean) {
 
-		while (!this.executeLine(this._currentLine, reverse)) {
+		while (!this.executeLine(this.currentLine, reverse)) {
 			if (this.updateCurrentLine(reverse)) {
 				break;
 			}
@@ -148,13 +150,13 @@ export class MockRuntime extends EventEmitter {
 
 		if (instruction) {
 			if (reverse) {
-				this._instruction--;
+				this.instruction--;
 			} else {
-				this._instruction++;
+				this.instruction++;
 			}
 			this.sendEvent('stopOnStep');
 		} else {
-			if (!this.executeLine(this._currentLine, reverse)) {
+			if (!this.executeLine(this.currentLine, reverse)) {
 				if (!this.updateCurrentLine(reverse)) {
 					this.findNextStatement(reverse, 'stopOnStep');
 				}
@@ -164,21 +166,21 @@ export class MockRuntime extends EventEmitter {
 
 	private updateCurrentLine(reverse: boolean): boolean {
 		if (reverse) {
-			if (this._currentLine > 0) {
-				this._currentLine--;
+			if (this.currentLine > 0) {
+				this.currentLine--;
 			} else {
 				// no more lines: stop at first line
-				this._currentLine = 0;
-				this._currentColumn = undefined;
+				this.currentLine = 0;
+				this.currentColumn = undefined;
 				this.sendEvent('stopOnEntry');
 				return true;
 			}
 		} else {
-			if (this._currentLine < this._sourceLines.length-1) {
-				this._currentLine++;
+			if (this.currentLine < this.sourceLines.length-1) {
+				this.currentLine++;
 			} else {
 				// no more lines: run to end
-				this._currentColumn = undefined;
+				this.currentColumn = undefined;
 				this.sendEvent('end');
 				return true;
 			}
@@ -191,15 +193,15 @@ export class MockRuntime extends EventEmitter {
 	 */
 	public stepIn(targetId: number | undefined) {
 		if (typeof targetId === 'number') {
-			this._currentColumn = targetId;
+			this.currentColumn = targetId;
 			this.sendEvent('stopOnStep');
 		} else {
-			if (typeof this._currentColumn === 'number') {
-				if (this._currentColumn <= this._sourceLines[this._currentLine].length) {
-					this._currentColumn += 1;
+			if (typeof this.currentColumn === 'number') {
+				if (this.currentColumn <= this.sourceLines[this.currentLine].length) {
+					this.currentColumn += 1;
 				}
 			} else {
-				this._currentColumn = 1;
+				this.currentColumn = 1;
 			}
 			this.sendEvent('stopOnStep');
 		}
@@ -209,10 +211,10 @@ export class MockRuntime extends EventEmitter {
 	 * "Step out" for Mock debug means: go to previous character
 	 */
 	public stepOut() {
-		if (typeof this._currentColumn === 'number') {
-			this._currentColumn -= 1;
-			if (this._currentColumn === 0) {
-				this._currentColumn = undefined;
+		if (typeof this.currentColumn === 'number') {
+			this.currentColumn -= 1;
+			if (this.currentColumn === 0) {
+				this.currentColumn = undefined;
 			}
 		}
 		this.sendEvent('stopOnStep');
@@ -249,9 +251,9 @@ export class MockRuntime extends EventEmitter {
 		words.push({ name: 'BOTTOM', index: -1 });	// add a sentinel so that the stack is never empty...
 
 		// if the line contains the word 'disassembly' we support to "disassemble" the line by adding an 'instruction' property to the stackframe
-		const instruction = line.indexOf('disassembly') >= 0 ? this._instruction : undefined;
+		const instruction = line.indexOf('disassembly') >= 0 ? this.instruction : undefined;
 
-		const column = typeof this._currentColumn === 'number' ? this._currentColumn : undefined;
+		const column = typeof this.currentColumn === 'number' ? this.currentColumn : undefined;
 
 		const frames: IRuntimeStackFrame[] = [];
 		// every word of the current line becomes a stack frame.
@@ -261,7 +263,7 @@ export class MockRuntime extends EventEmitter {
 				index: i,
 				name: `${words[i].name}(${i})`,	// use a word of the line as the stackframe name
 				file: this._sourceFile,
-				line: this._currentLine,
+				line: this.currentLine,
 				column: column, // words[i].index
 				instruction: instruction
 			};
@@ -288,11 +290,11 @@ export class MockRuntime extends EventEmitter {
 	 */
 	public async setBreakPoint(path: string, line: number): Promise<IRuntimeBreakpoint> {
 
-		const bp: IRuntimeBreakpoint = { verified: false, line, id: this._breakpointId++ };
-		let bps = this._breakPoints.get(path);
+		const bp: IRuntimeBreakpoint = { verified: false, line, id: this.breakpointId++ };
+		let bps = this.breakPoints.get(path);
 		if (!bps) {
 			bps = new Array<IRuntimeBreakpoint>();
-			this._breakPoints.set(path, bps);
+			this.breakPoints.set(path, bps);
 		}
 		bps.push(bp);
 
@@ -305,7 +307,7 @@ export class MockRuntime extends EventEmitter {
 	 * Clear breakpoint in file with given line.
 	 */
 	public clearBreakPoint(path: string, line: number): IRuntimeBreakpoint | undefined {
-		const bps = this._breakPoints.get(path);
+		const bps = this.breakPoints.get(path);
 		if (bps) {
 			const index = bps.findIndex(bp => bp.line === line);
 			if (index >= 0) {
@@ -318,40 +320,40 @@ export class MockRuntime extends EventEmitter {
 	}
 
 	public clearBreakpoints(path: string): void {
-		this._breakPoints.delete(path);
+		this.breakPoints.delete(path);
 	}
 
 	public setDataBreakpoint(address: string, accessType: 'read' | 'write' | 'readWrite'): boolean {
 
 		const x = accessType === 'readWrite' ? 'read write' : accessType;
 
-		const t = this._breakAddresses.get(address);
+		const t = this.breakAddresses.get(address);
 		if (t) {
 			if (t !== x) {
-				this._breakAddresses.set(address, 'read write');
+				this.breakAddresses.set(address, 'read write');
 			}
 		} else {
-			this._breakAddresses.set(address, x);
+			this.breakAddresses.set(address, x);
 		}
 		return true;
 	}
 
 	public clearAllDataBreakpoints(): void {
-		this._breakAddresses.clear();
+		this.breakAddresses.clear();
 	}
 	
 	public setExceptionsFilters(namedException: string | undefined, otherExceptions: boolean): void {
-		this._namedException = namedException;
-		this._otherExceptions = otherExceptions;
+		this.namedException = namedException;
+		this.otherExceptions = otherExceptions;
 	}
 
 	public setInstructionBreakpoint(address: number): boolean {
-		this._instructionBreakpoints.add(address);
+		this.instructionBreakpoints.add(address);
 		return true;
 	}
 
 	public clearInstructionBreakpoints(): void {
-		this._instructionBreakpoints.clear();
+		this.instructionBreakpoints.clear();
 	}
 
 	public async getGlobalVariables(cancellationToken?: () => boolean ): Promise<IRuntimeVariable[]> {
@@ -373,11 +375,11 @@ export class MockRuntime extends EventEmitter {
 	}
 
 	public getLocalVariables(): IRuntimeVariable[] {
-		return Array.from(this._variables, ([name, value]) => value);
+		return Array.from(this.variables, ([name, value]) => value);
 	}
 
 	public getLocalVariable(name: string): IRuntimeVariable | undefined {
-		return this._variables.get(name);
+		return this.variables.get(name);
 	}
 
 	/**
@@ -390,7 +392,7 @@ export class MockRuntime extends EventEmitter {
 		for (let a = address; a < address + instructionCount; a++) {
 			instructions.push({
 				address: a,
-				instruction: (a >= 0 && a < this._instructions.length) ? this._instructions[a].name : 'nop'
+				instruction: (a >= 0 && a < this.instructions.length) ? this.instructions[a].name : 'nop'
 			});
 		}
 
@@ -400,7 +402,7 @@ export class MockRuntime extends EventEmitter {
 	// private methods
 
 	private getLine(line?: number): string {
-		return this._sourceLines[line === undefined ? this._currentLine : line].trim();
+		return this.sourceLines[line === undefined ? this.currentLine : line].trim();
 	}
 
 	private getWords(line: string): Word[] {
@@ -417,18 +419,18 @@ export class MockRuntime extends EventEmitter {
 	private async loadSource(file: string): Promise<void> {
 		if (this._sourceFile !== file) {
 			this._sourceFile = file;
-			const contents = await this._fileAccessor.readFile(file);
-			this._sourceLines = contents.split(/\r?\n/);
+			const contents = await this.fileAccessor.readFile(file);
+			this.sourceLines = contents.split(/\r?\n/);
 
-			this._instructions = [];
+			this.instructions = [];
 
-			for (let line of this._sourceLines) {
-				this._starts.push(this._instructions.length);
+			for (let line of this.sourceLines) {
+				this.starts.push(this.instructions.length);
 				const words = this.getWords(line);
 				for (let word of words) {
-					this._instructions.push(word);
+					this.instructions.push(word);
 				}
-				this._ends.push(this._instructions.length);
+				this.ends.push(this.instructions.length);
 			}
 
 		}
@@ -439,34 +441,32 @@ export class MockRuntime extends EventEmitter {
 	 */
 	 private findNextStatement(reverse: boolean, stepEvent?: string): boolean {
 
-		for (let ln = this._currentLine; reverse ? ln >= 0 : ln < this._sourceLines.length; reverse ? ln-- : ln++) {
+		for (let ln = this.currentLine; reverse ? ln >= 0 : ln < this.sourceLines.length; reverse ? ln-- : ln++) {
 
-			if (this.debug) {
-				// is there a source breakpoint?
-				const breakpoints = this._breakPoints.get(this._sourceFile);
-				if (breakpoints) {
-					const bps = breakpoints.filter(bp => bp.line === ln);
-					if (bps.length > 0) {
-	
-						// send 'stopped' event
-						this.sendEvent('stopOnBreakpoint');
-	
-						// the following shows the use of 'breakpoint' events to update properties of a breakpoint in the UI
-						// if breakpoint is not yet verified, verify it now and send a 'breakpoint' update event
-						if (!bps[0].verified) {
-							bps[0].verified = true;
-							this.sendEvent('breakpointValidated', bps[0]);
-						}
-	
-						this._currentLine = ln;
-						return true;
+			// is there a source breakpoint?
+			const breakpoints = this.breakPoints.get(this._sourceFile);
+			if (breakpoints) {
+				const bps = breakpoints.filter(bp => bp.line === ln);
+				if (bps.length > 0) {
+
+					// send 'stopped' event
+					this.sendEvent('stopOnBreakpoint');
+
+					// the following shows the use of 'breakpoint' events to update properties of a breakpoint in the UI
+					// if breakpoint is not yet verified, verify it now and send a 'breakpoint' update event
+					if (!bps[0].verified) {
+						bps[0].verified = true;
+						this.sendEvent('breakpointValidated', bps[0]);
 					}
+
+					this.currentLine = ln;
+					return true;
 				}
 			}
 
 			const line = this.getLine(ln);
 			if (line.length > 0) {
-				this._currentLine = ln;
+				this.currentLine = ln;
 				break;
 			}
 		}
@@ -483,14 +483,10 @@ export class MockRuntime extends EventEmitter {
 	 */
 	private executeLine(ln: number, reverse: boolean): boolean {
 
-		if (!this.debug) {
-			return false;
-		}
-
 		// first "execute" the instructions associated with this line and potentially hit instruction breakpoints
-		while (reverse ? this._instruction >= this._starts[ln] : this._instruction < this._ends[ln]) {
-			reverse ? this._instruction-- : this._instruction++;
-			if (this._instructionBreakpoints.has(this._instruction)) {
+		while (reverse ? this.instruction >= this.starts[ln] : this.instruction < this.ends[ln]) {
+			reverse ? this.instruction-- : this.instruction++;
+			if (this.instructionBreakpoints.has(this.instruction)) {
 				this.sendEvent('stopOnInstructionBreakpoint');
 				return true;
 			}
@@ -533,19 +529,19 @@ export class MockRuntime extends EventEmitter {
 						v.value = parseFloat(value);
 					}
 
-					if (this._variables.has(name)) {
+					if (this.variables.has(name)) {
 						// the first write access to a variable is the "declaration" and not a "write access"
 						access = 'write';
 					}
-					this._variables.set(name, v);
+					this.variables.set(name, v);
 				} else {
-					if (this._variables.has(name)) {
+					if (this.variables.has(name)) {
 						// variable must exist in order to trigger a read access 
 						access = 'read';
 					}
 				}
 
-				const accessType = this._breakAddresses.get(name);
+				const accessType = this.breakAddresses.get(name);
 				if (access && accessType && accessType.indexOf(access) >= 0) {
 					this.sendEvent('stopOnDataBreakpoint', access);
 					return true;
@@ -563,11 +559,11 @@ export class MockRuntime extends EventEmitter {
 		const matches2 = /exception\((.*)\)/.exec(line);
 		if (matches2 && matches2.length === 2) {
 			const exception = matches2[1].trim();
-			if (this._namedException === exception) {
+			if (this.namedException === exception) {
 				this.sendEvent('stopOnException', exception);
 				return true;
 			} else {
-				if (this._otherExceptions) {
+				if (this.otherExceptions) {
 					this.sendEvent('stopOnException', undefined);
 					return true;
 				}
@@ -575,7 +571,7 @@ export class MockRuntime extends EventEmitter {
 		} else {
 			// if word 'exception' found in source -> throw exception
 			if (line.indexOf('exception') >= 0) {
-				if (this._otherExceptions) {
+				if (this.otherExceptions) {
 					this.sendEvent('stopOnException', undefined);
 					return true;
 				}
@@ -588,31 +584,29 @@ export class MockRuntime extends EventEmitter {
 
 	private async verifyBreakpoints(path: string): Promise<void> {
 
-		if (this.debug) {
-			const bps = this._breakPoints.get(path);
-			if (bps) {
-				await this.loadSource(path);
-				bps.forEach(bp => {
-					if (!bp.verified && bp.line < this._sourceLines.length) {
-						const srcLine = this.getLine(bp.line);
-						
-						// if a line is empty or starts with '+' we don't allow to set a breakpoint but move the breakpoint down
-						if (srcLine.length === 0 || srcLine.indexOf('+') === 0) {
-							bp.line++;
-						}
-						// if a line starts with '-' we don't allow to set a breakpoint but move the breakpoint up
-						if (srcLine.indexOf('-') === 0) {
-							bp.line--;
-						}
-						// don't set 'verified' to true if the line contains the word 'lazy'
-						// in this case the breakpoint will be verified 'lazy' after hitting it once.
-						if (srcLine.indexOf('lazy') < 0) {
-							bp.verified = true;
-							this.sendEvent('breakpointValidated', bp);
-						}
+		const bps = this.breakPoints.get(path);
+		if (bps) {
+			await this.loadSource(path);
+			bps.forEach(bp => {
+				if (!bp.verified && bp.line < this.sourceLines.length) {
+					const srcLine = this.getLine(bp.line);
+					
+					// if a line is empty or starts with '+' we don't allow to set a breakpoint but move the breakpoint down
+					if (srcLine.length === 0 || srcLine.indexOf('+') === 0) {
+						bp.line++;
 					}
-				});
-			}
+					// if a line starts with '-' we don't allow to set a breakpoint but move the breakpoint up
+					if (srcLine.indexOf('-') === 0) {
+						bp.line--;
+					}
+					// don't set 'verified' to true if the line contains the word 'lazy'
+					// in this case the breakpoint will be verified 'lazy' after hitting it once.
+					if (srcLine.indexOf('lazy') < 0) {
+						bp.verified = true;
+						this.sendEvent('breakpointValidated', bp);
+					}
+				}
+			});
 		}
 	}
 		

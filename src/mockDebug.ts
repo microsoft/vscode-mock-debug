@@ -213,13 +213,11 @@ export class MockDebugSession extends LoggingDebugSession {
 		// make sure to 'Stop' the buffered logging if 'trace' is not set
 		logger.setup(args.trace ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
 
-		this._runtime.debug = !args.noDebug;
-
 		// wait until configuration has finished (and configurationDoneRequest has been called)
 		await this._configurationDone.wait(1000);
 
 		// start the program in the runtime
-		await this._runtime.start(args.program, !!args.stopOnEntry);
+		await this._runtime.start(args.program, !!args.stopOnEntry, !args.noDebug);
 
 		if (args.compileError) {
 			// simulate a compile/build error in "launch" request:
