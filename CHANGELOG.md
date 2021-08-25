@@ -1,4 +1,7 @@
 
+## 0.46.6
+* Simplify "no-debug" mode (in order to profit from https://github.com/microsoft/vscode/issues/129255)
+
 ## 0.46.4
 * Generate errors for illegal arguments to `setExpression` request.
 * Specify 'compileError' in launch config to simulate a compile/build error in the "launch" request.
