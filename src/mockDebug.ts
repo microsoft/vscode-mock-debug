@@ -671,12 +671,23 @@ export class MockDebugSession extends LoggingDebugSession {
 		const isHex = args.memoryReference.startsWith('0x');
 		const pad = isHex ? args.memoryReference.length-2 : args.memoryReference.length;
 
+		const loc = this.createSource(this._runtime.sourceFile);
+
+		let lastLine = -1;
+
 		const instructions = this._runtime.disassemble(baseAddress+offset, count).map(instruction => {
 			const address = instruction.address.toString(isHex ? 16 : 10).padStart(pad, '0');
-			return {
+			const instr : DebugProtocol.DisassembledInstruction = {
 				address: isHex ? `0x${address}` : `${address}`,
 				instruction: instruction.instruction
 			};
+			// if instruction's source starts on a new line add the source to instruction
+			if (instruction.line !== undefined && lastLine !== instruction.line) {
+				lastLine = instruction.line;
+				instr.location = loc;
+				instr.line = this.convertDebuggerLineToClient(instruction.line);
+			}
+			return instr;
 		});
 
 		response.body = {

@@ -36,6 +36,7 @@ interface IRuntimeStack {
 interface RuntimeDisassembledInstruction {
 	address: number;
 	instruction: string;
+	line?: number;
 }
 
 export type IRuntimeVariableType = number | boolean | string | IRuntimeVariable[];
@@ -47,7 +48,8 @@ export interface IRuntimeVariable {
 
 interface Word {
 	name: string;
-	index: number
+	line: number;
+	index: number;
 }
 
 export function timeout(ms: number) {
@@ -223,7 +225,7 @@ export class MockRuntime extends EventEmitter {
 	public getStepInTargets(frameId: number): IRuntimeStepInTargets[] {
 
 		const line = this.getLine();
-		const words = this.getWords(line);
+		const words = this.getWords(this.currentLine, line);
 
 		// return nothing if frameId is out of range
 		if (frameId < 0 || frameId >= words.length) {
@@ -247,8 +249,8 @@ export class MockRuntime extends EventEmitter {
 	public stack(startFrame: number, endFrame: number): IRuntimeStack {
 
 		const line = this.getLine();
-		const words = this.getWords(line);
-		words.push({ name: 'BOTTOM', index: -1 });	// add a sentinel so that the stack is never empty...
+		const words = this.getWords(this.currentLine, line);
+		words.push({ name: 'BOTTOM', line: -1, index: -1 });	// add a sentinel so that the stack is never empty...
 
 		// if the line contains the word 'disassembly' we support to "disassemble" the line by adding an 'instruction' property to the stackframe
 		const instruction = line.indexOf('disassembly') >= 0 ? this.instruction : undefined;
@@ -282,7 +284,7 @@ export class MockRuntime extends EventEmitter {
 	 * Here we return the start location of words with more than 8 characters.
 	 */
 	public getBreakpoints(path: string, line: number): number[] {
-		return this.getWords(this.getLine(line)).filter(w => w.name.length > 8).map(w => w.index);
+		return this.getWords(line, this.getLine(line)).filter(w => w.name.length > 8).map(w => w.index);
 	}
 
 	/*
@@ -390,10 +392,18 @@ export class MockRuntime extends EventEmitter {
 		const instructions: RuntimeDisassembledInstruction[] = [];
 
 		for (let a = address; a < address + instructionCount; a++) {
-			instructions.push({
-				address: a,
-				instruction: (a >= 0 && a < this.instructions.length) ? this.instructions[a].name : 'nop'
-			});
+			if (a >= 0 && a < this.instructions.length) {
+				instructions.push({
+					address: a,
+					instruction: this.instructions[a].name,
+					line: this.instructions[a].line
+				});	
+			} else {
+				instructions.push({
+					address: a,
+					instruction: 'nop'
+				});	
+			}
 		}
 
 		return instructions;
@@ -405,13 +415,13 @@ export class MockRuntime extends EventEmitter {
 		return this.sourceLines[line === undefined ? this.currentLine : line].trim();
 	}
 
-	private getWords(line: string): Word[] {
+	private getWords(l: number, line: string): Word[] {
 		// break line into words
 		const WORD_REGEXP = /[a-z]+/ig;
 		const words: Word[] = [];
 		let match: RegExpExecArray | null;
 		while (match = WORD_REGEXP.exec(line)) {
-			words.push({ name: match[0], index: match.index });
+			words.push({ name: match[0], line: l, index: match.index });
 		}
 		return words;
 	}
@@ -424,9 +434,9 @@ export class MockRuntime extends EventEmitter {
 
 			this.instructions = [];
 
-			for (let line of this.sourceLines) {
+			for (let l = 0; l < this.sourceLines.length; l++) {
 				this.starts.push(this.instructions.length);
-				const words = this.getWords(line);
+				const words = this.getWords(l, this.sourceLines[l]);
 				for (let word of words) {
 					this.instructions.push(word);
 				}

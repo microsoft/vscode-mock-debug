@@ -1,4 +1,7 @@
 
+## 0.46.7
+* Add line and source information to disassemble instructions. 
+ 
 ## 0.46.6
 * Simplify "no-debug" mode (in order to profit from https://github.com/microsoft/vscode/issues/129255)
 
