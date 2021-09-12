@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import assert = require('assert');
+import * as assert from 'assert';
 import * as Path from 'path';
 import {DebugClient} from 'vscode-debugadapter-testsupport';
 import {DebugProtocol} from 'vscode-debugprotocol';
@@ -42,7 +42,7 @@ suite('Node Debug Adapter', () => {
 		test('should return supported features', () => {
 			return dc.initializeRequest().then(response => {
 				response.body = response.body || {};
-				assert.equal(response.body.supportsConfigurationDoneRequest, true);
+				assert.strictEqual(response.body.supportsConfigurationDoneRequest, true);
 			});
 		});
 
