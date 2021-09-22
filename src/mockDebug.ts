@@ -44,6 +44,7 @@ export class MockDebugSession extends LoggingDebugSession {
 	private _runtime: MockRuntime;
 
 	private _variableHandles = new Handles<string>();
+	private _memoryHandles = new Handles</* offset= */ number>();
 
 	private _configurationDone = new Subject();
 
@@ -148,6 +149,9 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// make VS Code provide "Step in Target" functionality
 		response.body.supportsStepInTargetsRequest = true;
+
+		// make VS Code able to read variable memory
+		response.body.supportsReadMemoryRequest = true;
 
 		this.sendResponse(response);
 
@@ -269,6 +273,15 @@ export class MockDebugSession extends LoggingDebugSession {
 		this.sendResponse(response);
 	}
 
+	protected async readMemoryRequest(response: DebugProtocol.ReadMemoryResponse, { offset = 0, count }: DebugProtocol.ReadMemoryArguments) {
+		response.body = {
+			address: '0',
+			data: this._runtime.memory.slice(offset, count).toString('base64'),
+			unreadableBytes: this._runtime.memory.length - (offset + count)
+		};
+		this.sendResponse(response);
+	}
+
 	protected async variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request) {
 
 		const variables: DebugProtocol.Variable[] = [];
@@ -327,6 +340,13 @@ export class MockDebugSession extends LoggingDebugSession {
 					type: "object",
 					value: "Object",
 					variablesReference: this._variableHandles.create(id + "_o")
+				});
+				variables.push({
+					name: id + "_b",
+					type: "string",
+					value: "Some binary data...",
+					variablesReference: 0,
+					memoryReference: String(this._memoryHandles.create(this._runtime.currentByteOffset)),
 				});
 
 				// cancellation support for long running requests

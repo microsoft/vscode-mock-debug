@@ -45,6 +45,10 @@ export class MockRuntime extends EventEmitter {
 
 	// the contents (= lines) of the one and only file
 	private _sourceLines: string[] = [];
+	private _sourceTextAsMemory = Buffer.alloc(0);
+	public get memory() {
+		return this._sourceTextAsMemory;
+	}
 
 	// This is the next line that will be 'executed'
 	private _currentLine = 0;
@@ -63,6 +67,18 @@ export class MockRuntime extends EventEmitter {
 
 	constructor(private _fileAccessor: FileAccessor) {
 		super();
+	}
+
+	/**
+	 * Current byte offset in the file where the instruction pointer is located.
+	 */
+	public get currentByteOffset() {
+		let offset = this._currentColumn || 0;
+		for (let i = 0; i < this._currentLine; i++) {
+			offset += this._sourceLines[i].length;
+		}
+
+		return offset;
 	}
 
 	/**
@@ -271,6 +287,7 @@ export class MockRuntime extends EventEmitter {
 		if (this._sourceFile !== file) {
 			this._sourceFile = file;
 			const contents = await this._fileAccessor.readFile(file);
+			this._sourceTextAsMemory = Buffer.from(contents);
 			this._sourceLines = contents.split('\n');
 		}
 	}
