@@ -1,4 +1,7 @@
 
+## 0.46.8
+* update dependencies
+
 ## 0.46.7
 * Add line and source information to disassemble instructions. 
  
