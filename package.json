@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "await-notify": "1.0.1",
-    "vscode-debugadapter": "^1.49.0"
+    "vscode-debugadapter": "^1.50.0"
   },
   "devDependencies": {
     "@types/vscode": "^1.59.0",
@@ -57,7 +57,7 @@
     "glob": "^7.1.7",
     "mocha": "^9.1.0",
     "typescript": "^4.3.5",
-    "vscode-debugadapter-testsupport": "^1.49.0",
+    "vscode-debugadapter-testsupport": "^1.50.0",
     "vsce": "^1.96.1",
     "ts-loader": "^8.1.0",
     "webpack": "^4.46.0",
