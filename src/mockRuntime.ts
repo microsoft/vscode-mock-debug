@@ -621,8 +621,8 @@ export class MockRuntime extends EventEmitter {
 	}
 		
 	private sendEvent(event: string, ... args: any[]): void {
-		setImmediate(() => {
+		setTimeout(() => {
 			this.emit(event, ...args);
-		});
+		}, 0);
 	}
 }

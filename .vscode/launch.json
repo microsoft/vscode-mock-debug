@@ -10,7 +10,7 @@
 				"${workspaceFolder}/sampleWorkspace"
 			],
 			"outFiles": [
-				"${workspaceFolder}/dist/ext/**/*.js"
+				"${workspaceFolder}/dist/**/*.js"
 			],
 			"preLaunchTask": "npm: watch"
 		},
@@ -25,9 +25,9 @@
 				"${workspaceFolder}/sampleWorkspace"
 			],
 			"outFiles": [
-				"${workspaceFolder}/dist/web/**/*.js"
+				"${workspaceFolder}/dist/**/*.js"
 			],
-			"preLaunchTask": "npm: watch-web"
+			"preLaunchTask": "npm: watch"
 		},
 		{
 			"name": "Server",

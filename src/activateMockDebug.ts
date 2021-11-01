@@ -19,11 +19,11 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 			}
 			if (targetResource) {
 				vscode.debug.startDebugging(undefined, {
-						type: 'mock',
-						name: 'Run File',
-						request: 'launch',
-						program: targetResource.fsPath
-					},
+					type: 'mock',
+					name: 'Run File',
+					request: 'launch',
+					program: targetResource.fsPath
+				},
 					{ noDebug: true }
 				);
 			}
@@ -103,7 +103,7 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 
 			const VARIABLE_REGEXP = /\$[a-z][a-z0-9]*/ig;
 			const line = document.lineAt(position.line).text;
-			
+
 			let m: RegExpExecArray | null;
 			while (m = VARIABLE_REGEXP.exec(line)) {
 				const varRange = new vscode.Range(position.line, m.index, position.line, m.index + m[0].length);
@@ -180,22 +180,35 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 }
 
 export const workspaceFileAccessor: FileAccessor = {
-	async readFile(path: string) {
+	async readFile(path: string): Promise<string> {
+		let uri: vscode.Uri;
 		try {
-			const uri = vscode.Uri.file(path);
-			const bytes = await vscode.workspace.fs.readFile(uri);
-			const contents = Buffer.from(bytes).toString('utf8');
-			return contents;
-		} catch(e) {
+			uri = vscode.Uri.file(path);
+		} catch (e) {
 			try {
-				const uri = vscode.Uri.parse(path);
-				const bytes = await vscode.workspace.fs.readFile(uri);
-				const contents = Buffer.from(bytes).toString('utf8');
-				return contents;
+				uri = vscode.Uri.parse(path);
 			} catch (e) {
 				return `cannot read '${path}'`;
 			}
 		}
+
+		const bytes = await vscode.workspace.fs.readFile(uri);
+		var result: string[] = [];
+		for (let i = 0; i < bytes.length;) {
+			const c = bytes[i++];
+			var cp: number;
+            if (c <= 0x7F) {
+                cp = c;
+            } else if (c <= 0xDF) {
+                cp = ((c & 0x1F) << 6) | (bytes[i++] & 0x3F);
+            } else if (c <= 0xEF) {
+                cp = ((c & 0x0F) << 12) | ((bytes[i++] & 0x3F) << 6) | (bytes[i++] & 0x3F);
+            } else {
+                cp = ((c & 0x07) << 18) | ((bytes[i++] & 0x3F) << 12) | ((bytes[i++] & 0x3F) << 6) | (bytes[i++] & 0x3F);
+            }
+			result.push(String.fromCodePoint(cp));
+		}
+		return result.join('');
 	}
 };
 

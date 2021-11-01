@@ -1,4 +1,7 @@
 
+## 0.46.9
+* upgrade from webpack 4 to webpack 5
+
 ## 0.46.8
 * update dependencies
 

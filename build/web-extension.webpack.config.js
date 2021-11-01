@@ -16,12 +16,15 @@ module.exports = /** @type WebpackConfig */ {
 	mode: 'none', // this leaves the source code as close as possible to the original (when packaging we set this to 'production')
 	target: 'webworker', // extensions run in a webworker context
 	entry: {
-		extension: './src/web/extension.ts',
+		extension: './src/web-extension.ts',
 	},
 	resolve: {
 		mainFields: ['module', 'main'],
 		extensions: ['.ts', '.js'], // support ts-files and js-files
-		alias: {
+		fallback: {
+			events: require.resolve('events'),
+			path: require.resolve('path-browserify'),
+			url: require.resolve('url')
 		}
 	},
 	module: {
@@ -48,8 +51,8 @@ module.exports = /** @type WebpackConfig */ {
 		hints: false
 	},
 	output: {
-		filename: 'extension.js',
-		path: path.join(__dirname, '../dist/web'),
+		filename: 'web-extension.js',
+		path: path.join(__dirname, '../dist'),
 		libraryTarget: 'commonjs'
 	},
 	devtool: 'source-map'

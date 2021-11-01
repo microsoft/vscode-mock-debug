@@ -1,7 +1,7 @@
 {
   "name": "mock-debug",
   "displayName": "Mock Debug",
-  "version": "0.46.8",
+  "version": "0.46.9",
   "publisher": "andreweinand",
   "description": "Starter extension for developing debug adapters for VS Code.",
   "author": {
@@ -28,19 +28,12 @@
     "url": "https://github.com/Microsoft/vscode-mock-debug/issues"
   },
   "scripts": {
-    "vscode:prepublish": "yarn run package-ext && yarn run package-web",
     "compile": "tsc -p ./",
     "lint": "eslint src --ext ts",
-    "watch": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./build/extension.webpack.config.js",
-    "watch2": "tsc -watch -p ./",
-    "pretest": "yarn run compile && yarn run lint",
-    "test": "node ./out/test/runTest.js",
+    "watch": "webpack --watch --devtool nosources-source-map --config ./build/extension.webpack.config.js --config ./build/web-extension.webpack.config.js",
     "package": "vsce package",
     "publish": "vsce publish",
-    "package-ext": "webpack --mode production --config ./build/extension.webpack.config.js",
-    "compile-web": "webpack --devtool nosources-source-map --config ./build/web-extension.webpack.config.js",
-    "watch-web": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./build/web-extension.webpack.config.js",
-    "package-web": "webpack --mode production --config ./build/web-extension.webpack.config.js"
+    "vscode:prepublish": "webpack --mode production --config ./build/extension.webpack.config.js --config ./build/web-extension.webpack.config.js"
   },
   "dependencies": {
     "await-notify": "1.0.1",
@@ -51,20 +44,23 @@
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.0.0",
     "@types/node": "^14.14.37",
-    "eslint": "^8.1.0",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
+    "eslint": "^8.1.0",
+    "events": "^3.3.0",
     "glob": "^7.2.0",
     "mocha": "^9.1.3",
+    "path-browserify": "^1.0.1",
+    "ts-loader": "^9.2.6",
     "typescript": "^4.4.4",
-    "vscode-debugadapter-testsupport": "^1.50.0",
+    "url": "^0.11.0",
     "vsce": "^1.100.2",
-    "ts-loader": "^8.3.0",
-    "webpack": "^4.46.0",
-    "webpack-cli": "^3.3.12"
+    "vscode-debugadapter-testsupport": "^1.50.0",
+    "webpack": "^5.60.0",
+    "webpack-cli": "^4.9.1"
   },
-  "main": "./dist/ext/extension.js",
-  "browser": "./dist/web/extension.js",
+  "main": "./dist/extension.js",
+  "browser": "./dist/web-extension.js",
   "activationEvents": [
     "onDebugResolve:mock",
     "onDebugDynamicConfigurations:mock",
@@ -160,16 +156,16 @@
               "compileError": {
                 "type": "string",
                 "description": "Simulates a compile error in 'launch' request.",
-								"enum": [
-									"default",
-									"show",
-									"hide"
-								],
-								"enumDescriptions": [
+                "enum": [
+                  "default",
+                  "show",
+                  "hide"
+                ],
+                "enumDescriptions": [
                   "default: show fake compile error to user",
-									"show fake compile error to user",
-									"do not show fake compile error to user"
-								]
+                  "show fake compile error to user",
+                  "do not show fake compile error to user"
+                ]
               }
             }
           }

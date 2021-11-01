@@ -3,7 +3,7 @@
  *--------------------------------------------------------*/
 
 import * as vscode from 'vscode';
-import { activateMockDebug } from '../activateMockDebug';
+import { activateMockDebug } from './activateMockDebug';
 
 export function activate(context: vscode.ExtensionContext) {
 	activateMockDebug(context);
