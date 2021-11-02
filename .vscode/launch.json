@@ -27,7 +27,7 @@
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"
 			],
-			"preLaunchTask": "npm: watch"
+			"preLaunchTask": "npm: watch web"
 		},
 		{
 			"name": "Server",

@@ -10,7 +10,7 @@ import {
 	Thread, StackFrame, Scope, Source, Handles, Breakpoint
 } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
-import { basename } from 'path';
+import { basename } from 'path-browserify';
 import { MockRuntime, IRuntimeBreakpoint, FileAccessor, IRuntimeVariable, timeout, IRuntimeVariableType } from './mockRuntime';
 import { Subject } from 'await-notify';
 

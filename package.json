@@ -1,7 +1,7 @@
 {
   "name": "mock-debug",
   "displayName": "Mock Debug",
-  "version": "0.46.9",
+  "version": "0.46.10",
   "publisher": "andreweinand",
   "description": "Starter extension for developing debug adapters for VS Code.",
   "author": {
@@ -30,14 +30,19 @@
   "scripts": {
     "compile": "tsc -p ./",
     "lint": "eslint src --ext ts",
-    "watch": "webpack --watch --devtool nosources-source-map --config ./build/extension.webpack.config.js --config ./build/web-extension.webpack.config.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
+    "watch": "npm run -S esbuild-base -- --sourcemap --sources-content=false --watch",
+ 
+    "esbuild-web": "esbuild ./src/web-extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=browser --outfile=dist/web-extension.js",
+    "watch-web": "npm run -S esbuild-web -- --sourcemap --sources-content=false --watch",
+
+    "build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false",
+
     "package": "vsce package",
     "publish": "vsce publish",
-    "vscode:prepublish": "webpack --mode production --config ./build/extension.webpack.config.js --config ./build/web-extension.webpack.config.js"
-  },
-  "dependencies": {
-    "await-notify": "1.0.1",
-    "vscode-debugadapter": "^1.50.0"
+    "vscode:prepublish": "npm run -S esbuild-base -- --minify && npm -S esbuild-web -- --minify"
   },
   "devDependencies": {
     "@types/vscode": "^1.61.0",
@@ -46,18 +51,18 @@
     "@types/node": "^14.14.37",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
+    "await-notify": "1.0.1",
     "eslint": "^8.1.0",
+    "esbuild": "^0.13.12",
     "events": "^3.3.0",
     "glob": "^7.2.0",
     "mocha": "^9.1.3",
     "path-browserify": "^1.0.1",
-    "ts-loader": "^9.2.6",
     "typescript": "^4.4.4",
     "url": "^0.11.0",
-    "vsce": "^1.100.2",
-    "vscode-debugadapter-testsupport": "^1.50.0",
-    "webpack": "^5.60.0",
-    "webpack-cli": "^4.9.1"
+    "vsce": "^1.102.0",
+    "vscode-debugadapter": "^1.50.0",
+    "vscode-debugadapter-testsupport": "^1.50.0"
   },
   "main": "./dist/extension.js",
   "browser": "./dist/web-extension.js",

@@ -1,5 +1,8 @@
 
 ## 0.46.9
+* switch from webpack 5 to esbuild 
+
+## 0.46.9
 * upgrade from webpack 4 to webpack 5
 
 ## 0.46.8
