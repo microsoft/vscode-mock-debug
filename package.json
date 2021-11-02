@@ -42,7 +42,7 @@
 
     "package": "vsce package",
     "publish": "vsce publish",
-    "vscode:prepublish": "npm run -S esbuild-base -- --minify && npm -S esbuild-web -- --minify"
+    "vscode:prepublish": "rimraf dist && npm run -S esbuild-base -- --minify && npm run -S esbuild-web -- --minify"
   },
   "devDependencies": {
     "@types/vscode": "^1.61.0",
@@ -58,6 +58,7 @@
     "glob": "^7.2.0",
     "mocha": "^9.1.3",
     "path-browserify": "^1.0.1",
+    "rimraf": "^3.0.2",
     "typescript": "^4.4.4",
     "url": "^0.11.0",
     "vsce": "^1.102.0",
