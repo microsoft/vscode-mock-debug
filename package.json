@@ -82,11 +82,13 @@
       "editor/title/run": [
         {
           "command": "extension.mock-debug.runEditorContents",
-          "when": "resourceLangId == markdown"
+          "when": "resourceLangId == markdown",
+          "group": "navigation@1"
         },
         {
           "command": "extension.mock-debug.debugEditorContents",
-          "when": "resourceLangId == markdown"
+          "when": "resourceLangId == markdown",
+          "group": "navigation@2"
         }
       ],
       "commandPalette": [
