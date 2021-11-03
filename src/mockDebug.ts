@@ -1,6 +1,14 @@
 /*---------------------------------------------------------
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
+/*
+ * mockDebug.ts implements the Debug Adapter that "adapts" or translates the Debug Adapter Protocol (DAP) used by the client (e.g. VS Code)
+ * into requests and events of the real "execution engine" or "debugger" (here: class MockRuntime).
+ * When implementing your own debugger extension for VS Code, most of the work will go into the Debug Adapter.
+ * Since the Debug Adapter is independent from VS Code, it can be used in other clients (IDEs) supporting the Debug Adapter Protocol.
+ * 
+ * The most important class of the Debug Adapter is the MockDebugSession which implements many DAP requests by talking to the MockRuntime.
+ */
 
 import {
 	Logger, logger,
@@ -32,6 +40,7 @@ interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	/** if specified, results in a simulated compile error in launch. */
 	compileError?: 'default' | 'show' | 'hide';
 }
+
 
 export class MockDebugSession extends LoggingDebugSession {
 
