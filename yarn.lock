@@ -2123,25 +2123,25 @@ vsce@^2.5.1:
     yauzl "^2.3.1"
     yazl "^2.2.2"
 
-vscode-debugadapter-testsupport@^1.50.0:
-  version "1.50.0"
-  resolved "https://registry.yarnpkg.com/vscode-debugadapter-testsupport/-/vscode-debugadapter-testsupport-1.50.0.tgz#17b091ec4ca577f39eb36619f2a5469582bee66a"
-  integrity sha512-stS8yE8le59FLeKvCvdSY6PoYtmUXMxR1WiAW2JS65Sg7ip+yQm+WMKQZz8Dat0vtUF4ALcaKf/P+KjPTdzVww==
+vscode-debugadapter-testsupport@^1.51.0-pre.0:
+  version "1.51.0-pre.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugadapter-testsupport/-/vscode-debugadapter-testsupport-1.51.0-pre.0.tgz#cfce6edec7f011bee0978158421d783fc9ff3370"
+  integrity sha512-VR7L+GH7WvGs/+DIY1wNZk0l3nfWzWZrCB02TeBxUGgIEOe5EK6AuLBJHTHlYCoGp5lblJbnJj6xC9L/rzjuNA==
   dependencies:
-    vscode-debugprotocol "1.50.1"
+    vscode-debugprotocol "1.51.0-pre.0"
 
-vscode-debugadapter@^1.50.0:
-  version "1.50.0"
-  resolved "https://registry.yarnpkg.com/vscode-debugadapter/-/vscode-debugadapter-1.50.0.tgz#9afb78bbfc61266012f4e119bdcafd1f014ae96b"
-  integrity sha512-KHtwd6uHOqB1C2/1hpKQcD4JY/88QXkieubzKQfT1PTLztnoM53Pz+pTNgH+VXrGDI50BzjLV6YOluPTufUaMQ==
+vscode-debugadapter@^1.51.0-pre.0:
+  version "1.51.0-pre.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugadapter/-/vscode-debugadapter-1.51.0-pre.0.tgz#02ab198cdf8aa0661df9da1e3822ad0fbe2143d3"
+  integrity sha512-tfwfLdHnNgdersFe1j3tK0Am28EMTZb6UT5IcvpSYQY7sCqU63BdgL9RZLz3r3nlW60j3nUbuR7A68ooSdapxQ==
   dependencies:
     mkdirp "^1.0.4"
-    vscode-debugprotocol "1.50.1"
+    vscode-debugprotocol "1.51.0-pre.0"
 
-vscode-debugprotocol@1.50.1:
-  version "1.50.1"
-  resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.50.1.tgz#8aa7114ede9ded5ee49ba056593ad936116cfb42"
-  integrity sha512-kIHIipklHnSjBm2KkRqTJLKL2FMZlJl0+/qpJt2y62YOamMNwcxNATnXXRgAwnzKKRMweqp93tJ83UTJ8+O7SQ==
+vscode-debugprotocol@1.51.0-pre.0:
+  version "1.51.0-pre.0"
+  resolved "https://registry.yarnpkg.com/vscode-debugprotocol/-/vscode-debugprotocol-1.51.0-pre.0.tgz#384b73fb1074d220de5593ed95165fd978a6de0a"
+  integrity sha512-zNGiYIKmZWvL8naCwJr3chS2YX3QwYAmsdr5qXdwLD75H40JJOmwnlaDFqLOCqNAIIT6rGYmR+6XVluwdcVT2w==
 
 which@2.0.2, which@^2.0.1:
   version "2.0.2"

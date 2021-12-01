@@ -1,4 +1,8 @@
 
+## 0.47.1
+* first "pre-release" version of Mock Debug: pre-release versions use odd minor version numbers
+* use a pre-release version of the DAP modules
+
 ## 0.46.11
 * preparing to publish "pre-release" version of Mock Debug
 

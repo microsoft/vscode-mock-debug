@@ -1,7 +1,7 @@
 {
   "name": "mock-debug",
   "displayName": "Mock Debug",
-  "version": "0.46.11",
+  "version": "0.47.1",
   "publisher": "andreweinand",
   "description": "Starter extension for developing debug adapters for VS Code.",
   "author": {
@@ -13,7 +13,7 @@
     "multi-root ready"
   ],
   "engines": {
-    "vscode": "^1.61.0"
+    "vscode": "^1.63.0"
   },
   "icon": "images/mock-debug-icon.png",
   "categories": [
@@ -42,6 +42,7 @@
 
     "package": "vsce package",
     "publish": "vsce publish",
+    "publish-pre-release": "vsce publish --pre-release",
     "vscode:prepublish": "rimraf dist && npm run -S esbuild-base -- --minify && npm run -S esbuild-web -- --minify"
   },
   "devDependencies": {
@@ -62,8 +63,8 @@
     "typescript": "^4.4.4",
     "url": "^0.11.0",
     "vsce": "^2.5.1",
-    "vscode-debugadapter": "^1.50.0",
-    "vscode-debugadapter-testsupport": "^1.50.0"
+    "vscode-debugadapter": "^1.51.0-pre.0",
+    "vscode-debugadapter-testsupport": "^1.51.0-pre.0"
   },
   "main": "./dist/extension.js",
   "browser": "./dist/web-extension.js",
