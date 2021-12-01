@@ -1,7 +1,7 @@
 {
   "name": "mock-debug",
   "displayName": "Mock Debug",
-  "version": "0.46.10",
+  "version": "0.46.11",
   "publisher": "andreweinand",
   "description": "Starter extension for developing debug adapters for VS Code.",
   "author": {
@@ -61,7 +61,7 @@
     "rimraf": "^3.0.2",
     "typescript": "^4.4.4",
     "url": "^0.11.0",
-    "vsce": "^1.102.0",
+    "vsce": "^2.5.1",
     "vscode-debugadapter": "^1.50.0",
     "vscode-debugadapter-testsupport": "^1.50.0"
   },

@@ -1,4 +1,12 @@
 
+## 0.46.11
+* preparing to publish "pre-release" version of Mock Debug
+
+## 0.46.10
+* enable NamedPipe support; fixes #47
+* sort Run before Debug command; fixes #58
+* improve comments; fixes #60
+
 ## 0.46.9
 * switch from webpack 5 to esbuild 
 
