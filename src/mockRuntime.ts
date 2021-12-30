@@ -538,8 +538,8 @@ export class MockRuntime extends EventEmitter {
 				let v: IRuntimeVariable = { name, value };
 
 				if (value && value.length > 0) {
-					const valueStart = byteOffset + matches0.index + name.length + 1;
-					v.fileRange = [valueStart, valueStart + value.length];
+					const declStart = byteOffset + matches0.index;
+					v.fileRange = [declStart, declStart + matches0[0].length];
 
 					if (value === 'true') {
 						v.value = true;

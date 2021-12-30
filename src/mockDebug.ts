@@ -387,7 +387,7 @@ export class MockDebugSession extends LoggingDebugSession {
 	protected async readMemoryRequest(response: DebugProtocol.ReadMemoryResponse, { offset = 0, count, memoryReference }: DebugProtocol.ReadMemoryArguments) {
 		const [start, end] = JSON.parse(memoryReference);
 		const realCount = Math.max(0, Math.min(count, end - (start + offset)));
-		const data = realCount > 0 ? this._runtime.memory.slice(offset + start, realCount) : Buffer.alloc(0);
+		const data = realCount > 0 ? this._runtime.memory.slice(offset + start, offset + start + realCount) : Buffer.alloc(0);
 
 		response.body = {
 			address: (start + offset).toString(),
