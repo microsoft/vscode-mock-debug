@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 /*
- * activateMockDebug.ts containes the shared extension code that can be executed both in node.js and the browser. 
+ * activateMockDebug.ts containes the shared extension code that can be executed both in node.js and the browser.
  */
 
 'use strict';
@@ -100,7 +100,7 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 	}
 
 	// override VS Code's default implementation of the debug hover
-	// here we match only Mock "variables", that are words starting with an '$' 
+	// here we match only Mock "variables", that are words starting with an '$'
 	context.subscriptions.push(vscode.languages.registerEvaluatableExpressionProvider('markdown', {
 		provideEvaluatableExpression(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.EvaluatableExpression> {
 

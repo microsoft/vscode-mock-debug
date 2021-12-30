@@ -6,7 +6,7 @@
  * into requests and events of the real "execution engine" or "debugger" (here: class MockRuntime).
  * When implementing your own debugger extension for VS Code, most of the work will go into the Debug Adapter.
  * Since the Debug Adapter is independent from VS Code, it can be used in other clients (IDEs) supporting the Debug Adapter Protocol.
- * 
+ *
  * The most important class of the Debug Adapter is the MockDebugSession which implements many DAP requests by talking to the MockRuntime.
  */
 
@@ -198,6 +198,9 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body.supportsSteppingGranularity = true;
 		response.body.supportsInstructionBreakpoints = true;
 
+		// make VS Code able to read variable memory
+		response.body.supportsReadMemoryRequest = true;
+
 		this.sendResponse(response);
 
 		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
@@ -356,7 +359,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				}
 				if (typeof f.instruction === 'number') {
 					const address = this.formatAddress(f.instruction);
-					sf.name = `${f.name} ${address}`; 
+					sf.name = `${f.name} ${address}`;
 					sf.instructionPointerReference = address;
 				}
 
@@ -381,10 +384,23 @@ export class MockDebugSession extends LoggingDebugSession {
 		this.sendResponse(response);
 	}
 
+	protected async readMemoryRequest(response: DebugProtocol.ReadMemoryResponse, { offset = 0, count, memoryReference }: DebugProtocol.ReadMemoryArguments) {
+		const [start, end] = JSON.parse(memoryReference);
+		const realCount = Math.max(0, Math.min(count, end - (start + offset)));
+		const data = realCount > 0 ? this._runtime.memory.slice(offset + start, realCount) : Buffer.alloc(0);
+
+		response.body = {
+			address: (start + offset).toString(),
+			data: data.toString('base64'),
+			unreadableBytes: count - realCount
+		};
+		this.sendResponse(response);
+	}
+
 	protected async variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request): Promise<void> {
 
 		let vs: IRuntimeVariable[] = [];
-		
+
 		const v = this._variableHandles.get(args.variablesReference);
 		if (v === 'locals') {
 			vs = this._runtime.getLocalVariables();
@@ -541,7 +557,7 @@ export class MockDebugSession extends LoggingDebugSession {
 					format: `variable '{lexpr}' not found`,
 					variables: { lexpr: args.expression },
 					showUser: true
-				});	
+				});
 			}
 		} else {
 			this.sendErrorResponse(response, {
@@ -792,8 +808,12 @@ export class MockDebugSession extends LoggingDebugSession {
 					break;
 				default:
 					dapVariable.value = typeof v.value;
-					break;		
+					break;
 			}
+		}
+
+		if (v.fileRange) {
+			dapVariable.memoryReference = JSON.stringify(v.fileRange);
 		}
 
 		return dapVariable;

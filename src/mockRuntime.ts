@@ -44,6 +44,7 @@ export type IRuntimeVariableType = number | boolean | string | IRuntimeVariable[
 export interface IRuntimeVariable {
 	name: string;
 	value: IRuntimeVariableType;
+	fileRange?: [from: number, to: number];
 }
 
 interface Word {
@@ -69,7 +70,7 @@ export function timeout(ms: number) {
  * it can be viewed as a simplified representation of a real "execution engine" (e.g. node.js)
  * or debugger (e.g. gdb).
  * When implementing your own debugger extension for VS Code, you probably don't need this
- * class because you can rely on some existing debugger or runtime.  
+ * class because you can rely on some existing debugger or runtime.
  */
 export class MockRuntime extends EventEmitter {
 
@@ -86,6 +87,11 @@ export class MockRuntime extends EventEmitter {
 	private instructions: Word[] = [];
 	private starts: number[] = [];
 	private ends: number[] = [];
+	private sourceTextAsMemory = Buffer.alloc(0);
+
+	public get memory() {
+		return this.sourceTextAsMemory;
+	}
 
 	// This is the next line that will be 'executed'
 	private _currentLine = 0;
@@ -355,7 +361,7 @@ export class MockRuntime extends EventEmitter {
 	public clearAllDataBreakpoints(): void {
 		this.breakAddresses.clear();
 	}
-	
+
 	public setExceptionsFilters(namedException: string | undefined, otherExceptions: boolean): void {
 		this.namedException = namedException;
 		this.otherExceptions = otherExceptions;
@@ -409,12 +415,12 @@ export class MockRuntime extends EventEmitter {
 					address: a,
 					instruction: this.instructions[a].name,
 					line: this.instructions[a].line
-				});	
+				});
 			} else {
 				instructions.push({
 					address: a,
 					instruction: 'nop'
-				});	
+				});
 			}
 		}
 
@@ -442,6 +448,7 @@ export class MockRuntime extends EventEmitter {
 		if (this._sourceFile !== file) {
 			this._sourceFile = file;
 			const contents = await this.fileAccessor.readFile(file);
+			this.sourceTextAsMemory = Buffer.from(contents);
 			this.sourceLines = contents.split(/\r?\n/);
 
 			this.instructions = [];
@@ -515,13 +522,14 @@ export class MockRuntime extends EventEmitter {
 		}
 
 		const line = this.getLine(ln);
+		const byteOffset = this.lineByteOffset(ln);
 
 		// find variable accesses
 		let reg0 = /\$([a-z][a-z0-9]*)(=(false|true|[0-9]+(\.[0-9]+)?|\".*\"|\{.*\}))?/ig;
 		let matches0: RegExpExecArray | null;
 		while (matches0 = reg0.exec(line)) {
 			if (matches0.length === 5) {
-				
+
 				let access: string | undefined;
 
 				const name = matches0[1];
@@ -530,6 +538,9 @@ export class MockRuntime extends EventEmitter {
 				let v: IRuntimeVariable = { name, value };
 
 				if (value && value.length > 0) {
+					const valueStart = byteOffset + matches0.index + name.length + 1;
+					v.fileRange = [valueStart, valueStart + value.length];
+
 					if (value === 'true') {
 						v.value = true;
 					} else if (value === 'false') {
@@ -558,7 +569,7 @@ export class MockRuntime extends EventEmitter {
 					this.variables.set(name, v);
 				} else {
 					if (this.variables.has(name)) {
-						// variable must exist in order to trigger a read access 
+						// variable must exist in order to trigger a read access
 						access = 'read';
 					}
 				}
@@ -612,7 +623,7 @@ export class MockRuntime extends EventEmitter {
 			bps.forEach(bp => {
 				if (!bp.verified && bp.line < this.sourceLines.length) {
 					const srcLine = this.getLine(bp.line);
-					
+
 					// if a line is empty or starts with '+' we don't allow to set a breakpoint but move the breakpoint down
 					if (srcLine.length === 0 || srcLine.indexOf('+') === 0) {
 						bp.line++;
@@ -631,10 +642,19 @@ export class MockRuntime extends EventEmitter {
 			});
 		}
 	}
-		
+
 	private sendEvent(event: string, ... args: any[]): void {
 		setTimeout(() => {
 			this.emit(event, ...args);
 		}, 0);
+	}
+
+	private lineByteOffset(lineNumber: number) {
+		let offset = 0;
+		for (; lineNumber > 0; lineNumber--) {
+			offset = this.sourceTextAsMemory.indexOf('\n', offset) + 1;
+		}
+
+		return offset;
 	}
 }
