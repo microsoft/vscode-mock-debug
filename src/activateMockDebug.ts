@@ -183,37 +183,28 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 }
 
 export const workspaceFileAccessor: FileAccessor = {
-	async readFile(path: string): Promise<string> {
+	async readFile(path: string): Promise<Uint8Array> {
 		let uri: vscode.Uri;
 		try {
-			uri = vscode.Uri.file(path);
+			uri = pathToUri(path);
 		} catch (e) {
-			try {
-				uri = vscode.Uri.parse(path);
-			} catch (e) {
-				return `cannot read '${path}'`;
-			}
+			return new TextEncoder().encode(`cannot read '${path}'`);
 		}
 
-		const bytes = await vscode.workspace.fs.readFile(uri);
-		var result: string[] = [];
-		for (let i = 0; i < bytes.length;) {
-			const c = bytes[i++];
-			var cp: number;
-            if (c <= 0x7F) {
-                cp = c;
-            } else if (c <= 0xDF) {
-                cp = ((c & 0x1F) << 6) | (bytes[i++] & 0x3F);
-            } else if (c <= 0xEF) {
-                cp = ((c & 0x0F) << 12) | ((bytes[i++] & 0x3F) << 6) | (bytes[i++] & 0x3F);
-            } else {
-                cp = ((c & 0x07) << 18) | ((bytes[i++] & 0x3F) << 12) | ((bytes[i++] & 0x3F) << 6) | (bytes[i++] & 0x3F);
-            }
-			result.push(String.fromCodePoint(cp));
-		}
-		return result.join('');
+		return await vscode.workspace.fs.readFile(uri);
+	},
+	async writeFile(path: string, contents: Uint8Array) {
+		await vscode.workspace.fs.writeFile(pathToUri(path), contents);
 	}
 };
+
+function pathToUri(path: string) {
+	try {
+		return vscode.Uri.file(path);
+	} catch (e) {
+		return vscode.Uri.parse(path);
+	}
+}
 
 class InlineDebugAdapterFactory implements vscode.DebugAdapterDescriptorFactory {
 

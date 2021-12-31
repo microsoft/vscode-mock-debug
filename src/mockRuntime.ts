@@ -5,7 +5,8 @@
 import { EventEmitter } from 'events';
 
 export interface FileAccessor {
-	readFile(path: string): Promise<string>;
+	readFile(path: string): Promise<Uint8Array>;
+	writeFile(path: string, contents: Uint8Array): Promise<void>;
 }
 
 export interface IRuntimeBreakpoint {
@@ -87,7 +88,7 @@ export class MockRuntime extends EventEmitter {
 	private instructions: Word[] = [];
 	private starts: number[] = [];
 	private ends: number[] = [];
-	private sourceTextAsMemory = Buffer.alloc(0);
+	private sourceTextAsMemory = new Uint8Array();
 
 	public get memory() {
 		return this.sourceTextAsMemory;
@@ -447,21 +448,27 @@ export class MockRuntime extends EventEmitter {
 	private async loadSource(file: string): Promise<void> {
 		if (this._sourceFile !== file) {
 			this._sourceFile = file;
-			const contents = await this.fileAccessor.readFile(file);
-			this.sourceTextAsMemory = Buffer.from(contents);
-			this.sourceLines = contents.split(/\r?\n/);
+			this.initializeContents(await this.fileAccessor.readFile(file));
+		}
+	}
 
-			this.instructions = [];
+	private initializeContents(memory: Uint8Array) {
+		this.sourceTextAsMemory = memory;
+		this.sourceLines = new TextDecoder().decode(memory).split(/\r?\n/);
 
-			for (let l = 0; l < this.sourceLines.length; l++) {
-				this.starts.push(this.instructions.length);
-				const words = this.getWords(l, this.sourceLines[l]);
-				for (let word of words) {
-					this.instructions.push(word);
-				}
-				this.ends.push(this.instructions.length);
+		this.instructions = [];
+
+		this.starts = [];
+		this.instructions = [];
+		this.ends = [];
+
+		for (let l = 0; l < this.sourceLines.length; l++) {
+			this.starts.push(this.instructions.length);
+			const words = this.getWords(l, this.sourceLines[l]);
+			for (let word of words) {
+				this.instructions.push(word);
 			}
-
+			this.ends.push(this.instructions.length);
 		}
 	}
 
@@ -504,6 +511,15 @@ export class MockRuntime extends EventEmitter {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Updates the source file contents and re-parses variables/instructions.
+	 */
+	public async writeData(offset: number, data: Uint8Array) {
+		this.sourceTextAsMemory.set(data, offset);
+		await this.fileAccessor.writeFile(this._sourceFile, this.sourceTextAsMemory);
+		this.initializeContents(this.sourceTextAsMemory);
 	}
 
 	/**
@@ -652,7 +668,7 @@ export class MockRuntime extends EventEmitter {
 	private lineByteOffset(lineNumber: number) {
 		let offset = 0;
 		for (; lineNumber > 0; lineNumber--) {
-			offset = this.sourceTextAsMemory.indexOf('\n', offset) + 1;
+			offset = this.sourceTextAsMemory.indexOf(10 /* \n */, offset) + 1;
 		}
 
 		return offset;

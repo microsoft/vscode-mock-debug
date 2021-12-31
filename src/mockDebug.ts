@@ -21,6 +21,7 @@ import { DebugProtocol } from 'vscode-debugprotocol';
 import { basename } from 'path-browserify';
 import { MockRuntime, IRuntimeBreakpoint, FileAccessor, IRuntimeVariable, timeout, IRuntimeVariableType } from './mockRuntime';
 import { Subject } from 'await-notify';
+import * as base64 from 'base64-js';
 
 /**
  * This interface describes the mock-debug specific launch attributes
@@ -198,8 +199,9 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body.supportsSteppingGranularity = true;
 		response.body.supportsInstructionBreakpoints = true;
 
-		// make VS Code able to read variable memory
+		// make VS Code able to read and write variable memory
 		response.body.supportsReadMemoryRequest = true;
+		response.body.supportsWriteMemoryRequest = true;
 
 		this.sendResponse(response);
 
@@ -384,14 +386,21 @@ export class MockDebugSession extends LoggingDebugSession {
 		this.sendResponse(response);
 	}
 
+	protected async writeMemoryRequest(response: DebugProtocol.WriteMemoryResponse, { data, memoryReference, offset = 0 }: DebugProtocol.WriteMemoryArguments) {
+		const [start] = JSON.parse(memoryReference);
+		const decoded = base64.toByteArray(data);
+		this._runtime.writeData(start + offset, decoded);
+		this.sendResponse(response);
+	}
+
 	protected async readMemoryRequest(response: DebugProtocol.ReadMemoryResponse, { offset = 0, count, memoryReference }: DebugProtocol.ReadMemoryArguments) {
 		const [start, end] = JSON.parse(memoryReference);
 		const realCount = Math.max(0, Math.min(count, end - (start + offset)));
-		const data = realCount > 0 ? this._runtime.memory.slice(offset + start, offset + start + realCount) : Buffer.alloc(0);
+		const encoded = realCount > 0 ? this._runtime.memory.slice(offset + start, offset + start + realCount) : new Uint8Array();
 
 		response.body = {
 			address: (start + offset).toString(),
-			data: data.toString('base64'),
+			data: base64.fromByteArray(encoded),
 			unreadableBytes: count - realCount
 		};
 		this.sendResponse(response);
