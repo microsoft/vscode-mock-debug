@@ -4,7 +4,7 @@
 
 import { MockDebugSession } from './mockDebug';
 
-import { readFile } from 'fs';
+import { promises as fs } from 'fs';
 import * as Net from 'net';
 import { FileAccessor } from './mockRuntime';
 
@@ -17,16 +17,11 @@ import { FileAccessor } from './mockRuntime';
  * So we can only use node.js API for accessing files.
  */
 const fsAccessor:  FileAccessor = {
-	async readFile(path: string): Promise<string> {
-		return new Promise((resolve, reject) => {
-			readFile(path, (err, data) => {
-				if (err) {
-					reject(err);
-				} else {
-					resolve(data.toString());
-				}
-			});
-		});
+	readFile(path: string): Promise<Uint8Array> {
+		return fs.readFile(path);
+	},
+	writeFile(path: string, contents: Uint8Array): Promise<void> {
+		return fs.writeFile(path, contents);
 	}
 };
 
