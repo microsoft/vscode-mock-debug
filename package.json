@@ -49,6 +49,8 @@
     "@types/vscode": "^1.61.0",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
+    "@vscode/debugadapter": "^1.51.0",
+    "@vscode/debugadapter-testsupport": "^1.51.0",
     "await-notify": "1.0.1",
     "base64-js": "^1.5.1",
     "esbuild": "^0.13.12",
@@ -60,9 +62,7 @@
     "rimraf": "^3.0.2",
     "typescript": "^4.4.4",
     "url": "^0.11.0",
-    "vsce": "^2.5.1",
-    "vscode-debugadapter": "^1.51.0-pre.0",
-    "vscode-debugadapter-testsupport": "^1.51.0-pre.0"
+    "vsce": "^2.5.1"
   },
   "main": "./dist/extension.js",
   "browser": "./dist/web-extension.js",

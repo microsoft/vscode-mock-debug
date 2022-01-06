@@ -16,8 +16,8 @@ import {
 	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent,
 	ProgressStartEvent, ProgressUpdateEvent, ProgressEndEvent, InvalidatedEvent,
 	Thread, StackFrame, Scope, Source, Handles, Breakpoint
-} from 'vscode-debugadapter';
-import { DebugProtocol } from 'vscode-debugprotocol';
+} from '@vscode/debugadapter';
+import { DebugProtocol } from '@vscode/debugprotocol';
 import { basename } from 'path-browserify';
 import { MockRuntime, IRuntimeBreakpoint, FileAccessor, IRuntimeVariable, timeout, IRuntimeVariableType } from './mockRuntime';
 import { Subject } from 'await-notify';
