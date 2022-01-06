@@ -5,7 +5,7 @@
  * mockDebug.ts implements the Debug Adapter that "adapts" or translates the Debug Adapter Protocol (DAP) used by the client (e.g. VS Code)
  * into requests and events of the real "execution engine" or "debugger" (here: class MockRuntime).
  * When implementing your own debugger extension for VS Code, most of the work will go into the Debug Adapter.
- * Since the Debug Adapter is independent from VS Code, it can be used in other clients (IDEs) supporting the Debug Adapter Protocol.
+ * Since the Debug Adapter is independent from VS Code, it can be used in any client (IDE) supporting the Debug Adapter Protocol.
  *
  * The most important class of the Debug Adapter is the MockDebugSession which implements many DAP requests by talking to the MockRuntime.
  */
@@ -227,7 +227,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		// make sure to 'Stop' the buffered logging if 'trace' is not set
 		logger.setup(args.trace ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
 
-		// wait until configuration has finished (and configurationDoneRequest has been called)
+		// wait 1 second until configuration has finished (and configurationDoneRequest has been called)
 		await this._configurationDone.wait(1000);
 
 		// start the program in the runtime
@@ -367,7 +367,8 @@ export class MockDebugSession extends LoggingDebugSession {
 
 				return sf;
 			}),
-			//no totalFrames: 				// VS Code has to probe/guess. Should result in a max. of two requests
+			// 4 options for 'totalFrames':
+			//omit totalFrames property: 	// VS Code has to probe/guess. Should result in a max. of two requests
 			totalFrames: stk.count			// stk.count is the correct size, should result in a max. of two requests
 			//totalFrames: 1000000 			// not the correct size, should result in a max. of two requests
 			//totalFrames: endFrame + 20 	// dynamically increases the size with every requested chunk, results in paging
