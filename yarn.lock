@@ -177,10 +177,10 @@
   dependencies:
     "@vscode/debugprotocol" "1.51.0"
 
-"@vscode/debugadapter@^1.51.0":
-  version "1.51.0"
-  resolved "https://registry.yarnpkg.com/@vscode/debugadapter/-/debugadapter-1.51.0.tgz#f4da557067714d259887107f19fe23f680302688"
-  integrity sha512-D8LFrLb/Jkb4ObydLqPd0extCxK5CJBwZdhbKDPpCOePV1kiInXDi3ve48Srb70ccbVEzfpXnD3j0rNSmRalqQ==
+"@vscode/debugadapter@^1.51.1":
+  version "1.51.1"
+  resolved "https://registry.yarnpkg.com/@vscode/debugadapter/-/debugadapter-1.51.1.tgz#3e359801ab0c75eea40b29932ddac6a8c0c4992e"
+  integrity sha512-oRzHenxK/5ZwqZr+tTq07pbuON61gV2mHBAg1MPDzzdj3oHs306OExFe9rrNw718pB9i8NfO2JJ1a7ah76dNxg==
   dependencies:
     "@vscode/debugprotocol" "1.51.0"
     mkdirp "^1.0.4"

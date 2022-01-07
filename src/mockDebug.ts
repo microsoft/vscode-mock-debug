@@ -15,11 +15,11 @@ import {
 	LoggingDebugSession,
 	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent,
 	ProgressStartEvent, ProgressUpdateEvent, ProgressEndEvent, InvalidatedEvent,
-	Thread, StackFrame, Scope, Source, Handles, Breakpoint
+	Thread, StackFrame, Scope, Source, Handles, Breakpoint, MemoryEvent
 } from '@vscode/debugadapter';
 import { DebugProtocol } from '@vscode/debugprotocol';
 import { basename } from 'path-browserify';
-import { MockRuntime, IRuntimeBreakpoint, FileAccessor, IRuntimeVariable, timeout, IRuntimeVariableType } from './mockRuntime';
+import { MockRuntime, IRuntimeBreakpoint, FileAccessor, RuntimeVariable, timeout, IRuntimeVariableType } from './mockRuntime';
 import { Subject } from 'await-notify';
 import * as base64 from 'base64-js';
 
@@ -51,7 +51,7 @@ export class MockDebugSession extends LoggingDebugSession {
 	// a Mock runtime (or debugger)
 	private _runtime: MockRuntime;
 
-	private _variableHandles = new Handles<'locals' | 'globals' | IRuntimeVariable>();
+	private _variableHandles = new Handles<'locals' | 'globals' | RuntimeVariable>();
 
 	private _configurationDone = new Subject();
 
@@ -189,7 +189,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body.supportsExceptionInfoRequest = true;
 
 		// make VS Code send setVariable request
-		response.body.supportsSetVariable = false;
+		response.body.supportsSetVariable = true;
 
 		// make VS Code send setExpression request
 		response.body.supportsSetExpression = true;
@@ -388,28 +388,46 @@ export class MockDebugSession extends LoggingDebugSession {
 	}
 
 	protected async writeMemoryRequest(response: DebugProtocol.WriteMemoryResponse, { data, memoryReference, offset = 0 }: DebugProtocol.WriteMemoryArguments) {
-		const [start] = JSON.parse(memoryReference);
-		const decoded = base64.toByteArray(data);
-		this._runtime.writeData(start + offset, decoded);
+		const variable = this._variableHandles.get(Number(memoryReference));
+		if (typeof variable === 'object') {
+			const decoded = base64.toByteArray(data);
+			variable.setMemory(decoded, offset);
+			response.body = { bytesWritten: decoded.length };
+		} else {
+			response.body = { bytesWritten: 0 };
+		}
+
 		this.sendResponse(response);
+		this.sendEvent(new InvalidatedEvent(['variables']));
 	}
 
 	protected async readMemoryRequest(response: DebugProtocol.ReadMemoryResponse, { offset = 0, count, memoryReference }: DebugProtocol.ReadMemoryArguments) {
-		const [start, end] = JSON.parse(memoryReference);
-		const realCount = Math.max(0, Math.min(count, end - (start + offset)));
-		const encoded = realCount > 0 ? this._runtime.memory.slice(offset + start, offset + start + realCount) : new Uint8Array();
+		const variable = this._variableHandles.get(Number(memoryReference));
+		if (typeof variable === 'object' && variable.memory) {
+			const memory = variable.memory.subarray(
+				Math.min(offset, variable.memory.length),
+				Math.min(offset + count, variable.memory.length),
+			);
 
-		response.body = {
-			address: (start + offset).toString(),
-			data: base64.fromByteArray(encoded),
-			unreadableBytes: count - realCount
-		};
+			response.body = {
+				address: offset.toString(),
+				data: base64.fromByteArray(memory),
+				unreadableBytes: count - memory.length
+			};
+		} else {
+			response.body = {
+				address: offset.toString(),
+				data: '',
+				unreadableBytes: count
+			};
+		}
+
 		this.sendResponse(response);
 	}
 
 	protected async variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request): Promise<void> {
 
-		let vs: IRuntimeVariable[] = [];
+		let vs: RuntimeVariable[] = [];
 
 		const v = this._variableHandles.get(args.variablesReference);
 		if (v === 'locals') {
@@ -433,14 +451,22 @@ export class MockDebugSession extends LoggingDebugSession {
 	}
 
 	protected setVariableRequest(response: DebugProtocol.SetVariableResponse, args: DebugProtocol.SetVariableArguments): void {
-		const scope = this._variableHandles.get(args.variablesReference);
-		if (scope === 'locals') {
-			const rv = this._runtime.getLocalVariable(args.name);
-			if (rv) {
-				rv.value = this.convertToRuntime(args.value);
-				response.body = this.convertFromRuntime(rv);
+		const container = this._variableHandles.get(args.variablesReference);
+		const rv = container === 'locals'
+			? this._runtime.getLocalVariable(args.name)
+			: container instanceof RuntimeVariable && container.value instanceof Array
+			? container.value.find(v => v.name === args.name)
+			: undefined;
+
+		if (rv) {
+			rv.value = this.convertToRuntime(args.value);
+			response.body = this.convertFromRuntime(rv);
+
+			if (rv.memory && rv.reference) {
+				this.sendEvent(new MemoryEvent(String(rv.reference), 0, rv.memory.length));
 			}
 		}
+
 		this.sendResponse(response);
 	}
 
@@ -487,7 +513,7 @@ export class MockDebugSession extends LoggingDebugSession {
 	protected async evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): Promise<void> {
 
 		let reply: string | undefined;
-		let rv: IRuntimeVariable | undefined;
+		let rv: RuntimeVariable | undefined;
 
 		switch (args.context) {
 			case 'repl':
@@ -528,10 +554,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				if (args.expression.startsWith('$')) {
 					rv = this._runtime.getLocalVariable(args.expression.substr(1));
 				} else {
-					rv = {
-						name: 'eval',
-						value: this.convertToRuntime(args.expression)
-					};
+					rv = new RuntimeVariable('eval', this.convertToRuntime(args.expression));
 				}
 				break;
 		}
@@ -785,7 +808,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		return value;
 	}
 
-	private convertFromRuntime(v: IRuntimeVariable): DebugProtocol.Variable {
+	private convertFromRuntime(v: RuntimeVariable): DebugProtocol.Variable {
 
 		let dapVariable: DebugProtocol.Variable = {
 			name: v.name,
@@ -797,7 +820,8 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		if (Array.isArray(v.value)) {
 			dapVariable.value = 'Object';
-			dapVariable.variablesReference = this._variableHandles.create(v);
+			v.reference ??= this._variableHandles.create(v);
+			dapVariable.variablesReference = v.reference;
 		} else {
 			switch (typeof v.value) {
 				case 'number':
@@ -822,8 +846,9 @@ export class MockDebugSession extends LoggingDebugSession {
 			}
 		}
 
-		if (v.fileRange) {
-			dapVariable.memoryReference = JSON.stringify(v.fileRange);
+		if (v.memory) {
+			v.reference ??= this._variableHandles.create(v);
+			dapVariable.memoryReference = String(v.reference);
 		}
 
 		return dapVariable;

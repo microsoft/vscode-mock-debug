@@ -40,12 +40,41 @@ interface RuntimeDisassembledInstruction {
 	line?: number;
 }
 
-export type IRuntimeVariableType = number | boolean | string | IRuntimeVariable[];
+export type IRuntimeVariableType = number | boolean | string | RuntimeVariable[];
 
-export interface IRuntimeVariable {
-	name: string;
-	value: IRuntimeVariableType;
-	fileRange?: [from: number, to: number];
+export class RuntimeVariable {
+	private _memory?: Uint8Array;
+
+	public reference?: number;
+
+	public get value() {
+		return this._value;
+	}
+
+	public set value(value: IRuntimeVariableType) {
+		this._value = value;
+		this._memory = undefined;
+	}
+
+	public get memory() {
+		if (this._memory === undefined && typeof this._value === 'string') {
+			this._memory = new TextEncoder().encode(this._value);
+		}
+		return this._memory;
+	}
+
+	constructor(public readonly name: string, private _value: IRuntimeVariableType) {}
+
+	public setMemory(data: Uint8Array, offset = 0) {
+		const memory = this.memory;
+		if (!memory) {
+			return;
+		}
+
+		memory.set(data, offset);
+		this._memory = memory;
+		this._value = new TextDecoder().decode(memory);
+	}
 }
 
 interface Word {
@@ -81,18 +110,13 @@ export class MockRuntime extends EventEmitter {
 		return this._sourceFile;
 	}
 
-	private variables = new Map<string, IRuntimeVariable>();
+	private variables = new Map<string, RuntimeVariable>();
 
 	// the contents (= lines) of the one and only file
 	private sourceLines: string[] = [];
 	private instructions: Word[] = [];
 	private starts: number[] = [];
 	private ends: number[] = [];
-	private sourceTextAsMemory = new Uint8Array();
-
-	public get memory() {
-		return this.sourceTextAsMemory;
-	}
 
 	// This is the next line that will be 'executed'
 	private _currentLine = 0;
@@ -377,15 +401,12 @@ export class MockRuntime extends EventEmitter {
 		this.instructionBreakpoints.clear();
 	}
 
-	public async getGlobalVariables(cancellationToken?: () => boolean ): Promise<IRuntimeVariable[]> {
+	public async getGlobalVariables(cancellationToken?: () => boolean ): Promise<RuntimeVariable[]> {
 
-		let a: IRuntimeVariable[] = [];
+		let a: RuntimeVariable[] = [];
 
 		for (let i = 0; i < 10; i++) {
-			a.push({
-				name: `global_${i}`,
-				value: i
-			});
+			a.push(new RuntimeVariable(`global_${i}`, i));
 			if (cancellationToken && cancellationToken()) {
 				break;
 			}
@@ -395,11 +416,11 @@ export class MockRuntime extends EventEmitter {
 		return a;
 	}
 
-	public getLocalVariables(): IRuntimeVariable[] {
+	public getLocalVariables(): RuntimeVariable[] {
 		return Array.from(this.variables, ([name, value]) => value);
 	}
 
-	public getLocalVariable(name: string): IRuntimeVariable | undefined {
+	public getLocalVariable(name: string): RuntimeVariable | undefined {
 		return this.variables.get(name);
 	}
 
@@ -453,7 +474,6 @@ export class MockRuntime extends EventEmitter {
 	}
 
 	private initializeContents(memory: Uint8Array) {
-		this.sourceTextAsMemory = memory;
 		this.sourceLines = new TextDecoder().decode(memory).split(/\r?\n/);
 
 		this.instructions = [];
@@ -514,15 +534,6 @@ export class MockRuntime extends EventEmitter {
 	}
 
 	/**
-	 * Updates the source file contents and re-parses variables/instructions.
-	 */
-	public async writeData(offset: number, data: Uint8Array) {
-		this.sourceTextAsMemory.set(data, offset);
-		await this.fileAccessor.writeFile(this._sourceFile, this.sourceTextAsMemory);
-		this.initializeContents(this.sourceTextAsMemory);
-	}
-
-	/**
 	 * "execute a line" of the readme markdown.
 	 * Returns true if execution sent out a stopped event and needs to stop.
 	 */
@@ -538,7 +549,6 @@ export class MockRuntime extends EventEmitter {
 		}
 
 		const line = this.getLine(ln);
-		const byteOffset = this.lineByteOffset(ln);
 
 		// find variable accesses
 		let reg0 = /\$([a-z][a-z0-9]*)(=(false|true|[0-9]+(\.[0-9]+)?|\".*\"|\{.*\}))?/ig;
@@ -551,29 +561,22 @@ export class MockRuntime extends EventEmitter {
 				const name = matches0[1];
 				const value = matches0[3];
 
-				let v: IRuntimeVariable = { name, value };
+				let v = new RuntimeVariable(name, value);
 
 				if (value && value.length > 0) {
-					const declStart = byteOffset + matches0.index;
-					v.fileRange = [declStart, declStart + matches0[0].length];
 
 					if (value === 'true') {
 						v.value = true;
 					} else if (value === 'false') {
 						v.value = false;
 					} else if (value[0] === '"') {
-						v.value = value.substr(1, value.length-2);
+						v.value = value.slice(1, -1);
 					} else if (value[0] === '{') {
-						v.value = [ {
-							name: 'fBool',
-							value: true
-						}, {
-							name: 'fInteger',
-							value: 123
-						}, {
-							name: 'fString',
-							value: 'hello'
-						} ];
+						v.value = [
+							new RuntimeVariable('fBool', true),
+							new RuntimeVariable('fInteger', 123),
+							new RuntimeVariable('fString', 'hello'),
+						];
 					} else {
 						v.value = parseFloat(value);
 					}
@@ -663,14 +666,5 @@ export class MockRuntime extends EventEmitter {
 		setTimeout(() => {
 			this.emit(event, ...args);
 		}, 0);
-	}
-
-	private lineByteOffset(lineNumber: number) {
-		let offset = 0;
-		for (; lineNumber > 0; lineNumber--) {
-			offset = this.sourceTextAsMemory.indexOf(10 /* \n */, offset) + 1;
-		}
-
-		return offset;
 	}
 }
