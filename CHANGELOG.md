@@ -1,4 +1,8 @@
 
+## 0.48.1
+* publish new release under Microsoft publisher
+* improved read/write memory behavior, invaldiate memory and variables on change
+
 ## 0.47.2
 * another "pre-release" version of Mock Debug (for testing the pre-release feature)
 

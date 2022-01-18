@@ -1,7 +1,7 @@
 {
   "name": "mock-debug",
   "displayName": "Mock Debug",
-  "version": "0.47.2",
+  "version": "0.48.1",
   "publisher": "ms-vscode",
   "description": "Starter extension for developing debug adapters for VS Code.",
   "author": {
@@ -61,7 +61,7 @@
     "rimraf": "^3.0.2",
     "typescript": "^4.4.4",
     "url": "^0.11.0",
-    "vsce": "^2.5.1"
+    "vsce": "^2.6.3"
   },
   "main": "./dist/extension.js",
   "browser": "./dist/web-extension.js",
