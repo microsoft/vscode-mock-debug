@@ -2,11 +2,10 @@
   "name": "mock-debug",
   "displayName": "Mock Debug",
   "version": "0.47.2",
-  "publisher": "andreweinand",
+  "publisher": "ms-vscode",
   "description": "Starter extension for developing debug adapters for VS Code.",
   "author": {
-    "name": "Microsoft Corporation",
-    "email": "aweinand@microsoft.com"
+    "name": "Microsoft Corporation"
   },
   "license": "MIT",
   "keywords": [
