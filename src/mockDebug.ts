@@ -106,8 +106,16 @@ export class MockDebugSession extends LoggingDebugSession {
 		this._runtime.on('breakpointValidated', (bp: IRuntimeBreakpoint) => {
 			this.sendEvent(new BreakpointEvent('changed', { verified: bp.verified, id: bp.id } as DebugProtocol.Breakpoint));
 		});
-		this._runtime.on('output', (text, filePath, line, column) => {
-			const e: DebugProtocol.OutputEvent = new OutputEvent(`${text}\n`);
+		this._runtime.on('output', (type, text, filePath, line, column) => {
+			
+			let category: string;
+			switch(type) {
+				case 'prio': category = 'important'; break;
+				case 'out': category = 'stdout'; break;
+				case 'err': category = 'stderr'; break;
+				default: category = 'console'; break;
+			}
+			const e: DebugProtocol.OutputEvent = new OutputEvent(`${text}\n`, category);
 
 			if (text === 'start' || text === 'startCollapsed' || text === 'end') {
 				e.body.group = text;

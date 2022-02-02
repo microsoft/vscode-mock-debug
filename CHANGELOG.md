@@ -1,4 +1,7 @@
 
+## 0.49.0
+* support all `output` event categories: `prio(xxx)`, `out(xxx)`, or `err(xxx)` (in addition to `log(xxx)`)
+
 ## 0.48.1
 * publish new release under Microsoft publisher
 * improved read/write memory behavior, invaldiate memory and variables on change

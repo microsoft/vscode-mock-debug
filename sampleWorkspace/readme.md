@@ -57,29 +57,32 @@ To make the debugger stop when an exception is thrown, two "exception options" e
 - **Named Exception**: if enabled and configured with a condition (e.g. `xxx`) the debugger will break on the `exception(xxx)` pattern.
 - **Other Exceptions**: if enabled the debugger will break on the word `exception` and the `exception(...)` pattern.
 
-## Output logging
+## Output events
 
-* a line with the pattern `log(xxx)` logs `xxx` to the debug console. If "xxx" is `start` or `end`, a "log group" is started or ended.
+* If a line containes patterns like `log(xxx)`, `prio(xxx)`, `out(xxx)`, or `err(xxx)` the argument `xxx` is shown in the debug console as follows:
+  * **log**: text is shown in debug console's default color to indicate that it is received from the debugger itself
+  * **prio**: text is shown as a notification to indicate that it is received from the debugger itself and has high priority
+  * **out**: text is shown in blue to indicate program output received from "stdout"
+  * **err**: text is shown in red to indicate program output received from "stderr"
+* If the argument `xxx` is `start` or `end`, a "log group" is started or ended.
+
+Some examples:
+```
+prio(a high priority message)
+out(some text from stdout)
+err(some text from stderr)
 
 log(start)
-log(arbitrary line of text)
+log(some text in group)
 log(start)
-log(arbitrary line of text level 2)
-log(start)
-log(arbitrary line of text level 3)
-log(start)
-log(arbitrary line of text level 4)
-log(start)
-log(arbitrary line of text level 5)
-log(another line of text level 5)
+log(some text on level 2 group)
+log(more text on level 2 group)
 log(end)
-log(another line of text level 4)
+log(startCollapsed)
+log(some text on a collapsed group)
 log(end)
-log(another line of text level 3)
+log(more text in group)
 log(end)
-log(another line of text level 2)
-log(end)
-log(another line of text)
-log(end)
+````
 
 ## The End

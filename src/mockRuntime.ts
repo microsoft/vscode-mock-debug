@@ -165,7 +165,7 @@ export class MockRuntime extends EventEmitter {
 			if (stopOnEntry) {
 				this.findNextStatement(false, 'stopOnEntry');
 			} else {
-				// we just start to run until we hit a breakpoint, an exception, or the end
+				// we just start to run until we hit a breakpoint, an exception, or the end of the program
 				this.continue(false);
 			}
 		} else {
@@ -602,9 +602,12 @@ export class MockRuntime extends EventEmitter {
 		}
 
 		// if 'log(...)' found in source -> send argument to debug console
-		const matches = /log\((.*)\)/.exec(line);
-		if (matches && matches.length === 2) {
-			this.sendEvent('output', matches[1], this._sourceFile, ln, matches.index);
+		const reg1 = /(log|prio|out|err)\(([^\)]*)\)/g;
+		let matches1: RegExpExecArray | null;
+		while (matches1 = reg1.exec(line)) {
+			if (matches1.length === 3) {
+				this.sendEvent('output', matches1[1], matches1[2], this._sourceFile, ln, matches1.index);
+			}
 		}
 
 		// if pattern 'exception(...)' found in source -> throw named exception
