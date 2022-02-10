@@ -826,31 +826,40 @@ export class MockDebugSession extends LoggingDebugSession {
 			evaluateName: '$' + v.name
 		};
 
-		if (Array.isArray(v.value)) {
-			dapVariable.value = 'Object';
-			v.reference ??= this._variableHandles.create(v);
+		if (v.name.indexOf('lazy') >= 0) {
+			dapVariable.value = '🛌 click me to retrieve value ...';
+			v.reference ??= this._variableHandles.create(new RuntimeVariable('', [ new RuntimeVariable('', v.value) ]));
 			dapVariable.variablesReference = v.reference;
+			dapVariable.presentationHint = { lazy: true };
 		} else {
-			switch (typeof v.value) {
-				case 'number':
-					if (Math.round(v.value) === v.value) {
-						dapVariable.value = this.formatNumber(v.value);
-						(<any>dapVariable).__vscodeVariableMenuContext = 'simple';	// enable context menu contribution
-						dapVariable.type = 'integer';
-					} else {
-						dapVariable.value = v.value.toString();
-						dapVariable.type = 'float';
-					}
-					break;
-				case 'string':
-					dapVariable.value = `"${v.value}"`;
-					break;
-				case 'boolean':
-					dapVariable.value = v.value ? 'true' : 'false';
-					break;
-				default:
-					dapVariable.value = typeof v.value;
-					break;
+
+			if (Array.isArray(v.value)) {
+				dapVariable.value = 'Object';
+				v.reference ??= this._variableHandles.create(v);
+				dapVariable.variablesReference = v.reference;
+			} else {
+
+				switch (typeof v.value) {
+					case 'number':
+						if (Math.round(v.value) === v.value) {
+							dapVariable.value = this.formatNumber(v.value);
+							(<any>dapVariable).__vscodeVariableMenuContext = 'simple';	// enable context menu contribution
+							dapVariable.type = 'integer';
+						} else {
+							dapVariable.value = v.value.toString();
+							dapVariable.type = 'float';
+						}
+						break;
+					case 'string':
+						dapVariable.value = `"${v.value}"`;
+						break;
+					case 'boolean':
+						dapVariable.value = v.value ? 'true' : 'false';
+						break;
+					default:
+						dapVariable.value = typeof v.value;
+						break;
+				}
 			}
 		}
 

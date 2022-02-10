@@ -28,6 +28,10 @@ Writing to a variable is done with the `$variable=value` syntax. The format of t
 Variables are shown in the VARIABLES view under the "Locals" and "Globals" scopes whenever the debugger stops.
 In addition a variable's value is shown when hovering over a variable and VS Code's Inline Values features shows the value at the end of the line.
 
+A variable where the name contains the string "lazy" will be shown in the VARIABLES view with a UI that requires an additional click to retrieve the value. Two examples:
+- Lazy Integer: $lazyInteger=999
+- Lazy Object: $lazyObject={foo}
+
 ## Breakpoints
 
 Breakpoints can be set in the breakpoint margin of the editor (even before a Mock Debug session was started).
