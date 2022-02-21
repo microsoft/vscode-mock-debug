@@ -1,3 +1,7 @@
+## 0.49.2 (pre-release)
+* Fix `lazy` property on `evaluateRequest`
+* Simplify lazy value placeholder to avoid confusion in testing
+
 ## 0.49.1 (pre-release)
 * support all `output` event categories: `prio(xxx)`, `out(xxx)`, or `err(xxx)` (in addition to `log(xxx)`)
 * returns the `lazy` property on the `VariablePresentationHint` if a variable name contains the word "lazy"
@@ -22,7 +26,7 @@
 * improve comments; fixes #60
 
 ## 0.46.9
-* switch from webpack 5 to esbuild 
+* switch from webpack 5 to esbuild
 
 ## 0.46.9
 * upgrade from webpack 4 to webpack 5
@@ -31,8 +35,8 @@
 * update dependencies
 
 ## 0.46.7
-* Add line and source information to disassemble instructions. 
- 
+* Add line and source information to disassemble instructions.
+
 ## 0.46.6
 * Simplify "no-debug" mode (in order to profit from https://github.com/microsoft/vscode/issues/129255)
 
@@ -47,7 +51,7 @@
 * Improved overall stepping behavior: mock debug now behaves like a real debugger: it breaks on a line before executing the line. Previously it was breaking while executing the line.
 
 ## 0.46.0
-* Rewrite Variables; see Readme.md in sampleWorkspace 
+* Rewrite Variables; see Readme.md in sampleWorkspace
 * Add support for Disassembly View, Instruction Stepping, and Instruction Breakpoints. Instruction breakpoints can be set in the Disassembly view.
 
 ## 0.45.8
