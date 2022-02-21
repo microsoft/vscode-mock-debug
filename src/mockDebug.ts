@@ -107,7 +107,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			this.sendEvent(new BreakpointEvent('changed', { verified: bp.verified, id: bp.id } as DebugProtocol.Breakpoint));
 		});
 		this._runtime.on('output', (type, text, filePath, line, column) => {
-			
+
 			let category: string;
 			switch(type) {
 				case 'prio': category = 'important'; break;
@@ -572,7 +572,8 @@ export class MockDebugSession extends LoggingDebugSession {
 			response.body = {
 				result: v.value,
 				type: v.type,
-				variablesReference: v.variablesReference
+				variablesReference: v.variablesReference,
+				presentationHint: v.presentationHint
 			};
 		} else {
 			response.body = {
