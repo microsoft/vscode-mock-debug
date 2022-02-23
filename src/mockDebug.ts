@@ -828,7 +828,9 @@ export class MockDebugSession extends LoggingDebugSession {
 		};
 
 		if (v.name.indexOf('lazy') >= 0) {
-			dapVariable.value = 'lazy var';
+			// a "lazy" variable needs an additional click to retrieve its value
+			
+			dapVariable.value = 'lazy var';		// placeholder value
 			v.reference ??= this._variableHandles.create(new RuntimeVariable('', [ new RuntimeVariable('', v.value) ]));
 			dapVariable.variablesReference = v.reference;
 			dapVariable.presentationHint = { lazy: true };
