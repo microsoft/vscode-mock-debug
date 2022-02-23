@@ -576,6 +576,7 @@ export class MockRuntime extends EventEmitter {
 							new RuntimeVariable('fBool', true),
 							new RuntimeVariable('fInteger', 123),
 							new RuntimeVariable('fString', 'hello'),
+							new RuntimeVariable('flazyInteger', 321)
 						];
 					} else {
 						v.value = parseFloat(value);
