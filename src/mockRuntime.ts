@@ -157,7 +157,7 @@ export class MockRuntime extends EventEmitter {
 	 */
 	public async start(program: string, stopOnEntry: boolean, debug: boolean): Promise<void> {
 
-		await this.loadSource(program);
+		await this.loadSource(this.normalizePathAndCasing(program));
 
 		if (debug) {
 			await this.verifyBreakpoints(this._sourceFile);
@@ -334,6 +334,7 @@ export class MockRuntime extends EventEmitter {
 	 * Set breakpoint in file with given line.
 	 */
 	public async setBreakPoint(path: string, line: number): Promise<IRuntimeBreakpoint> {
+		path = this.normalizePathAndCasing(path);
 
 		const bp: IRuntimeBreakpoint = { verified: false, line, id: this.breakpointId++ };
 		let bps = this.breakPoints.get(path);
@@ -352,7 +353,7 @@ export class MockRuntime extends EventEmitter {
 	 * Clear breakpoint in file with given line.
 	 */
 	public clearBreakPoint(path: string, line: number): IRuntimeBreakpoint | undefined {
-		const bps = this.breakPoints.get(path);
+		const bps = this.breakPoints.get(this.normalizePathAndCasing(path));
 		if (bps) {
 			const index = bps.findIndex(bp => bp.line === line);
 			if (index >= 0) {
@@ -365,7 +366,7 @@ export class MockRuntime extends EventEmitter {
 	}
 
 	public clearBreakpoints(path: string): void {
-		this.breakPoints.delete(path);
+		this.breakPoints.delete(this.normalizePathAndCasing(path));
 	}
 
 	public setDataBreakpoint(address: string, accessType: 'read' | 'write' | 'readWrite'): boolean {
@@ -468,7 +469,7 @@ export class MockRuntime extends EventEmitter {
 
 	private async loadSource(file: string): Promise<void> {
 		if (this._sourceFile !== file) {
-			this._sourceFile = file;
+			this._sourceFile = this.normalizePathAndCasing(file);
 			this.initializeContents(await this.fileAccessor.readFile(file));
 		}
 	}
@@ -670,5 +671,9 @@ export class MockRuntime extends EventEmitter {
 		setTimeout(() => {
 			this.emit(event, ...args);
 		}, 0);
+	}
+
+	private normalizePathAndCasing(path: string) {
+		return path.replace(/\\/g, '/').toLowerCase();
 	}
 }
