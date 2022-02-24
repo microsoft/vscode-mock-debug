@@ -1,4 +1,4 @@
-## 0.49.5 (pre-release)
+## 0.49.6
 * support all `output` event categories: `prio(xxx)`, `out(xxx)`, or `err(xxx)` (in addition to `log(xxx)`)
 * returns the `lazy` property on the `VariablePresentationHint` if a variable name contains the word "lazy"; the value placeholder for lazy variables is `lazy var`.
 
