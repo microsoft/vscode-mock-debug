@@ -180,25 +180,24 @@
   resolved "https://registry.yarnpkg.com/@ungap/promise-all-settled/-/promise-all-settled-1.1.2.tgz#aa58042711d6e3275dd37dc597e5d31e8c290a44"
   integrity sha512-sL/cEvJWAnClXw0wHk85/2L0G6Sj8UB0Ctc1TEMbKSsmpRosqhwj9gWgFRZSrBr2f9tiXISwNhCPmlfqUqyb9Q==
 
-"@vscode/debugadapter-testsupport@^1.54.0":
-  version "1.54.0"
-  resolved "https://registry.yarnpkg.com/@vscode/debugadapter-testsupport/-/debugadapter-testsupport-1.54.0.tgz#aa001a6dacd635355f2d55e56739bb42ae667111"
-  integrity sha512-0RJvLtTHuhDKaN1VFMN8d6BTWD3Tw+XHM2idezF1c6QnUnjVB1ZHcvcPGGmHvgjwtERIujOF4bo5d6vgQmwPog==
+"@vscode/debugadapter-testsupport@^1.55.0-pre.1":
+  version "1.55.0-pre.1"
+  resolved "https://registry.yarnpkg.com/@vscode/debugadapter-testsupport/-/debugadapter-testsupport-1.55.0-pre.1.tgz#87c4f0d2adac48a61ec9efb62064add74113f89e"
+  integrity sha512-DLNN5srnE/JxVwWbJmjhDC6YDk0no0viwgV1RPu52Wfm7ZiT7BtOOHZeuH01lViiz0tMz/261z3RF0AuTgHbiA==
   dependencies:
-    "@vscode/debugprotocol" "1.54.0"
+    "@vscode/debugprotocol" "1.55.0-pre.1"
 
-"@vscode/debugadapter@^1.54.0":
-  version "1.54.0"
-  resolved "https://registry.yarnpkg.com/@vscode/debugadapter/-/debugadapter-1.54.0.tgz#eec17fa051657f8b7de27498ba5f27a412033ddb"
-  integrity sha512-2/Fkhx9cvhVIvUW/ymoQP8QhsnkPpP24BZnzpkg8tt+pkZwGVAQfkNlbKFgxl/UFhChCGaG/ean9YlHI92CN+g==
+"@vscode/debugadapter@^1.55.0-pre.1":
+  version "1.55.0-pre.1"
+  resolved "https://registry.yarnpkg.com/@vscode/debugadapter/-/debugadapter-1.55.0-pre.1.tgz#8dc7ead39258112eb50c5f719f90d6861b3ef97e"
+  integrity sha512-0adE2bGcW6NC7CAAZegxqmQbM0Wilh8PD5GMqDb0hKBRUc2BJgpq5uAdNpPZWi0xhnw7COeyKqMUF9Wj8Gku7g==
   dependencies:
-    "@vscode/debugprotocol" "1.54.0"
-    mkdirp "^1.0.4"
+    "@vscode/debugprotocol" "1.55.0-pre.1"
 
-"@vscode/debugprotocol@1.54.0":
-  version "1.54.0"
-  resolved "https://registry.yarnpkg.com/@vscode/debugprotocol/-/debugprotocol-1.54.0.tgz#d0e687e4963e8535b94a8d549486ce25438d1a7c"
-  integrity sha512-/Qt6ICgqj2OzIsTJ9JJ4JTsvNz1ql+tfdbvtTWZCLJbDgkHwPNUSr6iKwCjgcZ7Hz8SbzVK8e9vIV/L7R21FCQ==
+"@vscode/debugprotocol@1.55.0-pre.1":
+  version "1.55.0-pre.1"
+  resolved "https://registry.yarnpkg.com/@vscode/debugprotocol/-/debugprotocol-1.55.0-pre.1.tgz#6b212cb84c15f11a805da466812eac8079d84ef8"
+  integrity sha512-+LnlVVUoOo5JGNZ1frUKhfk9mDrhBd+Pv4HF/GO3aHWUhpzDZN0/1iO07u1N5tbgDJ+1PCIZ5rWzX/VuVoq0cA==
 
 acorn-jsx@^5.3.1:
   version "5.3.1"
@@ -1432,11 +1431,6 @@ mkdirp-classic@^0.5.2, mkdirp-classic@^0.5.3:
   version "0.5.3"
   resolved "https://registry.yarnpkg.com/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz#fa10c9115cc6d8865be221ba47ee9bed78601113"
   integrity sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==
-
-mkdirp@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
-  integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
 mocha@^9.2.0:
   version "9.2.0"
