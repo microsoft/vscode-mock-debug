@@ -698,11 +698,13 @@ export class MockDebugSession extends LoggingDebugSession {
 				},
 				{
 					label: "item 1",
-					sortText: "01"
+					sortText: "01",
+					detail: "detail 1"
 				},
 				{
 					label: "item 2",
-					sortText: "02"
+					sortText: "02",
+					detail: "detail 2"
 				},
 				{
 					label: "array[]",
