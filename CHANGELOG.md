@@ -1,3 +1,7 @@
+## 0.50.0
+* add some details to completion items
+* use DAP 1.55.1
+
 ## 0.49.6
 * support all `output` event categories: `prio(xxx)`, `out(xxx)`, or `err(xxx)` (in addition to `log(xxx)`)
 * returns the `lazy` property on the `VariablePresentationHint` if a variable name contains the word "lazy"; the value placeholder for lazy variables is `lazy var`.
