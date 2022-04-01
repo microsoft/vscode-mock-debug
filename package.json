@@ -12,7 +12,7 @@
     "multi-root ready"
   ],
   "engines": {
-    "vscode": "^1.64.0"
+    "vscode": "^1.66.0"
   },
   "icon": "images/mock-debug-icon.png",
   "categories": [
@@ -45,23 +45,23 @@
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.1.0",
     "@types/node": "^14.14.37",
-    "@types/vscode": "^1.64.0",
-    "@typescript-eslint/eslint-plugin": "5.2.0",
-    "@typescript-eslint/parser": "^5.12.0",
+    "@types/vscode": "^1.66.0",
+    "@typescript-eslint/eslint-plugin": "^5.17.0",
+    "@typescript-eslint/parser": "^5.17.0",
     "@vscode/debugadapter": "^1.55.1",
     "@vscode/debugadapter-testsupport": "^1.55.1",
-    "await-notify": "1.0.1",
+    "await-notify": "^1.0.1",
     "base64-js": "^1.5.1",
-    "esbuild": "^0.14.21",
-    "eslint": "^8.9.0",
+    "esbuild": "^0.14.29",
+    "eslint": "^8.12.0",
     "events": "^3.3.0",
     "glob": "^7.2.0",
-    "mocha": "^9.2.0",
+    "mocha": "^9.2.2",
     "path-browserify": "^1.0.1",
     "rimraf": "^3.0.2",
-    "typescript": "^4.5.5",
+    "typescript": "^4.6.3",
     "url": "^0.11.0",
-    "vsce": "^2.6.7"
+    "vsce": "^2.7.0"
   },
   "main": "./dist/extension.js",
   "browser": "./dist/web-extension.js",
