@@ -11,6 +11,14 @@
 			"program": "${workspaceFolder}/readme.md",
 			"stopOnEntry": true,
 			"trace": false
+		},
+		{
+			"type": "mock",
+			"request": "attach",
+			"name": "Attach readme.md",
+			"program": "${workspaceFolder}/readme.md",
+			"stopOnEntry": true,
+			"trace": false
 		}
 	]
 }

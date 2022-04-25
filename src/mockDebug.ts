@@ -42,6 +42,8 @@ interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	compileError?: 'default' | 'show' | 'hide';
 }
 
+interface IAttachRequestArguments extends ILaunchRequestArguments { }
+
 
 export class MockDebugSession extends LoggingDebugSession {
 
@@ -211,6 +213,9 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body.supportsReadMemoryRequest = true;
 		response.body.supportsWriteMemoryRequest = true;
 
+		response.body.supportSuspendDebuggee = true;
+		response.body.supportTerminateDebuggee = true;
+
 		this.sendResponse(response);
 
 		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
@@ -228,6 +233,14 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// notify the launchRequest that configuration has finished
 		this._configurationDone.notify();
+	}
+
+	protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments, request?: DebugProtocol.Request): void {
+		console.log(`disconnectRequest suspend: ${args.suspendDebuggee}, terminate: ${args.terminateDebuggee}`);
+	}
+
+	protected async attachRequest(response: DebugProtocol.AttachResponse, args: IAttachRequestArguments) {
+		return this.launchRequest(response, args);
 	}
 
 	protected async launchRequest(response: DebugProtocol.LaunchResponse, args: ILaunchRequestArguments) {
@@ -267,7 +280,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		const actualBreakpoints0 = clientLines.map(async l => {
 			const { verified, line, id } = await this._runtime.setBreakPoint(path, this.convertClientLineToDebugger(l));
 			const bp = new Breakpoint(verified, this.convertDebuggerLineToClient(line)) as DebugProtocol.Breakpoint;
-			bp.id= id;
+			bp.id = id;
 			return bp;
 		});
 		const actualBreakpoints = await Promise.all<DebugProtocol.Breakpoint>(actualBreakpoints0);
