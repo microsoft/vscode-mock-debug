@@ -215,6 +215,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		response.body.supportSuspendDebuggee = true;
 		response.body.supportTerminateDebuggee = true;
+		response.body.supportsFunctionBreakpoints = true;
 
 		this.sendResponse(response);
 
@@ -266,6 +267,10 @@ export class MockDebugSession extends LoggingDebugSession {
 		} else {
 			this.sendResponse(response);
 		}
+	}
+
+	protected setFunctionBreakPointsRequest(response: DebugProtocol.SetFunctionBreakpointsResponse, args: DebugProtocol.SetFunctionBreakpointsArguments, request?: DebugProtocol.Request): void {
+		this.sendResponse(response);
 	}
 
 	protected async setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): Promise<void> {
