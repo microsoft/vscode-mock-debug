@@ -17,6 +17,7 @@ import { FileAccessor } from './mockRuntime';
  * So we can only use node.js API for accessing files.
  */
 const fsAccessor:  FileAccessor = {
+	isWindows: process.platform === 'win32',
 	readFile(path: string): Promise<Uint8Array> {
 		return fs.readFile(path);
 	},

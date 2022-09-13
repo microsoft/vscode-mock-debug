@@ -5,6 +5,7 @@
 import { EventEmitter } from 'events';
 
 export interface FileAccessor {
+	isWindows: boolean;
 	readFile(path: string): Promise<Uint8Array>;
 	writeFile(path: string, contents: Uint8Array): Promise<void>;
 }
@@ -674,7 +675,7 @@ export class MockRuntime extends EventEmitter {
 	}
 
 	private normalizePathAndCasing(path: string) {
-		if (process.platform === 'win32') {
+		if (this.fileAccessor.isWindows) {
 			return path.replace(/\//g, '\\').toLowerCase();
 		} else {
 			return path.replace(/\\/g, '/');
