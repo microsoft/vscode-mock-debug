@@ -69,6 +69,8 @@ export class MockDebugSession extends LoggingDebugSession {
 
 	private _addressesInHex = true;
 
+	private _launchArgs: ILaunchRequestArguments | undefined;
+
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
 	 * We configure the default implementation of a debug adapter here.
@@ -246,7 +248,6 @@ export class MockDebugSession extends LoggingDebugSession {
 	}
 
 	protected async launchRequest(response: DebugProtocol.LaunchResponse, args: ILaunchRequestArguments) {
-
 		// make sure to 'Stop' the buffered logging if 'trace' is not set
 		logger.setup(args.trace ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
 
@@ -266,6 +267,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				showUser: args.compileError === 'show' ? true : (args.compileError === 'hide' ? false : undefined)
 			});
 		} else {
+			this._launchArgs = args;
 			this.sendResponse(response);
 		}
 	}
@@ -547,6 +549,25 @@ export class MockDebugSession extends LoggingDebugSession {
 			case 'repl':
 				// handle some REPL commands:
 				// 'evaluate' supports to create and delete breakpoints from the 'repl':
+				if (args.expression === 'startDebugging()') {
+					this.sendRequest('startDebugging', {
+						request: 'launch',
+						configuration: this._launchArgs
+					}, 1000, response => {
+						console.log('startDebugging response:', response);
+					});
+					rv = new RuntimeVariable('eval', this.convertToRuntime('sent a startDebugging request 👍'));
+					const v = this.convertFromRuntime(rv);
+					response.body = {
+						result: v.value,
+						type: v.type,
+						variablesReference: v.variablesReference,
+						presentationHint: v.presentationHint
+					};
+					this.sendResponse(response);
+					return;
+				}
+
 				const matches = /new +([0-9]+)/.exec(args.expression);
 				if (matches && matches.length === 2) {
 					const mbp = await this._runtime.setBreakPoint(this._runtime.sourceFile, this.convertClientLineToDebugger(parseInt(matches[1])));
