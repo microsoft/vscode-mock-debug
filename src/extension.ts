@@ -24,6 +24,7 @@ import { platform } from 'process';
 import { ProviderResult } from 'vscode';
 import { MockDebugSession } from './mockDebug';
 import { activateMockDebug, workspaceFileAccessor } from './activateMockDebug';
+import { DebugLogger } from './debug-logger';
 
 /*
  * The compile time flag 'runMode' controls how the debug adapter is run.
@@ -55,6 +56,9 @@ export function activate(context: vscode.ExtensionContext) {
 			activateMockDebug(context);
 			break;
 	}
+
+	const debugLogger = new DebugLogger(['mock']);
+	debugLogger.activate(context);
 }
 
 export function deactivate() {

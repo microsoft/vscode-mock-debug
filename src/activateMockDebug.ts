@@ -9,6 +9,7 @@
 
 import * as vscode from 'vscode';
 import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
+import { logger } from './logger';
 import { MockDebugSession } from './mockDebug';
 import { FileAccessor } from './mockRuntime';
 
@@ -199,13 +200,38 @@ export const workspaceFileAccessor: FileAccessor = {
 	}
 };
 
-function pathToUri(path: string) {
-	try {
-		return vscode.Uri.file(path);
-	} catch (e) {
-		return vscode.Uri.parse(path);
-	}
-}
+const pathToUri = (path: string): vscode.Uri => {
+    let uri: vscode.Uri;
+
+    try {
+        uri = vscode.Uri.file(path);
+    } catch (e) {
+        uri = vscode.Uri.parse(path);
+    }
+
+    logger.debug('Path:');
+    logger.debug(uri);
+
+    // Fix up URI on remote systems
+    if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
+        const root = vscode.workspace.workspaceFolders[0].uri;
+        logger.debug('Root:');
+        logger.debug(root);
+
+        uri = vscode.Uri.from({
+            scheme: root.scheme,
+            authority: root.authority,
+            path: uri.path,
+            query: uri.query,
+            fragment: uri.fragment
+        });
+
+        logger.debug('Aligned:');
+        logger.debug(uri);
+    }
+
+    return uri;
+};
 
 class InlineDebugAdapterFactory implements vscode.DebugAdapterDescriptorFactory {
 

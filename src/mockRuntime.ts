@@ -675,10 +675,13 @@ export class MockRuntime extends EventEmitter {
 	}
 
 	private normalizePathAndCasing(path: string) {
+		return path;
+		/*
 		if (this.fileAccessor.isWindows) {
 			return path.replace(/\//g, '\\').toLowerCase();
 		} else {
 			return path.replace(/\\/g, '/');
 		}
+		*/
 	}
 }
