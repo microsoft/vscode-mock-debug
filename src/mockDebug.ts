@@ -914,14 +914,14 @@ export class MockDebugSession extends LoggingDebugSession {
 			return this.fileAccessor.convertDebuggerPathToClient(debuggerPath);
 		}
 
-        return super.convertDebuggerPathToClient(debuggerPath);
-    }
+		return super.convertDebuggerPathToClient(debuggerPath);
+	}
 
 	protected convertClientPathToDebugger(clientPath: string): string {
 		if (this.fileAccessor.convertClientPathToDebugger) {
 			return this.fileAccessor.convertClientPathToDebugger(clientPath);
 		}
 
-        return super.convertClientPathToDebugger(clientPath);
-    }
+		return super.convertClientPathToDebugger(clientPath);
+	}
 }

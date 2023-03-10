@@ -212,11 +212,7 @@ export const workspaceFileAccessor: FileAccessor = {
 	},
 	convertClientPathToDebugger(path: string): string {
 		// Remove scheme
-		const uri = pathToUri(path).with({
-			scheme: undefined,
-			authority: undefined
-		});
-		return uri.toString();
+		return vscode.Uri.parse(path).fsPath;
 	}
 };
 
