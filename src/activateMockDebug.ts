@@ -9,7 +9,6 @@
 
 import * as vscode from 'vscode';
 import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
-import { logger } from './logger';
 import { MockDebugSession } from './mockDebug';
 import { FileAccessor } from './mockRuntime';
 
@@ -183,12 +182,20 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 	}
 }
 
+// Fix up URI on remote systems
+const overrideUri: { scheme?: string, authority?: string } = {};
+if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
+	const root = vscode.workspace.workspaceFolders[0].uri;
+	overrideUri.scheme = root.scheme;
+	overrideUri.authority = root.authority;
+}
+
 export const workspaceFileAccessor: FileAccessor = {
 	isWindows: false,
 	async readFile(path: string): Promise<Uint8Array> {
 		let uri: vscode.Uri;
 		try {
-			uri = pathToUri(path);
+			uri = pathToUri(path, overrideUri);
 		} catch (e) {
 			return new TextEncoder().encode(`cannot read '${path}'`);
 		}
@@ -197,41 +204,29 @@ export const workspaceFileAccessor: FileAccessor = {
 	},
 	async writeFile(path: string, contents: Uint8Array) {
 		await vscode.workspace.fs.writeFile(pathToUri(path), contents);
+	},
+	convertDebuggerPathToClient(path: string): string {
+		// Add overrides
+		const uri = pathToUri(path, overrideUri);
+		return uri.toString();
+	},
+	convertClientPathToDebugger(path: string): string {
+		// Remove scheme
+		const uri = pathToUri(path).with({
+			scheme: undefined,
+			authority: undefined
+		});
+		return uri.toString();
 	}
 };
 
-const pathToUri = (path: string): vscode.Uri => {
-    let uri: vscode.Uri;
-
-    try {
-        uri = vscode.Uri.file(path);
-    } catch (e) {
-        uri = vscode.Uri.parse(path);
-    }
-
-    logger.debug('Path:');
-    logger.debug(uri);
-
-    // Fix up URI on remote systems
-    if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
-        const root = vscode.workspace.workspaceFolders[0].uri;
-        logger.debug('Root:');
-        logger.debug(root);
-
-        uri = vscode.Uri.from({
-            scheme: root.scheme,
-            authority: root.authority,
-            path: uri.path,
-            query: uri.query,
-            fragment: uri.fragment
-        });
-
-        logger.debug('Aligned:');
-        logger.debug(uri);
-    }
-
-    return uri;
-};
+function pathToUri(path: string, change: typeof overrideUri = {}) {
+	try {
+		return vscode.Uri.file(path).with(change);
+	} catch (e) {
+		return vscode.Uri.parse(path).with(change);
+	}
+}
 
 class InlineDebugAdapterFactory implements vscode.DebugAdapterDescriptorFactory {
 
