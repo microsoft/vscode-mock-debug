@@ -68,9 +68,7 @@
   "activationEvents": [
     "onDebugResolve:mock",
     "onDebugDynamicConfigurations:mock",
-    "onCommand:extension.mock-debug.getProgramName",
-    "onCommand:extension.mock-debug.runEditorContents",
-    "onCommand:extension.mock-debug.debugEditorContents"
+    "onCommand:extension.mock-debug.getProgramName"
   ],
   "workspaceTrust": {
     "request": "never"
