@@ -183,7 +183,7 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 }
 
 export const workspaceFileAccessor: FileAccessor = {
-	isWindows: false,
+	isWindows: typeof process !== 'undefined' && process.platform === 'win32',
 	async readFile(path: string): Promise<Uint8Array> {
 		let uri: vscode.Uri;
 		try {

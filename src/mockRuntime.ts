@@ -311,7 +311,7 @@ export class MockRuntime extends EventEmitter {
 				file: this._sourceFile,
 				line: this.currentLine,
 				column: column, // words[i].index
-				instruction: instruction
+				instruction: instruction ? instruction + i : 0
 			};
 
 			frames.push(stackFrame);
