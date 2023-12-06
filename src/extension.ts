@@ -22,7 +22,7 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { platform } from 'process';
 import { ProviderResult } from 'vscode';
-import { MockDebugSession } from './mockDebug';
+import { MockDebugSession } from './old/mockDebug';
 import { activateMockDebug, workspaceFileAccessor } from './activateMockDebug';
 
 /*

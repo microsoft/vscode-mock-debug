@@ -6,3 +6,5 @@ npm-debug.log
 mock-debug.txt
 *.vsix
 .DS_Store
+package-lock.json
+sampleWorkspace/.vscode

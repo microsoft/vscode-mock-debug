@@ -5,20 +5,13 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"type": "mock",
+			"type": "prolog",
 			"request": "launch",
-			"name": "Debug readme.md",
-			"program": "${workspaceFolder}/readme.md",
+			"name": "Debug",
+			"program": "${workspaceFolder}/wait.ari",
 			"stopOnEntry": true,
-			"trace": false
-		},
-		{
-			"type": "mock",
-			"request": "attach",
-			"name": "Attach readme.md",
-			"program": "${workspaceFolder}/readme.md",
-			"stopOnEntry": true,
-			"trace": false
+			"trace": false,
+			"debugServer": 4711
 		}
 	]
 }

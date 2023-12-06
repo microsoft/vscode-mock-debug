@@ -2,11 +2,12 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { MockDebugSession } from './mockDebug';
-
+import { DebugSession } from './debugSession';
 import { promises as fs } from 'fs';
 import * as Net from 'net';
-import { FileAccessor } from './mockRuntime';
+import { FileAccessor } from './old/mockRuntime';
+import { WebSocket, WebSocketServer } from 'ws';
+import { EngineSocket } from './engineSocket';
 
 /*
  * debugAdapter.js is the entrypoint of the debug adapter when it runs as a separate process.
@@ -16,7 +17,7 @@ import { FileAccessor } from './mockRuntime';
  * Since here we run the debug adapter as a separate ("external") process, it has no access to VS Code API.
  * So we can only use node.js API for accessing files.
  */
-const fsAccessor:  FileAccessor = {
+const fsAccessor: FileAccessor = {
 	isWindows: process.platform === 'win32',
 	readFile(path: string): Promise<Uint8Array> {
 		return fs.readFile(path);
@@ -47,22 +48,51 @@ args.forEach(function (val, index, array) {
 });
 
 if (port > 0) {
+	var debugSessions: DebugSession[] = [];
+	var engineSockets: EngineSocket[] = [];
+	const wss = new WebSocketServer({ port: 4712 });
+	wss.on('connection', (ws: WebSocket) => {
+			const socket = new EngineSocket(ws);
+		
+			console.log('New client connected');
+			ws.on('close', () => {
+				console.log('Client disconnected');
+				engineSockets = engineSockets.filter(item => item !== socket);
+			});
+
+			const session = debugSessions.pop();
+			if (session) {
+				session.startRuntime(socket);
+			} else {
+				engineSockets.push(socket);
+			}
+		});
 
 	// start a server that creates a new session for every connection request
 	console.error(`waiting for debug protocol on port ${port}`);
 	Net.createServer((socket) => {
+		const session = new DebugSession(fsAccessor);
+		session.setRunAsServer(true);
+		session.start(socket, socket);
+
 		console.error('>> accepted connection from client');
 		socket.on('end', () => {
 			console.error('>> client connection closed\n');
+			debugSessions = debugSessions.filter(item => item !== session);
 		});
-		const session = new MockDebugSession(fsAccessor);
-		session.setRunAsServer(true);
-		session.start(socket, socket);
+		
+		const engine = engineSockets.pop();
+		if (engine) {
+			session.startRuntime(engine);
+		} else {
+			debugSessions.push(session);
+		}
 	}).listen(port);
+
 } else {
 
 	// start a single session that communicates via stdin/stdout
-	const session = new MockDebugSession(fsAccessor);
+	const session = new DebugSession(fsAccessor);
 	process.on('SIGTERM', () => {
 		session.shutdown();
 	});

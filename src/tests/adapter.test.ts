@@ -51,6 +51,7 @@ suite('Node Debug Adapter', () => {
 				adapterID: 'mock',
 				linesStartAt1: true,
 				columnsStartAt1: true,
+				supportsVariableType: true,
 				pathFormat: 'url'
 			}).then(response => {
 				done(new Error("does not report error on invalid 'pathFormat' attribute"));

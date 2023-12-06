@@ -1,11 +1,11 @@
 {
-  "name": "mock-debug",
-  "displayName": "Mock Debug",
-  "version": "0.52.0",
-  "publisher": "ms-vscode",
-  "description": "Starter extension for developing debug adapters for VS Code.",
+  "name": "prolog-debug",
+  "displayName": "Prolog Debug",
+  "version": "0.1.0",
+  "publisher": "cinthamo@gmail.com",
+  "description": "Prolog debugger for VS Code, need to be compiled on BLint with debug.",
   "author": {
-    "name": "Microsoft Corporation"
+    "name": "Cristian Inthamoussu"
   },
   "license": "MIT",
   "keywords": [
@@ -66,8 +66,8 @@
   "main": "./dist/extension.js",
   "browser": "./dist/web-extension.js",
   "activationEvents": [
-    "onDebugResolve:mock",
-    "onDebugDynamicConfigurations:mock",
+    "onDebugResolve:prolog",
+    "onDebugDynamicConfigurations:prolog",
     "onCommand:extension.mock-debug.getProgramName"
   ],
   "workspaceTrust": {
@@ -78,29 +78,29 @@
       "editor/title/run": [
         {
           "command": "extension.mock-debug.runEditorContents",
-          "when": "resourceLangId == markdown",
+          "when": "resourceLangId == ari",
           "group": "navigation@1"
         },
         {
           "command": "extension.mock-debug.debugEditorContents",
-          "when": "resourceLangId == markdown",
+          "when": "resourceLangId == ari",
           "group": "navigation@2"
         }
       ],
       "commandPalette": [
         {
           "command": "extension.mock-debug.debugEditorContents",
-          "when": "resourceLangId == markdown"
+          "when": "resourceLangId == ari"
         },
         {
           "command": "extension.mock-debug.runEditorContents",
-          "when": "resourceLangId == markdown"
+          "when": "resourceLangId == ari"
         }
       ],
       "debug/variables/context": [
         {
           "command": "extension.mock-debug.toggleFormatting",
-          "when": "debugType == 'mock' && debugProtocolVariableMenuContext == 'simple'"
+          "when": "debugType == 'prolog' && debugProtocolVariableMenuContext == 'simple'"
         }
       ]
     },
@@ -108,14 +108,14 @@
       {
         "command": "extension.mock-debug.debugEditorContents",
         "title": "Debug File",
-        "category": "Mock Debug",
+        "category": "Prolog Debug",
         "enablement": "!inDebugMode",
         "icon": "$(debug-alt)"
       },
       {
         "command": "extension.mock-debug.runEditorContents",
         "title": "Run File",
-        "category": "Mock Debug",
+        "category": "Prolog Debug",
         "enablement": "!inDebugMode",
         "icon": "$(play)"
       },
@@ -124,18 +124,29 @@
         "title": "Toggle between decimal and hex formatting"
       }
     ],
+    "languages": [
+      {
+        "id": "ari",
+        "extensions": [
+          ".ari"
+        ],
+        "aliases": [
+          "Prolog"
+        ]
+      }
+    ],
     "breakpoints": [
       {
-        "language": "markdown"
+        "language": "ari"
       }
     ],
     "debuggers": [
       {
-        "type": "mock",
+        "type": "prolog",
         "languages": [
-          "markdown"
+          "ari"
         ],
-        "label": "Mock Debug",
+        "label": "Prolog Debug",
         "program": "./out/debugAdapter.js",
         "runtime": "node",
         "configurationAttributes": {
@@ -214,7 +225,7 @@
         },
         "initialConfigurations": [
           {
-            "type": "mock",
+            "type": "prolog",
             "request": "launch",
             "name": "Ask for file name",
             "program": "${workspaceFolder}/${command:AskForProgramName}",
@@ -223,10 +234,10 @@
         ],
         "configurationSnippets": [
           {
-            "label": "Mock Debug: Launch",
-            "description": "A new configuration for 'debugging' a user selected markdown file.",
+            "label": "Prolog Debug: Launch",
+            "description": "A new configuration for 'debugging' a user selected prolog file.",
             "body": {
-              "type": "mock",
+              "type": "prolog",
               "request": "launch",
               "name": "Ask for file name",
               "program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
@@ -239,5 +250,8 @@
         }
       }
     ]
+  },
+  "dependencies": {
+    "ws": "^8.14.2"
   }
 }
