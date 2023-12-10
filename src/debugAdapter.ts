@@ -38,7 +38,7 @@ const fsAccessor: FileAccessor = {
  */
 
 // first parse command line arguments to see whether the debug adapter should run as a server
-let port = 0;
+let port = 4711;
 const args = process.argv.slice(2);
 args.forEach(function (val, index, array) {
 	const portMatch = /^--server=(\d{4,5})$/.exec(val);
@@ -47,54 +47,43 @@ args.forEach(function (val, index, array) {
 	}
 });
 
-if (port > 0) {
-	var debugSessions: DebugSession[] = [];
-	var engineSockets: EngineSocket[] = [];
-	const wss = new WebSocketServer({ port: 4712 });
-	wss.on('connection', (ws: WebSocket) => {
-			const socket = new EngineSocket(ws);
-		
-			console.log('New client connected');
-			ws.on('close', () => {
-				console.log('Client disconnected');
-				engineSockets = engineSockets.filter(item => item !== socket);
-			});
-
-			const session = debugSessions.pop();
-			if (session) {
-				session.startRuntime(socket);
-			} else {
-				engineSockets.push(socket);
-			}
+var debugSessions: DebugSession[] = [];
+var engineSockets: EngineSocket[] = [];
+const wss = new WebSocketServer({ port: port + 1 });
+wss.on('connection', (ws: WebSocket) => {
+		const socket = new EngineSocket(ws);
+	
+		console.log('New client connected');
+		ws.on('close', () => {
+			console.log('Client disconnected');
+			engineSockets = engineSockets.filter(item => item !== socket);
 		});
 
-	// start a server that creates a new session for every connection request
-	console.error(`waiting for debug protocol on port ${port}`);
-	Net.createServer((socket) => {
-		const session = new DebugSession(fsAccessor);
-		session.setRunAsServer(true);
-		session.start(socket, socket);
-
-		console.error('>> accepted connection from client');
-		socket.on('end', () => {
-			console.error('>> client connection closed\n');
-			debugSessions = debugSessions.filter(item => item !== session);
-		});
-		
-		const engine = engineSockets.pop();
-		if (engine) {
-			session.startRuntime(engine);
+		const session = debugSessions.pop();
+		if (session) {
+			session.startRuntime(socket);
 		} else {
-			debugSessions.push(session);
+			engineSockets.push(socket);
 		}
-	}).listen(port);
-
-} else {
-
-	// start a single session that communicates via stdin/stdout
-	const session = new DebugSession(fsAccessor);
-	process.on('SIGTERM', () => {
-		session.shutdown();
 	});
-	session.start(process.stdin, process.stdout);
-}
+
+// start a server that creates a new session for every connection request
+console.error(`waiting for debug protocol on port ${port} and prolog connections on port ${port+1}`);
+Net.createServer((socket) => {
+	const session = new DebugSession(fsAccessor);
+	session.setRunAsServer(true);
+	session.start(socket, socket);
+
+	console.error('>> accepted connection from client');
+	socket.on('end', () => {
+		console.error('>> client connection closed\n');
+		debugSessions = debugSessions.filter(item => item !== session);
+	});
+	
+	const engine = engineSockets.pop();
+	if (engine) {
+		session.startRuntime(engine);
+	} else {
+		debugSessions.push(session);
+	}
+}).listen(port);

@@ -9,8 +9,8 @@
 
 import * as vscode from 'vscode';
 import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode';
-import { FileAccessor } from './old/mockRuntime';
-import { DebugSession } from './debugSession';
+import { FileAccessor } from './mockRuntime';
+import { DebugSession } from '../debugSession';
 
 export function activateMockDebug(context: vscode.ExtensionContext, factory?: vscode.DebugAdapterDescriptorFactory) {
 
@@ -96,7 +96,7 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 	}
 	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('mock', factory));
 	if ('dispose' in factory) {
-		context.subscriptions.push(factory);
+	//	context.subscriptions.push(factory);
 	}
 
 	// override VS Code's default implementation of the debug hover
