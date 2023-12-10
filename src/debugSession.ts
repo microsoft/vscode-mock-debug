@@ -46,9 +46,6 @@ interface IAttachRequestArguments extends ILaunchRequestArguments { }
 
 export class DebugSession extends LoggingDebugSession {
 
-	private _threadID = 1;
-
-	// a Mock runtime (or debugger)
 	private _runtime: RuntimeSession;
 
 	private _configurationDone = new Subject();
@@ -123,7 +120,7 @@ export class DebugSession extends LoggingDebugSession {
 	}
 
 	public startRuntime(engine: EngineSocket) {
-		this._runtime.setEngine(engine, ++this._threadID);
+		this._runtime.setEngine(engine);
 	}
 
 	/**
@@ -392,6 +389,11 @@ export class DebugSession extends LoggingDebugSession {
 
 	protected stepOutRequest(response: DebugProtocol.StepOutResponse, args: DebugProtocol.StepOutArguments): void {
 		this._runtime.stepOut(args.threadId);
+		this.sendResponse(response);
+	}
+
+	protected restartRequest(response: DebugProtocol.RestartResponse, args: DebugProtocol.RestartArguments, request?: DebugProtocol.Request | undefined): void {
+		this._runtime.restart();
 		this.sendResponse(response);
 	}
 

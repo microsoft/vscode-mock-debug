@@ -91,7 +91,8 @@ export class RuntimeSession extends EventEmitter {
 	private _breakPoints = new Map<string, IRuntimeBreakpoint[]>();
 	private _breakPointId = 1;
 	private _stackId = 1;
-	private _engines: Map<number, EngineSocket> = new Map<number, EngineSocket>();
+	private _threadID = 1; // only 1
+	private _engine: EngineSocket | null = null;
 	private _stacks: Map<number, IRuntimeStackFrame[]> = new Map<number, IRuntimeStackFrame[]>();
 	private _variables: Map<number, Map<string, RuntimeVariable>> = new Map<number, Map<string, RuntimeVariable>>();
 
@@ -99,8 +100,8 @@ export class RuntimeSession extends EventEmitter {
 		super();
 	}
 
-	public setEngine(engine: EngineSocket, threadId: number) {
-		this._engines.set(threadId, engine);
+	public setEngine(engine: EngineSocket) {
+		this._engine = engine;
 		engine.on('stop', (data: IEngineStopData) =>
 		{
 			const newStack: IRuntimeStackFrame[] = [];
@@ -124,16 +125,15 @@ export class RuntimeSession extends EventEmitter {
 				newStack.push(stack);
 			});
 
+			var threadId = this._threadID;
 			this._stacks.set(threadId, newStack);
 
 			//this.sendEvent('stopOnException', data.variables["$exception"]);
 			this.sendEvent(data.stopName, threadId);
 		});
 		engine.on('close', () => {
-			this._engines.delete(threadId);
-			if (this._engines.size === 0) {
-				this.sendEvent('end');
-			}
+			this._engine = null;
+			this.sendEvent('end');
 		});
 		engine.start();
 		engine.sendCommandData('initialData', {
@@ -149,27 +149,31 @@ export class RuntimeSession extends EventEmitter {
 	}
 
 	public pause(threadId: number) {
-		this._engines.get(threadId)?.sendCommand('pause');
+		this._engine?.sendCommand('pause');
+	}
+
+	public restart(): void {
+		this._engine?.sendCommand('dumpDb');
 	}
 
 	public continue(threadId: number, reverse: boolean) {
 		if (reverse) {
-			this._engines.get(threadId)?.sendCommand('dumpDb');
+			this._engine?.sendCommand('continueBack');
 		} else {
-			this._engines.get(threadId)?.sendCommand('continue');
+			this._engine?.sendCommand('continue');
 		}
 	}
 
 	public step(threadId: number, reverse: boolean) {
-		this._engines.get(threadId)?.sendCommand(reverse ? 'stepBack' : 'step');
+		this._engine?.sendCommand(reverse ? 'stepBack' : 'step');
 	}
 
 	public stepIn(threadId: number) {
-		this._engines.get(threadId)?.sendCommand('stepIn');
+		this._engine?.sendCommand('stepIn');
 	}
 
 	public stepOut(threadId: number) {
-		this._engines.get(threadId)?.sendCommand('stepOut');
+		this._engine?.sendCommand('stepOut');
 	}
 
 	/*
@@ -192,9 +196,7 @@ export class RuntimeSession extends EventEmitter {
 		}
 		bps.push(bp);
 		
-		this._engines.forEach(engine =>
-			engine.sendCommandData('setBreakPoint', { path, line })
-		);
+		this._engine?.sendCommandData('setBreakPoint', { path, line });
 		return { id: 0, line, verified: true };
 	}
 
@@ -213,17 +215,13 @@ export class RuntimeSession extends EventEmitter {
 			}
 		}
 
-		this._engines.forEach(engine =>
-			engine.sendCommandData('clearBreakPoint', { path, line })
-		);
+		this._engine?.sendCommandData('clearBreakPoint', { path, line });
 		return undefined;
 	}
 
 	public clearBreakpoints(path: string): void {
 		this._breakPoints.delete(this.normalizePathAndCasing(path));
-		this._engines.forEach(engine =>
-			engine.sendCommandData('clearBreakPoints', { path })
-		);
+		this._engine?.sendCommandData('clearBreakPoints', { path });
 	}
 
 	public setDataBreakpoint(address: string, accessType: 'read' | 'write' | 'readWrite'): boolean {
@@ -276,19 +274,12 @@ export class RuntimeSession extends EventEmitter {
 	}
 
 	public getThreads(): IRuntimeThread[] {
-		if (this._engines.size > 0) {
-			return Array.from(this._engines, ([key, value]) => ({
-				id: key,
-				name: `Prolog ${key}`
-			}));
-		} else {
-			return [
-				{
-					id: 1,
-					name: 'waiting'
-				}
-			];
-		}
+		return [
+			{
+				id: 1,
+				name: this._engine === null ? 'waiting' : 'Prolog'
+			}
+		];
 	}
 
 	public getStack(threadId: number, startFrame: number, endFrame: number): IRuntimeStack {
