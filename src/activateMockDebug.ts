@@ -191,7 +191,7 @@ if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.lengt
 }
 
 export const workspaceFileAccessor: FileAccessor = {
-	isWindows: false,
+	isWindows: typeof process !== 'undefined' && process.platform === 'win32',
 	async readFile(path: string): Promise<Uint8Array> {
 		let uri: vscode.Uri;
 		try {

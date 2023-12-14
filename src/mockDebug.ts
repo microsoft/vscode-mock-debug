@@ -753,22 +753,23 @@ export class MockDebugSession extends LoggingDebugSession {
 	}
 
 	protected disassembleRequest(response: DebugProtocol.DisassembleResponse, args: DebugProtocol.DisassembleArguments) {
-
-		const baseAddress = parseInt(args.memoryReference);
+		const memoryInt = args.memoryReference.slice(3);
+		const baseAddress = parseInt(memoryInt);
 		const offset = args.instructionOffset || 0;
 		const count = args.instructionCount;
 
-		const isHex = args.memoryReference.startsWith('0x');
-		const pad = isHex ? args.memoryReference.length-2 : args.memoryReference.length;
+		const isHex = memoryInt.startsWith('0x');
+		const pad = isHex ? memoryInt.length-2 : memoryInt.length;
 
 		const loc = this.createSource(this._runtime.sourceFile);
 
 		let lastLine = -1;
 
 		const instructions = this._runtime.disassemble(baseAddress+offset, count).map(instruction => {
-			const address = instruction.address.toString(isHex ? 16 : 10).padStart(pad, '0');
+			let address = Math.abs(instruction.address).toString(isHex ? 16 : 10).padStart(pad, '0');
+			const sign = instruction.address < 0 ? '-' : '';
 			const instr : DebugProtocol.DisassembledInstruction = {
-				address: isHex ? `0x${address}` : `${address}`,
+				address: sign + (isHex ? `0x${address}` : `${address}`),
 				instruction: instruction.instruction
 			};
 			// if instruction's source starts on a new line add the source to instruction
@@ -793,7 +794,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// set instruction breakpoints
 		const breakpoints = args.breakpoints.map(ibp => {
-			const address = parseInt(ibp.instructionReference);
+			const address = parseInt(ibp.instructionReference.slice(3));
 			const offset = ibp.offset || 0;
 			return <DebugProtocol.Breakpoint>{
 				verified: this._runtime.setInstructionBreakpoint(address + offset)
@@ -898,7 +899,7 @@ export class MockDebugSession extends LoggingDebugSession {
 	}
 
 	private formatAddress(x: number, pad = 8) {
-		return this._addressesInHex ? '0x' + x.toString(16).padStart(8, '0') : x.toString(10);
+		return 'mem' + (this._addressesInHex ? '0x' + x.toString(16).padStart(8, '0') : x.toString(10));
 	}
 
 	private formatNumber(x: number) {
