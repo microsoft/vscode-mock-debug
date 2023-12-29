@@ -53,9 +53,9 @@ const wss = new WebSocketServer({ port: port + 1 });
 wss.on('connection', (ws: WebSocket) => {
 		const socket = new EngineSocket(ws);
 	
-		console.log('New client connected');
+		console.log('New prolog debugger engine connected');
 		ws.on('close', () => {
-			console.log('Client disconnected');
+			console.log('Prolog debugger engine disconnected');
 			engineSockets = engineSockets.filter(item => item !== socket);
 		});
 
@@ -74,9 +74,9 @@ Net.createServer((socket) => {
 	session.setRunAsServer(true);
 	session.start(socket, socket);
 
-	console.error('>> accepted connection from client');
+	console.error('>> New visual studio code connected');
 	socket.on('end', () => {
-		console.error('>> client connection closed\n');
+		console.error('>> Visual studio code disconnected\n');
 		debugSessions = debugSessions.filter(item => item !== session);
 	});
 	

@@ -22,8 +22,8 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { platform } from 'process';
 import { ProviderResult } from 'vscode';
-import { MockDebugSession } from './mockDebug';
-import { activateMockDebug, workspaceFileAccessor } from './activateMockDebug';
+import { MockDebugSession } from './old/mockDebug';
+import { activateMockDebug, workspaceFileAccessor } from './old/activateMockDebug';
 
 /*
  * The compile time flag 'runMode' controls how the debug adapter is run.
