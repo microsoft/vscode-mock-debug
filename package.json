@@ -218,6 +218,8 @@
     ]
   },
   "dependencies": {
+    "bufferutil": "^4.0.8",
+    "utf-8-validate": "^6.0.3",
     "ws": "^8.14.2"
   }
 }
