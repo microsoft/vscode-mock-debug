@@ -1,225 +1,208 @@
 {
-  "name": "prolog-debug",
-  "displayName": "Prolog Debugger",
-  "version": "0.1.0",
-  "publisher": "cinthamo",
-  "description": "Prolog debugger for VS Code, need to be compiled on BLint with debug.",
-  "author": {
-    "name": "Cristian Inthamoussu"
-  },
-  "license": "MIT",
-  "keywords": [
-    "multi-root ready"
-  ],
-  "engines": {
-    "vscode": "^1.66.0"
-  },
-  "icon": "images/prolog.png",
-  "categories": [
-    "Debuggers"
-  ],
-  "private": true,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Microsoft/vscode-mock-debug.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Microsoft/vscode-mock-debug/issues"
-  },
-  "scripts": {
-    "compile": "tsc -p ./",
-    "lint": "eslint src --ext ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
-    "watch": "npm run -S esbuild-base -- --sourcemap --sources-content=false --watch",
-    "esbuild-web": "esbuild ./src/web-extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=browser --outfile=dist/web-extension.js",
-    "watch-web": "npm run -S esbuild-web -- --sourcemap --sources-content=false --watch",
-    "build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false",
-    "build-server": "npx webpack",
-    "package": "vsce package",
-    "publish": "vsce publish",
-    "publish-pre-release": "vsce publish --pre-release",
-    "vscode:prepublish": "rimraf dist && npm run -S esbuild-base -- --minify && npm run -S esbuild-web -- --minify",
-    "test": "npm run typecheck"
-  },
-  "devDependencies": {
-    "@types/glob": "^7.2.0",
-    "@types/mocha": "^9.1.0",
-    "@types/node": "^14.14.37",
-    "@types/vscode": "^1.66.0",
-    "@typescript-eslint/eslint-plugin": "^5.17.0",
-    "@typescript-eslint/parser": "^5.17.0",
-    "@vscode/debugadapter": "^1.56.0",
-    "@vscode/debugadapter-testsupport": "^1.56.0",
-    "await-notify": "^1.0.1",
-    "base64-js": "^1.5.1",
-    "esbuild": "^0.14.29",
-    "eslint": "^8.12.0",
-    "events": "^3.3.0",
-    "glob": "^7.2.0",
-    "mocha": "^9.2.2",
-    "path-browserify": "^1.0.1",
-    "rimraf": "^3.0.2",
-    "ts-loader": "^9.5.1",
-    "typescript": "^4.9.5",
-    "url": "^0.11.0",
-    "vsce": "^2.7.0",
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.4"
-  },
-  "main": "./dist/extension.js",
-  "browser": "./dist/web-extension.js",
-  "activationEvents": [
-    "onDebugResolve:prolog",
-    "onDebugDynamicConfigurations:prolog",
-    "onCommand:extension.mock-debug.getProgramName"
-  ],
-  "workspaceTrust": {
-    "request": "never"
-  },
-  "contributes": {
-    "menus": {
-      "editor/title/run": [
-        {
-          "command": "extension.mock-debug.runEditorContents",
-          "when": "resourceLangId == ari",
-          "group": "navigation@1"
-        },
-        {
-          "command": "extension.mock-debug.debugEditorContents",
-          "when": "resourceLangId == ari",
-          "group": "navigation@2"
-        }
-      ],
-      "commandPalette": [
-        {
-          "command": "extension.mock-debug.debugEditorContents",
-          "when": "resourceLangId == ari"
-        },
-        {
-          "command": "extension.mock-debug.runEditorContents",
-          "when": "resourceLangId == ari"
-        }
-      ],
-      "debug/variables/context": [
-        {
-          "command": "extension.mock-debug.toggleFormatting",
-          "when": "debugType == 'prolog' && debugProtocolVariableMenuContext == 'simple'"
-        }
-      ]
+    "name": "prolog-debug",
+    "displayName": "Prolog Debugger",
+    "version": "0.1.0",
+    "publisher": "cinthamo",
+    "description": "Prolog debugger for VS Code, need to be compiled on BLint with debug.",
+    "author": {
+        "name": "Cristian Inthamoussu"
     },
-    "commands": [
-      {
-        "command": "extension.mock-debug.debugEditorContents",
-        "title": "Debug File",
-        "category": "Prolog Debug",
-        "enablement": "!inDebugMode",
-        "icon": "$(debug-alt)"
-      },
-      {
-        "command": "extension.mock-debug.runEditorContents",
-        "title": "Run File",
-        "category": "Prolog Debug",
-        "enablement": "!inDebugMode",
-        "icon": "$(play)"
-      },
-      {
-        "command": "extension.mock-debug.toggleFormatting",
-        "title": "Toggle between decimal and hex formatting"
-      }
+    "license": "MIT",
+    "keywords": [
+        "multi-root ready"
     ],
-    "languages": [
-      {
-        "id": "ari",
-        "extensions": [
-          ".ari"
-        ],
-        "aliases": [
-          "Prolog"
-        ]
-      }
+    "engines": {
+        "vscode": "^1.66.0"
+    },
+    "icon": "images/prolog.png",
+    "categories": [
+        "Debuggers"
     ],
-    "breakpoints": [
-      {
-        "language": "ari"
-      }
+    "private": true,
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Microsoft/vscode-mock-debug.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Microsoft/vscode-mock-debug/issues"
+    },
+    "scripts": {
+        "compile": "tsc -p ./",
+        "lint": "eslint src --ext ts",
+        "typecheck": "tsc -p tsconfig.json --noEmit",
+        "esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
+        "watch": "npm run -S esbuild-base -- --sourcemap --sources-content=false --watch",
+        "build": "npm run -S esbuild-base -- --sourcemap --sources-content=false",
+        "build-server": "npx webpack",
+        "package": "vsce package",
+        "publish": "vsce publish",
+        "publish-pre-release": "vsce publish --pre-release",
+        "vscode:prepublish": "rimraf dist && npm run -S esbuild-base -- --minify",
+        "test": "npm run typecheck"
+    },
+    "devDependencies": {
+        "@types/glob": "^7.2.0",
+        "@types/mocha": "^9.1.0",
+        "@types/node": "^14.14.37",
+        "@types/vscode": "^1.66.0",
+        "@typescript-eslint/eslint-plugin": "^5.17.0",
+        "@typescript-eslint/parser": "^5.17.0",
+        "@vscode/debugadapter": "^1.56.0",
+        "@vscode/debugadapter-testsupport": "^1.56.0",
+        "await-notify": "^1.0.1",
+        "base64-js": "^1.5.1",
+        "esbuild": "^0.14.29",
+        "eslint": "^8.12.0",
+        "events": "^3.3.0",
+        "glob": "^7.2.0",
+        "mocha": "^9.2.2",
+        "path-browserify": "^1.0.1",
+        "rimraf": "^3.0.2",
+        "ts-loader": "^9.5.1",
+        "typescript": "^4.9.5",
+        "url": "^0.11.0",
+        "vsce": "^2.7.0",
+        "webpack": "^5.89.0",
+        "webpack-cli": "^5.1.4"
+    },
+    "main": "./dist/extension.js",
+    "browser": "./dist/web-extension.js",
+    "activationEvents": [
+        "onDebugResolve:prolog",
+        "onDebugDynamicConfigurations:prolog",
+        "onCommand:extension.mock-debug.getProgramName"
     ],
-    "debuggers": [
-      {
-        "type": "prolog",
-        "languages": [
-          "ari"
-        ],
-        "label": "Prolog Debug",
-        "program": "./out/debugAdapter.js",
-        "runtime": "node",
-        "configurationAttributes": {
-          "launch": {
-            "required": [
-              "program"
+    "workspaceTrust": {
+        "request": "never"
+    },
+    "contributes": {
+        "menus": {
+            "editor/title/run": [{
+                    "command": "extension.mock-debug.runEditorContents",
+                    "when": "resourceLangId == ari",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "extension.mock-debug.debugEditorContents",
+                    "when": "resourceLangId == ari",
+                    "group": "navigation@2"
+                }
             ],
-            "properties": {
-              "program": {
-                "type": "string",
-                "description": "Absolute path to a text file.",
-                "default": "${workspaceFolder}/${command:AskForProgramName}"
-              },
-              "stopOnEntry": {
-                "type": "boolean",
-                "description": "Automatically stop after launch.",
-                "default": true
-              }
-            }
-          },
-          "attach": {
-            "required": [
-              "program"
+            "commandPalette": [{
+                    "command": "extension.mock-debug.debugEditorContents",
+                    "when": "resourceLangId == ari"
+                },
+                {
+                    "command": "extension.mock-debug.runEditorContents",
+                    "when": "resourceLangId == ari"
+                }
             ],
-            "properties": {
-              "program": {
-                "type": "string",
-                "description": "Absolute path to a text file.",
-                "default": "${workspaceFolder}/${command:AskForProgramName}"
-              },
-              "stopOnEntry": {
-                "type": "boolean",
-                "description": "Automatically stop after attach.",
-                "default": true
-              }
-            }
-          }
+            "debug/variables/context": [{
+                "command": "extension.mock-debug.toggleFormatting",
+                "when": "debugType == 'prolog' && debugProtocolVariableMenuContext == 'simple'"
+            }]
         },
-        "initialConfigurations": [
-          {
-            "type": "prolog",
-            "request": "attach",
-            "name": "Prolog Debugger",
-            "stopOnEntry": true,
-            "debugServer": 4711
-          }
-        ],
-        "configurationSnippets": [
-          {
-            "label": "Prolog Debug: Launch",
-            "description": "A new configuration for 'debugging' a user selected prolog file.",
-            "body": {
-              "type": "prolog",
-              "request": "launch",
-              "name": "Ask for file name",
-              "program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
-              "stopOnEntry": true
+        "commands": [{
+                "command": "extension.mock-debug.debugEditorContents",
+                "title": "Debug File",
+                "category": "Prolog Debug",
+                "enablement": "!inDebugMode",
+                "icon": "$(debug-alt)"
+            },
+            {
+                "command": "extension.mock-debug.runEditorContents",
+                "title": "Run File",
+                "category": "Prolog Debug",
+                "enablement": "!inDebugMode",
+                "icon": "$(play)"
+            },
+            {
+                "command": "extension.mock-debug.toggleFormatting",
+                "title": "Toggle between decimal and hex formatting"
             }
-          }
         ],
-        "variables": {
-          "AskForProgramName": "extension.mock-debug.getProgramName"
-        }
-      }
-    ]
-  },
-  "dependencies": {
-    "bufferutil": "^4.0.8",
-    "utf-8-validate": "^6.0.3",
-    "ws": "^8.14.2"
-  }
+        "languages": [{
+            "id": "ari",
+            "extensions": [
+                ".ari"
+            ],
+            "aliases": [
+                "Prolog"
+            ]
+        }],
+        "breakpoints": [{
+            "language": "ari"
+        }],
+        "debuggers": [{
+            "type": "prolog",
+            "languages": [
+                "ari"
+            ],
+            "label": "Prolog Debug",
+            "program": "./out/debugAdapter.js",
+            "runtime": "node",
+            "configurationAttributes": {
+                "launch": {
+                    "required": [
+                        "program"
+                    ],
+                    "properties": {
+                        "program": {
+                            "type": "string",
+                            "description": "Absolute path to a text file.",
+                            "default": "${workspaceFolder}/${command:AskForProgramName}"
+                        },
+                        "stopOnEntry": {
+                            "type": "boolean",
+                            "description": "Automatically stop after launch.",
+                            "default": true
+                        }
+                    }
+                },
+                "attach": {
+                    "required": [
+                        "program"
+                    ],
+                    "properties": {
+                        "program": {
+                            "type": "string",
+                            "description": "Absolute path to a text file.",
+                            "default": "${workspaceFolder}/${command:AskForProgramName}"
+                        },
+                        "stopOnEntry": {
+                            "type": "boolean",
+                            "description": "Automatically stop after attach.",
+                            "default": true
+                        }
+                    }
+                }
+            },
+            "initialConfigurations": [{
+                "type": "prolog",
+                "request": "attach",
+                "name": "Prolog Debugger",
+                "stopOnEntry": true,
+                "debugServer": 4711
+            }],
+            "configurationSnippets": [{
+                "label": "Prolog Debug: Launch",
+                "description": "A new configuration for 'debugging' a user selected prolog file.",
+                "body": {
+                    "type": "prolog",
+                    "request": "launch",
+                    "name": "Ask for file name",
+                    "program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
+                    "stopOnEntry": true
+                }
+            }],
+            "variables": {
+                "AskForProgramName": "extension.mock-debug.getProgramName"
+            }
+        }]
+    },
+    "dependencies": {
+        "bufferutil": "^4.0.8",
+        "utf-8-validate": "^6.0.3",
+        "ws": "^8.14.2"
+    }
 }
