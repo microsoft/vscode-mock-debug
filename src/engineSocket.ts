@@ -66,8 +66,8 @@ export class EngineSocket extends EventEmitter {
         this._saveEmit = [];
     }
 
-    public sendCommand(name: string) {
-        this._ws.send(name);
+    public async sendCommand(name: string): Promise<void> {
+        await this._ws.send(name);
     }
 
     public sendCommandData(name: string, jsonObject: any) {

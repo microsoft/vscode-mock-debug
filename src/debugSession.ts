@@ -142,9 +142,10 @@ export class DebugSession extends LoggingDebugSession {
 		// make VS Code use 'evaluate' when hovering over source
 		response.body.supportsEvaluateForHovers = true;
 
-		// make VS Code show a 'step back' button
+		// make VS Code show a 'step back','Restart' buttons
 		response.body.supportsStepBack = true;
-		response.body.supportsRestartRequest = false;
+		response.body.supportsRestartRequest = true;
+		response.body.supportsTerminateRequest = false;
 		response.body.supportsRestartFrame = false;
 		
 		// make VS Code support data breakpoints
@@ -209,8 +210,10 @@ export class DebugSession extends LoggingDebugSession {
 		this._configurationDone.notify();
 	}
 
-	protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments, request?: DebugProtocol.Request): void {
-		console.log(`disconnectRequest suspend: ${args.suspendDebuggee}, terminate: ${args.terminateDebuggee}`);
+	protected async disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments, request?: DebugProtocol.Request) {
+		console.log(`disconnectRequest2 suspend: ${args.suspendDebuggee}, restart: ${args.restart}, terminate: ${args.terminateDebuggee}`);
+		await this._runtime.end();
+		this.sendResponse(response);
 	}
 
 	protected async attachRequest(response: DebugProtocol.AttachResponse, args: IAttachRequestArguments) {
@@ -226,7 +229,7 @@ export class DebugSession extends LoggingDebugSession {
 		await this._configurationDone.wait(1000);
 
 		// start the program in the runtime
-		await this._runtime.start(args.program, !!args.stopOnEntry, !args.noDebug);
+		this._runtime.start(args.program, !!args.stopOnEntry, !args.noDebug);
 
 		this.sendResponse(response);
 	}
@@ -394,6 +397,8 @@ export class DebugSession extends LoggingDebugSession {
 
 	protected restartRequest(response: DebugProtocol.RestartResponse, args: DebugProtocol.RestartArguments, request?: DebugProtocol.Request | undefined): void {
 		this._runtime.restart();
+		response.success = false;
+		response.message = 'database saved successfully';
 		this.sendResponse(response);
 	}
 

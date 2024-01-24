@@ -142,12 +142,16 @@ export class RuntimeSession extends EventEmitter {
 		});
 	}
 
-	public async start(program: string, stopOnEntry: boolean, debug: boolean): Promise<void> {
+	public start(program: string, stopOnEntry: boolean, debug: boolean) {
 		this._waitFile = program;
 		this._stopOnEntry = stopOnEntry;
 		this.sendEvent('stopOnEntry');
 	}
 
+	public async end(): Promise<void> {
+		await this._engine?.sendCommand('finish');
+	}
+	
 	public pause(threadId: number) {
 		this._engine?.sendCommand('pause');
 	}
