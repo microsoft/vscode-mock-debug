@@ -1,12 +1,6 @@
 import { EventEmitter } from 'events';
 import { EngineSocket, IEngineStopData } from './engineSocket';
 
-export interface FileAccessor {
-	isWindows: boolean;
-	readFile(path: string): Promise<Uint8Array>;
-	writeFile(path: string, contents: Uint8Array): Promise<void>;
-}
-
 export interface IRuntimeBreakpoint {
 	id: number;
 	line: number;
@@ -40,10 +34,6 @@ interface IRuntimeThread {
 export type IRuntimeVariableType = number | boolean | string | RuntimeVariable[];
 
 export class RuntimeVariable {
-	private _memory?: Uint8Array;
-
-	public reference?: number;
-
 	public get value() {
 		return this._value;
 	}
@@ -67,16 +57,6 @@ export class RuntimeVariable {
 
 	constructor(public readonly name: string, private _value: IRuntimeVariableType, private _type: string) {}
 
-	public setMemory(data: Uint8Array, offset = 0) {
-		const memory = this.memory;
-		if (!memory) {
-			return;
-		}
-
-		memory.set(data, offset);
-		this._memory = memory;
-		this._value = new TextDecoder().decode(memory);
-	}
 }
 
 export function timeout(ms: number) {
@@ -95,10 +75,6 @@ export class RuntimeSession extends EventEmitter {
 	private _engine: EngineSocket | null = null;
 	private _stacks: Map<number, IRuntimeStackFrame[]> = new Map<number, IRuntimeStackFrame[]>();
 	private _variables: Map<number, Map<string, RuntimeVariable>> = new Map<number, Map<string, RuntimeVariable>>();
-
-	public constructor(private _fileAccessor: FileAccessor) {
-		super();
-	}
 
 	public setEngine(engine: EngineSocket) {
 		this._engine = engine;
@@ -270,7 +246,7 @@ export class RuntimeSession extends EventEmitter {
 	}
 
 	private normalizePathAndCasing(path: string) {
-		if (this._fileAccessor.isWindows) {
+		if (process.platform === 'win32') {
 			return path.replace(/\//g, '\\').toLowerCase();
 		} else {
 			return path.replace(/\\/g, '/');

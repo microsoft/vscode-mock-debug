@@ -21,10 +21,10 @@
     "private": true,
     "repository": {
         "type": "git",
-        "url": "https://github.com/Microsoft/vscode-mock-debug.git"
+        "url": "https://github.com/cinthamo/vscode-prolog-debug.git"
     },
     "bugs": {
-        "url": "https://github.com/Microsoft/vscode-mock-debug/issues"
+        "url": "https://github.com/cinthamo/vscode-prolog-debug/issues"
     },
     "scripts": {
         "compile": "tsc -p ./",
@@ -66,61 +66,14 @@
         "webpack-cli": "^5.1.4"
     },
     "main": "./dist/extension.js",
-    "browser": "./dist/web-extension.js",
     "activationEvents": [
         "onDebugResolve:prolog",
-        "onDebugDynamicConfigurations:prolog",
-        "onCommand:extension.mock-debug.getProgramName"
+        "onDebugDynamicConfigurations:prolog"
     ],
     "workspaceTrust": {
         "request": "never"
     },
     "contributes": {
-        "menus": {
-            "editor/title/run": [{
-                    "command": "extension.mock-debug.runEditorContents",
-                    "when": "resourceLangId == ari",
-                    "group": "navigation@1"
-                },
-                {
-                    "command": "extension.mock-debug.debugEditorContents",
-                    "when": "resourceLangId == ari",
-                    "group": "navigation@2"
-                }
-            ],
-            "commandPalette": [{
-                    "command": "extension.mock-debug.debugEditorContents",
-                    "when": "resourceLangId == ari"
-                },
-                {
-                    "command": "extension.mock-debug.runEditorContents",
-                    "when": "resourceLangId == ari"
-                }
-            ],
-            "debug/variables/context": [{
-                "command": "extension.mock-debug.toggleFormatting",
-                "when": "debugType == 'prolog' && debugProtocolVariableMenuContext == 'simple'"
-            }]
-        },
-        "commands": [{
-                "command": "extension.mock-debug.debugEditorContents",
-                "title": "Debug File",
-                "category": "Prolog Debug",
-                "enablement": "!inDebugMode",
-                "icon": "$(debug-alt)"
-            },
-            {
-                "command": "extension.mock-debug.runEditorContents",
-                "title": "Run File",
-                "category": "Prolog Debug",
-                "enablement": "!inDebugMode",
-                "icon": "$(play)"
-            },
-            {
-                "command": "extension.mock-debug.toggleFormatting",
-                "title": "Toggle between decimal and hex formatting"
-            }
-        ],
         "languages": [{
             "id": "ari",
             "extensions": [
@@ -191,13 +144,9 @@
                     "type": "prolog",
                     "request": "launch",
                     "name": "Ask for file name",
-                    "program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
                     "stopOnEntry": true
                 }
-            }],
-            "variables": {
-                "AskForProgramName": "extension.mock-debug.getProgramName"
-            }
+            }]
         }]
     },
     "dependencies": {

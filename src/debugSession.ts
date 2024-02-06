@@ -2,30 +2,30 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 /*
- * mockDebug.ts implements the Debug Adapter that "adapts" or translates the Debug Adapter Protocol (DAP) used by the client (e.g. VS Code)
- * into requests and events of the real "execution engine" or "debugger" (here: class MockRuntime).
+ * debugSession.ts implements the Debug Adapter that "adapts" or translates the Debug Adapter Protocol (DAP) used by the client (e.g. VS Code)
+ * into requests and events of the real "execution engine" or "debugger" (here: class RuntimeSession).
  * When implementing your own debugger extension for VS Code, most of the work will go into the Debug Adapter.
  * Since the Debug Adapter is independent from VS Code, it can be used in any client (IDE) supporting the Debug Adapter Protocol.
  *
- * The most important class of the Debug Adapter is the MockDebugSession which implements many DAP requests by talking to the MockRuntime.
+ * The most important class of the Debug Adapter is the DebugSession which implements many DAP requests by talking to the RuntimeSession.
  */
 
 import {
 	Logger, logger,
 	LoggingDebugSession,
 	InitializedEvent, TerminatedEvent, StoppedEvent, BreakpointEvent, OutputEvent,
-	InvalidatedEvent, Thread, StackFrame, Scope, Source, Breakpoint, MemoryEvent
+	InvalidatedEvent, Thread, StackFrame, Scope, Source, Breakpoint
 } from '@vscode/debugadapter';
 import { DebugProtocol } from '@vscode/debugprotocol';
 import { basename } from 'path-browserify';
-import { RuntimeSession, IRuntimeBreakpoint, FileAccessor, RuntimeVariable, IRuntimeVariableType } from './runtimeSession';
+import { RuntimeSession, IRuntimeBreakpoint, RuntimeVariable, IRuntimeVariableType } from './runtimeSession';
 import { Subject } from 'await-notify';
 import { EngineSocket } from './engineSocket';
 
 /**
- * This interface describes the mock-debug specific launch attributes
+ * This interface describes the prolog debug specific launch attributes
  * (which are not part of the Debug Adapter Protocol).
- * The schema for these attributes lives in the package.json of the mock-debug extension.
+ * The schema for these attributes lives in the package.json of the prolog debug extension.
  * The interface should always match this schema.
  */
 interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
@@ -43,7 +43,6 @@ interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 
 interface IAttachRequestArguments extends ILaunchRequestArguments { }
 
-
 export class DebugSession extends LoggingDebugSession {
 
 	private _runtime: RuntimeSession;
@@ -59,13 +58,13 @@ export class DebugSession extends LoggingDebugSession {
 	 * Creates a new debug adapter that is used for one debug session.
 	 * We configure the default implementation of a debug adapter here.
 	 */
-	public constructor(fileAccessor: FileAccessor) {
-		super("mock-debug.txt");
+	public constructor() {
+		super();
 
 		this.setDebuggerLinesStartAt1(true);
 		this.setDebuggerColumnsStartAt1(true);
 
-		this._runtime = new RuntimeSession(fileAccessor);
+		this._runtime = new RuntimeSession();
 
 		// setup event handlers
 		this._runtime.on('stopOnEntry', (threadId) => {
@@ -335,7 +334,6 @@ export class DebugSession extends LoggingDebugSession {
 	protected async variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments, request?: DebugProtocol.Request): Promise<void> {
 
 		const vs = this._runtime.getLocalVariables(args.variablesReference);
-
 		response.body = {
 			variables: vs.map(v => this.convertFromRuntime(v))
 		};
@@ -347,10 +345,6 @@ export class DebugSession extends LoggingDebugSession {
 		if (rv) {
 			rv.value = this.convertToRuntime(args.value);
 			response.body = this.convertFromRuntime(rv);
-
-			if (rv.memory && rv.reference) {
-				this.sendEvent(new MemoryEvent(String(rv.reference), 0, rv.memory.length));
-			}
 		}
 
 		this.sendResponse(response);
@@ -504,7 +498,7 @@ export class DebugSession extends LoggingDebugSession {
 
 	private convertToRuntime(value: string): IRuntimeVariableType {
 
-		value= value.trim();
+		value = value.trim();
 
 		if (value === 'true') {
 			return true;
@@ -565,7 +559,6 @@ export class DebugSession extends LoggingDebugSession {
 	}
 
 	private createSource(filePath: string): Source {
-		return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, 'mock-adapter-data');
+		return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, 'adapter-data');
 	}
 }
-
