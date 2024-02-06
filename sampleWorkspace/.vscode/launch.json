@@ -10,7 +10,7 @@
 			"name": "Debug",
 			"program": "${workspaceFolder}/wait.ari",
 			"stopOnEntry": true,
-			"trace": false,
+			"writeLog": true,
 			"debugServer": 4711
 		}
 	]

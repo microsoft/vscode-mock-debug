@@ -35,6 +35,10 @@ interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 	stopOnEntry?: boolean;
 	/** enable logging the Debug Adapter Protocol */
 	trace?: boolean;
+	/** enable debugger logging */
+	writeLog?: boolean;
+	/** path to log file **/
+	logFile?: string;
 	/** run without debugging */
 	noDebug?: boolean;
 	/** if specified, results in a simulated compile error in launch. */
@@ -171,7 +175,7 @@ export class DebugSession extends LoggingDebugSession {
 		response.body.supportsExceptionInfoRequest = true;
 
 		// make VS Code send setVariable request
-		response.body.supportsSetVariable = false;
+		response.body.supportsSetVariable = true;
 
 		// make VS Code send setExpression request
 		response.body.supportsSetExpression = false;
@@ -228,7 +232,7 @@ export class DebugSession extends LoggingDebugSession {
 		await this._configurationDone.wait(1000);
 
 		// start the program in the runtime
-		this._runtime.start(args.program, !!args.stopOnEntry, !args.noDebug);
+		this._runtime.start(args.program, !!args.stopOnEntry, !!args.writeLog, args.logFile ?? '');
 
 		this.sendResponse(response);
 	}
@@ -341,7 +345,8 @@ export class DebugSession extends LoggingDebugSession {
 	}
 
 	protected setVariableRequest(response: DebugProtocol.SetVariableResponse, args: DebugProtocol.SetVariableArguments): void {
-		const rv = this._runtime.getLocalVariable(args.variablesReference, args.name);
+		const name = args.name.split(" ")[0];
+		const rv = this._runtime.getLocalVariable(args.variablesReference, name);
 		if (rv) {
 			rv.value = this.convertToRuntime(args.value);
 			response.body = this.convertFromRuntime(rv);
@@ -404,6 +409,7 @@ export class DebugSession extends LoggingDebugSession {
 		switch (args.context) {
 			case 'hover':
 			case 'watch':
+			case 'variables':
 				rv = this._runtime.evaluate(args.expression, args.frameId);
 				if (!rv) {
 					reply = `undefined '${args.expression}'`;
@@ -415,7 +421,7 @@ export class DebugSession extends LoggingDebugSession {
 		if (rv) {
 			const v = this.convertFromRuntime(rv);
 			response.body = {
-				result: `${v.value} (${v.type})`,
+				result: v.value,
 				type: v.type,
 				variablesReference: v.variablesReference,
 				presentationHint: v.presentationHint
@@ -433,7 +439,7 @@ export class DebugSession extends LoggingDebugSession {
 	protected setExpressionRequest(response: DebugProtocol.SetExpressionResponse, args: DebugProtocol.SetExpressionArguments): void {
 
 		if (args.expression.startsWith('$')) {
-			const rv = this._runtime.evaluate(args.expression.substr(1), args.frameId);
+			const rv = this._runtime.evaluate(args.expression, args.frameId);
 			if (rv) {
 				rv.value = this.convertToRuntime(args.value);
 				response.body = this.convertFromRuntime(rv);
@@ -526,6 +532,10 @@ export class DebugSession extends LoggingDebugSession {
 			evaluateName: '$' + v.name
 		};
 
+		if (v.isReadOnly) {
+			dapVariable.presentationHint = { attributes: [ 'readOnly' ] };
+		}
+
 		if (Array.isArray(v.value)) {
 			dapVariable.value = `[${v.value.join(',')}]`;
 		} else {
@@ -540,7 +550,7 @@ export class DebugSession extends LoggingDebugSession {
 					}
 					break;
 				case 'string':
-					dapVariable.value = `"${v.value}"`;
+					dapVariable.value = v.value;
 					break;
 				case 'boolean':
 					dapVariable.value = v.value ? 'true' : 'false';

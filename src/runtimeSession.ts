@@ -42,21 +42,18 @@ export class RuntimeVariable {
 		return this._type;
 	}
 
+	public get isReadOnly() {
+		return this.name !== '$writeLog';
+	}
+
 	public set value(value: IRuntimeVariableType) {
-		this._value = value;
-		this._type = typeof value;
-		this._memory = undefined;
-	}
-
-	public get memory() {
-		if (this._memory === undefined && typeof this._value === 'string') {
-			this._memory = new TextEncoder().encode(this._value);
+		if (this._session.onVariableValueChanging(this.name, value)) {
+			this._value = value;
+			this._type = typeof value;
 		}
-		return this._memory;
 	}
 
-	constructor(public readonly name: string, private _value: IRuntimeVariableType, private _type: string) {}
-
+	constructor(private _session: RuntimeSession, public readonly name: string, private _value: IRuntimeVariableType, private _type: string) {}
 }
 
 export function timeout(ms: number) {
@@ -67,7 +64,7 @@ export class RuntimeSession extends EventEmitter {
 
 	// the initial (and one and only) file we are 'debugging'
 	private _waitFile: string = '';
-	private _stopOnEntry: boolean = true;
+	private _initialData?: object = undefined;
 	private _breakPoints = new Map<string, IRuntimeBreakpoint[]>();
 	private _breakPointId = 1;
 	private _stackId = 1;
@@ -81,21 +78,21 @@ export class RuntimeSession extends EventEmitter {
 		engine.on('stop', (data: IEngineStopData) =>
 		{
 			const newStack: IRuntimeStackFrame[] = [];
-			data.stack.forEach(v => {
+			data.stack.forEach(s => {
 				var stack = {
 					id: this._stackId++,
-					name: v.repetition > 1 ? `${v.predicate} (${v.repetition})` : v.predicate,
-					file: v.file,
-					line: v.line,
-					column: v.column
+					name: s.repetition > 1 ? `${s.predicate} (${s.repetition})` : s.predicate,
+					file: s.file,
+					line: s.line,
+					column: s.column
 				};
 				var variables = new Map<string, RuntimeVariable>();
-				v.variables.forEach(v => {
+				s.variables.forEach(v => {
 					var name = v.name;
 					if (name.startsWith('VSD')) {
 						name = name.replace('VSD', '$');
 					}
-					variables.set(name, new RuntimeVariable(name, v.value, v.type));
+					variables.set(name, new RuntimeVariable(this, name, v.value, v.type));
 				});
 				this._variables.set(stack.id, variables);
 				newStack.push(stack);
@@ -111,17 +108,24 @@ export class RuntimeSession extends EventEmitter {
 			this._engine = null;
 			this.sendEvent('end');
 		});
-		engine.start();
-		engine.sendCommandData('initialData', {
-			breakpoints: Array.from(this._breakPoints, ([name, value]) => ({ path: name, lines: value })),
-			stopOnEntry: this._stopOnEntry
-		});
+		this.startEngine();
 	}
 
-	public start(program: string, stopOnEntry: boolean, debug: boolean) {
+	private startEngine() {
+		if (this._initialData) {
+			this._engine?.sendCommandData('initialData', {
+				...this._initialData,
+				breakpoints: Array.from(this._breakPoints, ([name, value]) => ({ path: name, lines: value }))
+			});
+			this._engine?.start();
+		}
+	}
+
+	public start(program: string, stopOnEntry: boolean, writeLog: boolean, logFile: string) {
 		this._waitFile = program;
-		this._stopOnEntry = stopOnEntry;
-		this.sendEvent('stopOnEntry');
+		this._initialData = { stopOnEntry, writeLog, logFile };
+		//this.sendEvent('stopOnEntry'); // show waitFile (not working)
+		this.startEngine();
 	}
 
 	public async end(): Promise<void> {
@@ -229,7 +233,18 @@ export class RuntimeSession extends EventEmitter {
 
 	public evaluate(expression: string, frameId?: number): RuntimeVariable | undefined {
 		if (!frameId) { return undefined; }
-		return this.getLocalVariable(frameId, expression);
+		if (expression.startsWith('$')) {
+			return this.getLocalVariable(frameId, expression.substring(1));
+		}
+		return undefined;
+	}
+
+	public onVariableValueChanging(name: string, value: IRuntimeVariableType): boolean {
+		if (name === '$writeLog' && (value === true || value === false)) {
+			this._engine?.sendCommandData('setVariable', { name, value });
+			return true;
+		}
+		return false;
 	}
 
 	/**
