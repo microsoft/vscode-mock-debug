@@ -7,7 +7,7 @@ The text of the markdown is considered the "program to debug" and certain keywor
 
 With the "Run/Debug" split button in the editor header you can easily "run" or "debug" a Markdown file without having to configure a debug configuration.
 "Running" a Markdown file has no visible effect. "Debugging" a Markdown file starts the debugger and stops on the first line.
-  
+
 ## Stacks
 
 If debugging stops on a line, the line becomes a stack in the CALL STACK with the individual words shown as frames.
@@ -39,6 +39,7 @@ If a Mock Debug session is active, breakpoints are "validated" according to thes
 
 * if a line is empty or starts with `+` we don't allow to set a breakpoint but move the breakpoint down
 * if a line starts with `-` we don't allow to set a breakpoint but move the breakpoint up
+* if a line starts with `!`, "hardware" breakpoints can be set on the line
 * a breakpoint on a line containing the word `lazy` is not immediately validated, but only after hitting it once.
 
 ## Data Breakpoints

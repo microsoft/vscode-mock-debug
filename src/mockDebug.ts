@@ -218,6 +218,11 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body.supportsFunctionBreakpoints = true;
 		response.body.supportsDelayedStackTraceLoading = true;
 
+		response.body.breakpointModes = [
+			{ appliesTo: ['source', 'exception'], label: 'Software', mode: 'sw' },
+			{ appliesTo: ['source', 'exception'], label: 'Hardware', mode: 'hw' },
+		];
+
 		this.sendResponse(response);
 
 		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
@@ -277,19 +282,18 @@ export class MockDebugSession extends LoggingDebugSession {
 	protected async setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): Promise<void> {
 
 		const path = args.source.path as string;
-		const clientLines = args.lines || [];
 
 		// clear all breakpoints for this file
 		this._runtime.clearBreakpoints(path);
 
 		// set and verify breakpoint locations
-		const actualBreakpoints0 = clientLines.map(async l => {
-			const { verified, line, id } = await this._runtime.setBreakPoint(path, this.convertClientLineToDebugger(l));
+		const actualBreakpoints0 = (args.breakpoints || []).map(async ({ line: l, mode }): Promise<DebugProtocol.Breakpoint> => {
+			const { verified, line, id } = await this._runtime.setBreakPoint(path, this.convertClientLineToDebugger(l), mode);
 			const bp = new Breakpoint(verified, this.convertDebuggerLineToClient(line)) as DebugProtocol.Breakpoint;
 			bp.id = id;
 			return bp;
 		});
-		const actualBreakpoints = await Promise.all<DebugProtocol.Breakpoint>(actualBreakpoints0);
+		const actualBreakpoints = await Promise.all(actualBreakpoints0);
 
 		// send back the actual breakpoint positions
 		response.body = {

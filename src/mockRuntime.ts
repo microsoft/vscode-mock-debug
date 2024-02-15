@@ -14,6 +14,7 @@ export interface IRuntimeBreakpoint {
 	id: number;
 	line: number;
 	verified: boolean;
+	mode: string; // hw or sw
 }
 
 interface IRuntimeStepInTargets {
@@ -334,10 +335,10 @@ export class MockRuntime extends EventEmitter {
 	/*
 	 * Set breakpoint in file with given line.
 	 */
-	public async setBreakPoint(path: string, line: number): Promise<IRuntimeBreakpoint> {
+	public async setBreakPoint(path: string, line: number, mode = 'sw'): Promise<IRuntimeBreakpoint> {
 		path = this.normalizePathAndCasing(path);
 
-		const bp: IRuntimeBreakpoint = { verified: false, line, id: this.breakpointId++ };
+		const bp: IRuntimeBreakpoint = { verified: false, line, id: this.breakpointId++, mode };
 		let bps = this.breakPoints.get(path);
 		if (!bps) {
 			bps = new Array<IRuntimeBreakpoint>();
@@ -654,13 +655,16 @@ export class MockRuntime extends EventEmitter {
 						bp.line++;
 					}
 					// if a line starts with '-' we don't allow to set a breakpoint but move the breakpoint up
-					if (srcLine.indexOf('-') === 0) {
+					if (srcLine.startsWith('-')) {
 						bp.line--;
 					}
 					// don't set 'verified' to true if the line contains the word 'lazy'
 					// in this case the breakpoint will be verified 'lazy' after hitting it once.
 					if (srcLine.indexOf('lazy') < 0) {
-						bp.verified = true;
+						// if a line starts with '!' we allow setting hardware breakpoints there
+						if (srcLine.startsWith('!') || bp.mode !== 'hw') {
+							bp.verified = true;
+						}
 						this.sendEvent('breakpointValidated', bp);
 					}
 				}
