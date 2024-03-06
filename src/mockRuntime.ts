@@ -48,6 +48,7 @@ export class RuntimeVariable {
 	private _memory?: Uint8Array;
 
 	public reference?: number;
+	public ordinal?: number;
 
 	public get value() {
 		return this._value;
@@ -144,7 +145,7 @@ export class MockRuntime extends EventEmitter {
 	// so that the frontend can match events with breakpoints.
 	private breakpointId = 1;
 
-	private breakAddresses = new Map<string, string>();
+	private breakAddresses = new Map<string | number, string>();
 
 	private namedException: string | undefined;
 	private otherExceptions = false;
@@ -371,17 +372,17 @@ export class MockRuntime extends EventEmitter {
 		this.breakPoints.delete(this.normalizePathAndCasing(path));
 	}
 
-	public setDataBreakpoint(address: string, accessType: 'read' | 'write' | 'readWrite'): boolean {
+	public setDataBreakpoint(nameOrOrdinal: string | number, accessType: 'read' | 'write' | 'readWrite'): boolean {
 
 		const x = accessType === 'readWrite' ? 'read write' : accessType;
 
-		const t = this.breakAddresses.get(address);
+		const t = this.breakAddresses.get(nameOrOrdinal);
 		if (t) {
 			if (t !== x) {
-				this.breakAddresses.set(address, 'read write');
+				this.breakAddresses.set(nameOrOrdinal, 'read write');
 			}
 		} else {
-			this.breakAddresses.set(address, x);
+			this.breakAddresses.set(nameOrOrdinal, x);
 		}
 		return true;
 	}
@@ -589,15 +590,18 @@ export class MockRuntime extends EventEmitter {
 						// the first write access to a variable is the "declaration" and not a "write access"
 						access = 'write';
 					}
+					v.ordinal = this.variables.size;
 					this.variables.set(name, v);
 				} else {
-					if (this.variables.has(name)) {
+					const existing = this.variables.get(name);
+					if (existing) {
 						// variable must exist in order to trigger a read access
 						access = 'read';
+						v.ordinal = existing.ordinal;
 					}
 				}
 
-				const accessType = this.breakAddresses.get(name);
+				const accessType = this.breakAddresses.get(name) || this.breakAddresses.get(v.ordinal!);
 				if (access && accessType && accessType.indexOf(access) >= 0) {
 					this.sendEvent('stopOnDataBreakpoint', access);
 					return true;

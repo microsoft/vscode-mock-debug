@@ -161,6 +161,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// make VS Code support data breakpoints
 		response.body.supportsDataBreakpoints = true;
+		response.body.supportsDataBreakpointBytes = true;
 
 		// make VS Code support completion in REPL
 		response.body.supportsCompletionsRequest = true;
@@ -688,6 +689,11 @@ export class MockDebugSession extends LoggingDebugSession {
 				response.body.accessTypes = ["read", "write", "readWrite"];
 				response.body.canPersist = true;
 			}
+		} else if (args.asAddress) {
+			response.body.dataId = `range:${args.name}:${args.bytes || 1}`;
+			response.body.description = `${args.bytes} variables after ${args.name}`;
+			response.body.accessTypes = ["read", "write", "readWrite"];
+			response.body.canPersist = true;
 		}
 
 		this.sendResponse(response);
@@ -703,7 +709,17 @@ export class MockDebugSession extends LoggingDebugSession {
 		};
 
 		for (const dbp of args.breakpoints) {
-			const ok = this._runtime.setDataBreakpoint(dbp.dataId, dbp.accessType || 'write');
+			let ok = false;
+			if (dbp.dataId.startsWith('range:')) {
+				const [, start, bytes] = dbp.dataId.split(':').map(Number);
+				for (let i = 0; i < bytes; i++) {
+					this._runtime.setDataBreakpoint(start + i, dbp.accessType || 'write')
+					ok = true;
+				}
+			} else {
+				ok = this._runtime.setDataBreakpoint(dbp.dataId, dbp.accessType || 'write');
+			}
+
 			response.body.breakpoints.push({
 				verified: ok
 			});

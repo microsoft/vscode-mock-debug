@@ -42,6 +42,8 @@ If a Mock Debug session is active, breakpoints are "validated" according to thes
 * if a line starts with `!`, "hardware" breakpoints can be set on the line
 * a breakpoint on a line containing the word `lazy` is not immediately validated, but only after hitting it once.
 
+!some line
+
 ## Data Breakpoints
 
 Data Breakpoints can be set for different access modes in the VARIABLES view of the editor via the context menu.
@@ -50,6 +52,10 @@ The syntax `$variable` triggers a read access data breakpoint, the syntax `$vari
 Examples:
 - Read Access: $i
 - Write Access: $i=999
+
+You can also set data breakpoints on "memory addresses". In mock debug, the "address" of a variable is the zero-indexed order in which it was made, so asking to pause on read/writes to `0x2` will pause when the third variable is written to, which is `b1` in this readme:
+
+- Read Access: $b1
 
 ## Disassembly View
 
