@@ -20,3 +20,9 @@ extends:
 
       - script: yarn run test
         displayName: Typecheck extension
+
+    tsa:
+      config:
+        serviceTreeID: '053e3ba6-924d-456c-ace0-67812c5ccc52'
+        areaPath: 'Visual Studio Code Debugging Extensions'
+      enabled: true
