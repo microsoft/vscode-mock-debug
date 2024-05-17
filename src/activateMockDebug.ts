@@ -63,7 +63,8 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 
 	// register a configuration provider for 'mock' debug type
 	const provider = new MockConfigurationProvider();
-	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', provider));
+	// context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', provider));
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock2', provider));
 
 	// register a dynamic configuration provider for 'mock' debug type
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('mock', {
@@ -159,24 +160,26 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 	 * e.g. add all missing attributes to the debug configuration.
 	 */
 	resolveDebugConfiguration(folder: WorkspaceFolder | undefined, config: DebugConfiguration, token?: CancellationToken): ProviderResult<DebugConfiguration> {
+		config.type = 'mock';
+		config.program = '${file}';
+		
+		// // if launch.json is missing or empty
+		// if (!config.type && !config.request && !config.name) {
+		// 	const editor = vscode.window.activeTextEditor;
+		// 	if (editor && editor.document.languageId === 'markdown') {
+		// 		config.type = 'mock';
+		// 		config.name = 'Launch';
+		// 		config.request = 'launch';
+		// 		config.program = '${file}';
+		// 		config.stopOnEntry = true;
+		// 	}
+		// }
 
-		// if launch.json is missing or empty
-		if (!config.type && !config.request && !config.name) {
-			const editor = vscode.window.activeTextEditor;
-			if (editor && editor.document.languageId === 'markdown') {
-				config.type = 'mock';
-				config.name = 'Launch';
-				config.request = 'launch';
-				config.program = '${file}';
-				config.stopOnEntry = true;
-			}
-		}
-
-		if (!config.program) {
-			return vscode.window.showInformationMessage("Cannot find a program to debug").then(_ => {
-				return undefined;	// abort launch
-			});
-		}
+		// if (!config.program) {
+		// 	return vscode.window.showInformationMessage("Cannot find a program to debug").then(_ => {
+		// 		return undefined;	// abort launch
+		// 	});
+		// }
 
 		return config;
 	}
