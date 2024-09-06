@@ -233,10 +233,7 @@ export class RuntimeSession extends EventEmitter {
 
 	public evaluate(expression: string, frameId?: number): RuntimeVariable | undefined {
 		if (!frameId) { return undefined; }
-		if (expression.startsWith('$')) {
-			return this.getLocalVariable(frameId, expression.substring(1));
-		}
-		return undefined;
+		return this.getLocalVariable(frameId, expression);
 	}
 
 	public onVariableValueChanging(name: string, value: IRuntimeVariableType): boolean {

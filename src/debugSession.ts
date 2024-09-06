@@ -215,8 +215,15 @@ export class DebugSession extends LoggingDebugSession {
 
 	protected async disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments, request?: DebugProtocol.Request) {
 		console.log(`disconnectRequest2 suspend: ${args.suspendDebuggee}, restart: ${args.restart}, terminate: ${args.terminateDebuggee}`);
-		await this._runtime.end();
-		this.sendResponse(response);
+		if (args.restart) {
+			this._runtime.restart();
+			response.success = false;
+			response.message = 'database saved successfully';
+			this.sendResponse(response);
+		} else {
+			await this._runtime.end();
+			this.sendResponse(response);
+		}
 	}
 
 	protected async attachRequest(response: DebugProtocol.AttachResponse, args: IAttachRequestArguments) {
