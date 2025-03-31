@@ -174,6 +174,25 @@ export class MockRuntime extends EventEmitter {
 		}
 	}
 
+	public async restart(program: string, stopOnEntry: boolean, debug: boolean): Promise<void> {
+
+		this.currentLine = 0;
+		this.currentColumn = undefined;
+
+		if (debug) {
+			await this.verifyBreakpoints(this._sourceFile);
+
+			if (stopOnEntry) {
+				this.findNextStatement(false, 'stopOnEntry');
+			} else {
+				// we just start to run until we hit a breakpoint, an exception, or the end of the program
+				this.continue(false);
+			}
+		} else {
+			this.continue(false);
+		}
+	}
+
 	/**
 	 * Continue execution to the end/beginning.
 	 */
