@@ -15,10 +15,10 @@ extends:
   template: azure-pipelines/extension/pre-release.yml@templates
   parameters:
     buildSteps:
-      - script: yarn install --frozen-lockfile
+      - script: npm ci
         displayName: Install dependencies
 
-      - script: yarn run test
+      - script: npm test
         displayName: Typecheck extension
 
     tsa:
