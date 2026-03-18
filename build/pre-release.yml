@@ -14,6 +14,7 @@ resources:
 extends:
   template: azure-pipelines/extension/pre-release.yml@templates
   parameters:
+    nodeVersion: '22.x'
     buildSteps:
       - script: npm ci
         displayName: Install dependencies
