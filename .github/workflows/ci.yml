@@ -6,11 +6,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: ['^16']
+        node-version: ['22']
     steps:
     - uses: actions/checkout@v1
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install --frozen-lockfile
-    - run: yarn test
+    - run: npm ci
+    - run: npm test
