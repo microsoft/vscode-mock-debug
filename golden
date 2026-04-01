@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOLDEN | حلويات ذهبية - منيو كامل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #F4D03F;
+            --gold-dark: #B8860B;
+            --black: #0A0A0A;
+            --white: #FFFFFF;
+            --cream: #FFFAF0;
+            --brown: #5D4037;
+            --gradient-gold: linear-gradient(135deg, #F9D976 0%, #D4AF37 50%, #8E6D13 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--black);
+            color: var(--white);
+            overflow-x: hidden;
+        }
+        
+        /* Link Banner */
+        .link-banner {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            padding: 15px 20px;
+            text-align: center;
+            position: relative;
+            z-index: 1001;
+        }
+        
+        .link-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .link-text {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--black);
+        }
+        
+        .page-url {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--black);
+            flex: 1;
+            text-align: center;
+            direction: ltr;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .copy-link-btn {
+            background: var(--black);
+            color: var(--gold);
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .copy-link-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        .copy-success {
+            color: #4CAF50;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .copy-success.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Fixed Header */
+        .fixed-header {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--gold);
+            z-index: 1000;
+            padding: 15px 0;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 900;
+            font-style: italic;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-link {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background: var(--gold);
+            color: var(--black);
+        }
+        
+        .whatsapp-fixed {
+            background: #25D366;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .whatsapp-fixed:hover {
+            background: #128C7E;
+            transform: translateY(-3px);
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, #000000 0%, #1a1a1a 100%);
+            position: relative;
+            text-align: center;
+            margin-top: 130px;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+        }
+        
+        .golden-main {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(80px, 15vw, 160px);
+            font-weight: 900;
+            font-style: italic;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 0 50px rgba(212, 175, 55, 0.3);
+            animation: goldenGlow 4s ease-in-out infinite;
+            letter-spacing: -3px;
+            margin-bottom: 20px;
+        }
+        
+        .hero-subtitle {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .hero-btn {
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 18px;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-gold);
+            color: var(--black);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 2px solid var(--gold);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateY(-5px);
+        }
+        
+        @keyframes goldenGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.3));
+                transform: scale(1);
+            }
+            50% {
+                filter: drop-shadow(0 0 40px rgba(212, 175, 55, 0.5));
+                transform: scale(1.02);
+            }
+        }
+        
+        /* Sections Common */
+        .section {
+            padding: 100px 20px;
+            position: relative;
+        }
+        
+        .section-title {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 100px;
+            height: 4px;
+            background: var(--gradient-gold);
+            border-radius: 2px;
+        }
+        
+        .golden-accent {
+            color: var(--gold);
+        }
+        
+        .section-description {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 800px;
+            margin: 0 auto 50px;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .section-number {
+            font-size: 120px;
+            font-weight: 900;
+            color: rgba(212, 175, 55, 0.1);
+            position: absolute;
+            top: 0;
+            right: 20px;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Eastern Menu Section */
+        .eastern-section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+        }
+        
+        .eastern-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(93, 64, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+        }
+        
+        .menu-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .category-card {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .category-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.1);
+        }
+        
+        .category-title {
+            background: linear-gradient(135deg, #8B4513, #5D2906);
+            color: var(--gold);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid var(--gold);
+        }
+        
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-item:hover {
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 8px;
+            padding: 12px 10px;
+        }
+        
+        .item-name {
+            font-weight: 700;
+            color: var(--white);
+            font-size: 16px;
+            flex: 1;
+        }
+        
+        .item-price {
+            background: var(--gold);
+            color: var(--black);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        /* Western Menu Section */
+        .western-section {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        }
+        
+        .western-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 30% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(93, 64, 55, 0.05) 0%, transparent 50%);
+        }
+        
+        /* Branches Section */
+        .branches-section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+        }
+        
+        .branches-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 90%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 90% 10%, rgba(93, 64, 55, 0.05) 0%, transparent 50%);
+        }
+        
+        .branches-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .branch-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(212, 175, 55, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .branch-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--gold);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .branch-icon {
+            font-size: 50px;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+        
+        .branch-title {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            color: var(--gold);
+            text-align: center;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 15px;
+        }
+        
+        .branch-details {
+            margin-top: 25px;
+        }
+        
+        .branch-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            border-right: 3px solid var(--gold);
+        }
+        
+        .branch-info i {
+            color: var(--gold);
+            font-size: 20px;
+            margin-top: 3px;
+        }
+        
+        .branch-info h4 {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 5px;
+        }
+        
+        .branch-info p {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--white);
+            line-height: 1.5;
+        }
+        
+        .whatsapp-branch {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            margin-top: 20px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .whatsapp-branch:hover {
+            background: #128C7E;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+        }
+        
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 50px 20px;
+            text-align: center;
+            border-top: 2px solid var(--gold);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            font-weight: 900;
+            font-style: italic;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+        
+        .footer-info {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        
+        .footer-contact {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .copyright {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .golden-main {
+                font-size: 120px;
+            }
+            
+            .link-content {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .golden-main {
+                font-size: 90px;
+            }
+            
+            .section-title {
+                font-size: 36px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .header-content {
+                justify-content: center;
+            }
+            
+            .whatsapp-fixed {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 1001;
+                padding: 12px 20px;
+            }
+            
+            .fixed-header {
+                top: 80px;
+            }
+            
+            .hero-section {
+                margin-top: 140px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .golden-main {
+                font-size: 70px;
+            }
+            
+            .section {
+                padding: 80px 15px;
+            }
+            
+            .menu-container {
+                padding: 30px 20px;
+            }
+            
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .branches-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .branch-card {
+                padding: 30px 20px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+            
+            .page-url {
+                font-size: 12px;
+                padding: 8px 10px;
+            }
+            
+            .link-banner {
+                padding: 12px 15px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .golden-main {
+                font-size: 50px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+            
+            .section-description {
+                font-size: 16px;
+            }
+            
+            .section-number {
+                font-size: 80px;
+                right: 10px;
+            }
+            
+            .hero-subtitle {
+                font-size: 18px;
+                padding: 0 20px;
+            }
+            
+            .footer-contact {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .link-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .page-url {
+                order: -1;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Link Banner -->
+    <div class="link-banner">
+        <div class="link-content">
+            <div class="link-text">🔗 رابط صفحة المنيو:</div>
+            <div class="page-url" id="pageUrl">https://golden-sweets.com/menu</div>
+            <button class="copy-link-btn" onclick="copyPageUrl()">
+                <i class="fas fa-copy"></i>
+                نسخ الرابط
+            </button>
+            <div class="copy-success" id="copySuccess">✓ تم نسخ الرابط!</div>
+        </div>
+    </div>
+
+    <!-- Fixed Header -->
+    <header class="fixed-header">
+        <div class="header-content">
+            <div class="logo">GOLDEN</div>
+            <nav class="nav-links">
+                <a href="#home" class="nav-link">الرئيسية</a>
+                <a href="#eastern" class="nav-link">المنيو الشرقي</a>
+                <a href="#western" class="nav-link">المنيو الغربي</a>
+                <a href="#branches" class="nav-link">الفروع</a>
+            </nav>
+            <a href="https://wa.me/201201068500" class="whatsapp-fixed" target="_blank">
+                <i class="fab fa-whatsapp"></i>
+                واتساب
+            </a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+        <div class="hero-content">
+            <h1 class="golden-main">GOLDEN</h1>
+            <p class="hero-subtitle">
+                أجود أنواع الحلويات الشرقية والغربية بأيدي أمهر الحلوانيين.<br>
+                نقدم لكم طعم الذهب في كل قطعة
+            </p>
+            <div class="hero-buttons">
+                <a href="#eastern" class="hero-btn btn-primary">
+                    <i class="fas fa-moon"></i>
+                    المنيو الشرقي
+                </a>
+                <a href="#western" class="hero-btn btn-secondary">
+                    <i class="fas fa-birthday-cake"></i>
+                    المنيو الغربي
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Eastern Menu Section -->
+    <section class="section eastern-section" id="eastern">
+        <div class="section-number">01</div>
+        <h2 class="section-title">منيو <span class="golden-accent">الشرقي</span></h2>
+        <p class="section-description">
+            أجود أنواع الحلويات الشرقية المصنوعة بأيدي أمهر الحلوانيين.<br>
+            كل قطعة تُحضر بعناية فائقة باستخدام أفضل المكونات الطبيعية.
+        </p>
+        
+        <div class="menu-container">
+            <div class="menu-grid">
+                <!-- البسبوسة -->
+                <div class="category-card">
+                    <div class="category-title">البسبوسة</div>
+                    <div class="menu-item">
+                        <div class="item-name">بسبوسة تركي</div>
+                        <div class="item-price">180 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">بسبوسة سادة</div>
+                        <div class="item-price">150 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">بسبوسة بندق</div>
+                        <div class="item-price">220 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">بسبوسة فستق</div>
+                        <div class="item-price">350 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">بسبوسة قشطة</div>
+                        <div class="item-price">200 ج.م</div>
+                    </div>
+                </div>
+                
+                <!-- الكنافة -->
+                <div class="category-card">
+                    <div class="category-title">الكنافة</div>
+                    <div class="menu-item">
+                        <div class="item-name">كنافة قشطة</div>
+                        <div class="item-price">200 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">كنافة كريمة</div>
+                        <div class="item-price">150 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">كنافة مكسرات</div>
+                        <div class="item-price">250 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">كنافة نوتيلا</div>
+                        <div class="item-price">220 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">كنافة يورمة</div>
+                        <div class="item-price">350 ج.م</div>
+                    </div>
+                </div>
+                
+                <!-- حلويات أخرى -->
+                <div class="category-card">
+                    <div class="category-title">حلويات أخرى</div>
+                    <div class="menu-item">
+                        <div class="item-name">جلاش كريمة</div>
+                        <div class="item-price">150 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">جلاش مكسرات</div>
+                        <div class="item-price">220 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">بقلاوة</div>
+                        <div class="item-price">250 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">بلح الشام</div>
+                        <div class="item-price">150 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">معمول بالتمر</div>
+                        <div class="item-price">200 ج.م</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="https://wa.me/201201068500?text=مرحباً، أريد الحجز على الحلويات الشرقية" 
+                   class="whatsapp-branch" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                    احجز الآن عبر واتساب
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Western Menu Section -->
+    <section class="section western-section" id="western">
+        <div class="section-number">02</div>
+        <h2 class="section-title">منيو <span class="golden-accent">الغربي</span></h2>
+        <p class="section-description">
+            تشكيلة فاخرة من التورت والكيكات بتصاميم مذهلة وطعم لا يقاوم.<br>
+            تورت وكيك لكل المناسبات بأيدي خبراء الحلويات.
+        </p>
+        
+        <div class="menu-container">
+            <div class="menu-grid">
+                <!-- تورته مدورة -->
+                <div class="category-card">
+                    <div class="category-title">🎂 تورته مدورة</div>
+                    <div class="menu-item">
+                        <div class="item-name">مقاس 18 سم</div>
+                        <div class="item-price">200 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">مقاس 20 سم</div>
+                        <div class="item-price">250 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">مقاس 22 سم</div>
+                        <div class="item-price">300 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">مقاس 24 سم</div>
+                        <div class="item-price">350 ج.م</div>
+                    </div>
+                </div>
+                
+                <!-- تابع المدورة وقلب -->
+                <div class="category-card">
+                    <div class="category-title">🎂 تابع المدورة</div>
+                    <div class="menu-item">
+                        <div class="item-name">مقاس 26 سم</div>
+                        <div class="item-price">400 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">مقاس 28 سم</div>
+                        <div class="item-price">430 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">مقاس 30 سم</div>
+                        <div class="item-price">500 ج.م</div>
+                    </div>
+                    
+                    <div class="category-title" style="margin-top: 25px; margin-bottom: 15px;">❤️ تورته قلب</div>
+                    <div class="menu-item">
+                        <div class="item-name">قلب صغير</div>
+                        <div class="item-price">220 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">قلب وسط</div>
+                        <div class="item-price">320 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">قلب كبير</div>
+                        <div class="item-price">450 ج.م</div>
+                    </div>
+                </div>
+                
+                <!-- عجين السكر -->
+                <div class="category-card">
+                    <div class="category-title">📏 عجين السكر</div>
+                    <div class="menu-item">
+                        <div class="item-name">20 × 20 سم</div>
+                        <div class="item-price">280 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">25 × 25 سم</div>
+                        <div class="item-price">380 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">30 × 30 سم</div>
+                        <div class="item-price">500 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">30 × 40 سم</div>
+                        <div class="item-price">600 ج.م</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-name">40 × 40 سم</div>
+                        <div class="item-price">750 ج.م</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="https://wa.me/201201068500?text=مرحباً، أريد الحجز على التورت والكيكات" 
+                   class="whatsapp-branch" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                    احجز الآن عبر واتساب
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Branches Section -->
+    <section class="section branches-section" id="branches">
+        <div class="section-number">03</div>
+        <h2 class="section-title">الفروع <span class="golden-accent">والتواصل</span></h2>
+        <p class="section-description">
+            توجد لدينا فرعين في المنصورة للحصول على أفضل خدمة.<br>
+            يمكنك الاتصال أو التواصل عبر واتساب للحجز والاستفسارات.
+        </p>
+        
+        <div class="branches-container">
+            <!-- الفرع الأول -->
+            <div class="branch-card">
+                <div class="branch-icon">
+                    <i class="fas fa-store"></i>
+                </div>
+                <h3 class="branch-title">الفرع الأول</h3>
+                
+                <div class="branch-details">
+                    <div class="branch-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h4>العنوان:</h4>
+                            <p>طريق موقف المنصورة - أمام شركة حسونة للأدوات الكهربائية</p>
+                        </div>
+                    </div>
+                    
+                    <div class="branch-info">
+                        <i class="fas fa-phone-alt"></i>
+                        <div>
+                            <h4>رقم الهاتف:</h4>
+                            <p>01201068500</p>
+                        </div>
+                    </div>
+                    
+                    <button class="whatsapp-branch" onclick="openWhatsApp('201201068500', 'مرحباً، أريد التواصل مع فرع المنصورة الأول')">
+                        <i class="fab fa-whatsapp"></i>
+                        تواصل عبر واتساب - الفرع الأول
+                    </button>
+                </div>
+            </div>
+            
+            <!-- الفرع الثاني -->
+            <div class="branch-card">
+                <div class="branch-icon">
+                    <i class="fas fa-store"></i>
+                </div>
+                <h3 class="branch-title">الفرع الثاني</h3>
+                
+                <div class="branch-details">
+                    <div class="branch-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h4>العنوان:</h4>
+                            <p>طريق الغشام - بجوار صيدلية العزبي</p>
+                        </div>
+                    </div>
+                    
+                    <div class="branch-info">
+                        <i class="fas fa-phone-alt"></i>
+                        <div>
+                            <h4>رقم الهاتف:</h4>
+                            <p>01019123164</p>
+                        </div>
+                    </div>
+                    
+                    <button class="whatsapp-branch" onclick="openWhatsApp('2010019123164', 'مرحباً، أريد التواصل مع فرع المنصورة الثاني')">
+                        <i class="fab fa-whatsapp"></i>
+                        تواصل عبر واتساب - الفرع الثاني
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">GOLDEN</div>
+            <p class="footer-info">
+                منذ عام 2010 ونحن نقدم أجود أنواع الحلويات الشرقية والغربية بأيدي أمهر الحلوانيين،<br>
+                باستخدام أفضل المكونات الطبيعية وبتقنيات حديثة تضمن الجودة والطعم المميز.
+            </p>
+            
+            <div class="footer-contact">
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>01201068500</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>01019123164</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>واتساب</span>
+                </div>
+            </div>
+            
+            <p class="copyright">
+                © 2024 GOLDEN - جميع الحقوق محفوظة | القاهرة - مصر<br>
+                تم التصميم بعناية لضمان تجربة استخدام ممتازة على جميع الأجهزة
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Page URL - يمكن تغييره هنا
+        const pageUrl = "https://golden-sweets.com/menu";
+        
+        // Set the URL in the banner
+        document.getElementById('pageUrl').textContent = pageUrl;
+        
+        // Function to copy page URL
+        function copyPageUrl() {
+            navigator.clipboard.writeText(pageUrl).then(() => {
+                // Show success message
+                const successMsg = document.getElementById('copySuccess');
+                successMsg.classList.add('show');
+                
+                // Change button text temporarily
+                const copyBtn = document.querySelector('.copy-link-btn');
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> تم النسخ!';
+                copyBtn.style.background = '#4CAF50';
+                
+                setTimeout(() => {
+                    successMsg.classList.remove('show');
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.style.background = '';
+                }, 3000);
+                
+                // Vibrate if supported
+                if (navigator.vibrate) {
+                    navigator.vibrate(100);
+                }
+            }).catch(err => {
+                alert('حدث خطأ في نسخ الرابط. حاول مرة أخرى.');
+                console.error('Failed to copy: ', err);
+            });
+        }
+        
+        // Function to open WhatsApp
+        function openWhatsApp(phoneNumber, message) {
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+        
+        // Make phone numbers clickable
+        document.querySelectorAll('.branch-info p').forEach(phone => {
+            if (phone.textContent.match(/\d{11}/)) {
+                phone.style.cursor = 'pointer';
+                phone.style.color = 'var(--gold)';
+                phone.style.fontWeight = 'bold';
+                phone.addEventListener('click', function() {
+                    const phoneNumber = this.textContent.trim();
+                    if (/Mobi|Android/i.test(navigator.userAgent)) {
+                        window.location.href = `tel:${phoneNumber}`;
+                    } else {
+                        navigator.clipboard.writeText(phoneNumber).then(() => {
+                            const originalText = this.textContent;
+                            this.textContent = 'تم نسخ الرقم!';
+                            setTimeout(() => {
+                                this.textContent = originalText;
+                            }, 2000);
+                        });
+                    }
+                });
+            }
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 130,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.fixed-header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(10, 10, 10, 0.95)';
+                header.style.backdropFilter = 'blur(10px)';
+            } else {
+                header.style.background = 'rgba(10, 10, 10, 0.95)';
+                header.style.backdropFilter = 'blur(10px)';
+            }
+        });
+        
+        // Create floating golden particles
+        document.addEventListener('DOMContentLoaded', function() {
+            createFloatingParticles();
+        });
+        
+        function createFloatingParticles() {
+            const particlesContainer = document.createElement('div');
+            particlesContainer.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: -1;
+                overflow: hidden;
+            `;
+            
+            document.body.appendChild(particlesContainer);
+            
+            // Create particles
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: absolute;
+                    width: ${Math.random() * 3 + 1}px;
+                    height: ${Math.random() * 3 + 1}px;
+                    background: var(--gold);
+                    border-radius: 50%;
+                    opacity: ${Math.random() * 0.2 + 0.05};
+                `;
+                
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = Math.random() * 100 + 'vh';
+                particle.style.animation = `
+                    float ${Math.random() * 20 + 10}s linear infinite,
+                    pulse ${Math.random() * 3 + 2}s ease-in-out infinite
+                `;
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                
+                particlesContainer.appendChild(particle);
+            }
+            
+            // Add CSS for animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes float {
+                    0% { transform: translate(0, 0) rotate(0deg); }
+                    100% { transform: translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 100}px) rotate(360deg); }
+                }
+                @keyframes pulse {
+                    0%, 100% { opacity: 0.1; }
+                    50% { opacity: 0.3; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Keyboard shortcut to copy URL (Ctrl+L)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'l') {
+                e.preventDefault();
+                copyPageUrl();
+            }
+        });
+        
+        // Auto-select URL when clicked
+        document.getElementById('pageUrl').addEventListener('click', function() {
+            const range = document.createRange();
+            range.selectNodeContents(this);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+        });
+    </script>
+</body>
+</html>
