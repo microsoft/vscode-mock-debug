@@ -8,8 +8,8 @@ jobs:
       matrix:
         node-version: ['22']
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-node@v1
+    - uses: actions/checkout@50fbc622fc4ef5163becd7fab6573eac35f8462e # v1.2.0
+    - uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e # v1.4.6
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
