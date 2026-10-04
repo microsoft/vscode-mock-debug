@@ -33,8 +33,9 @@
     "esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
     "watch": "npm run -S esbuild-base -- --sourcemap --sources-content=false --watch",
     "esbuild-web": "esbuild ./src/web-extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=browser --outfile=dist/web-extension.js",
+    "esbuild-adapter": "esbuild ./src/debugAdapter.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/debugAdapter.js",
     "watch-web": "npm run -S esbuild-web -- --sourcemap --sources-content=false --watch",
-    "build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false",
+    "build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false && npm run -S esbuild-adapter -- --sourcemap --sources-content=false",
     "package": "vsce package",
     "publish": "vsce publish",
     "publish-pre-release": "vsce publish --pre-release",
@@ -136,7 +137,7 @@
           "markdown"
         ],
         "label": "Mock Debug",
-        "program": "./out/debugAdapter.js",
+        "program": "./dist/debugAdapter.js",
         "runtime": "node",
         "configurationAttributes": {
           "launch": {
