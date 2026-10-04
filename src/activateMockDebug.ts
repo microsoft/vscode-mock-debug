@@ -182,12 +182,20 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 	}
 }
 
+// Fix up URI on remote systems
+const overrideUri: { scheme?: string, authority?: string } = {};
+if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
+	const root = vscode.workspace.workspaceFolders[0].uri;
+	overrideUri.scheme = root.scheme;
+	overrideUri.authority = root.authority;
+}
+
 export const workspaceFileAccessor: FileAccessor = {
 	isWindows: typeof process !== 'undefined' && process.platform === 'win32',
 	async readFile(path: string): Promise<Uint8Array> {
 		let uri: vscode.Uri;
 		try {
-			uri = pathToUri(path);
+			uri = pathToUri(path, overrideUri);
 		} catch (e) {
 			return new TextEncoder().encode(`cannot read '${path}'`);
 		}
@@ -196,14 +204,23 @@ export const workspaceFileAccessor: FileAccessor = {
 	},
 	async writeFile(path: string, contents: Uint8Array) {
 		await vscode.workspace.fs.writeFile(pathToUri(path), contents);
+	},
+	convertDebuggerPathToClient(path: string): string {
+		// Add overrides
+		const uri = pathToUri(path, overrideUri);
+		return uri.toString();
+	},
+	convertClientPathToDebugger(path: string): string {
+		// Remove scheme
+		return vscode.Uri.parse(path).fsPath;
 	}
 };
 
-function pathToUri(path: string) {
+function pathToUri(path: string, change: typeof overrideUri = {}) {
 	try {
-		return vscode.Uri.file(path);
+		return vscode.Uri.file(path).with(change);
 	} catch (e) {
-		return vscode.Uri.parse(path);
+		return vscode.Uri.parse(path).with(change);
 	}
 }
 
