@@ -218,6 +218,8 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body.supportsFunctionBreakpoints = true;
 		response.body.supportsDelayedStackTraceLoading = true;
 
+		response.body.supportsRestartRequest = false;
+
 		this.sendResponse(response);
 
 		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
@@ -268,6 +270,15 @@ export class MockDebugSession extends LoggingDebugSession {
 		} else {
 			this.sendResponse(response);
 		}
+	}
+
+	protected async restartRequest(response: DebugProtocol.RestartResponse, args0: DebugProtocol.RestartArguments, request?: DebugProtocol.Request | undefined) {
+
+		if (args0.arguments) {
+			const args = <ILaunchRequestArguments> args0.arguments;
+			await this._runtime.restart(args.program, !!args.stopOnEntry, !args.noDebug);
+		}	
+		this.sendResponse(response);
 	}
 
 	protected setFunctionBreakPointsRequest(response: DebugProtocol.SetFunctionBreakpointsResponse, args: DebugProtocol.SetFunctionBreakpointsArguments, request?: DebugProtocol.Request): void {
