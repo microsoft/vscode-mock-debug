@@ -8,6 +8,8 @@ export interface FileAccessor {
 	isWindows: boolean;
 	readFile(path: string): Promise<Uint8Array>;
 	writeFile(path: string, contents: Uint8Array): Promise<void>;
+	convertDebuggerPathToClient?(path: string): string;
+	convertClientPathToDebugger?(path: string): string;
 }
 
 export interface IRuntimeBreakpoint {

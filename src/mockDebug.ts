@@ -73,7 +73,7 @@ export class MockDebugSession extends LoggingDebugSession {
 	 * Creates a new debug adapter that is used for one debug session.
 	 * We configure the default implementation of a debug adapter here.
 	 */
-	public constructor(fileAccessor: FileAccessor) {
+	public constructor(protected fileAccessor: FileAccessor) {
 		super("mock-debug.txt");
 
 		// this debugger uses zero-based lines and columns
@@ -276,7 +276,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 	protected async setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): Promise<void> {
 
-		const path = args.source.path as string;
+		const path = this.convertClientPathToDebugger(args.source.path as string);
 		const clientLines = args.lines || [];
 
 		// clear all breakpoints for this file
@@ -301,7 +301,8 @@ export class MockDebugSession extends LoggingDebugSession {
 	protected breakpointLocationsRequest(response: DebugProtocol.BreakpointLocationsResponse, args: DebugProtocol.BreakpointLocationsArguments, request?: DebugProtocol.Request): void {
 
 		if (args.source.path) {
-			const bps = this._runtime.getBreakpoints(args.source.path, this.convertClientLineToDebugger(args.line));
+			const path = this.convertClientPathToDebugger(args.source.path as string);
+			const bps = this._runtime.getBreakpoints(path, this.convertClientLineToDebugger(args.line));
 			response.body = {
 				breakpoints: bps.map(col => {
 					return {
@@ -908,5 +909,20 @@ export class MockDebugSession extends LoggingDebugSession {
 	private createSource(filePath: string): Source {
 		return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, 'mock-adapter-data');
 	}
-}
 
+	protected convertDebuggerPathToClient(debuggerPath: string): string {
+		if (this.fileAccessor.convertDebuggerPathToClient) {
+			return this.fileAccessor.convertDebuggerPathToClient(debuggerPath);
+		}
+
+		return super.convertDebuggerPathToClient(debuggerPath);
+	}
+
+	protected convertClientPathToDebugger(clientPath: string): string {
+		if (this.fileAccessor.convertClientPathToDebugger) {
+			return this.fileAccessor.convertClientPathToDebugger(clientPath);
+		}
+
+		return super.convertClientPathToDebugger(clientPath);
+	}
+}
